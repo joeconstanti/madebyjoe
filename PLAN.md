@@ -42,7 +42,7 @@ Trends we use:
 - `index.html`: one page: preloader → hero → index list → marquee → 5 chapters → How it fits → Selected brands → About → Contact → footer.
 - `css/main.css`: tokens, layout, responsive (stack below 1000 px), reduced motion.
 - `js/main.js`: Lenis, GSAP ScrollTrigger + SplitText, loader tied to real loading, hover preview, pill cycler, sticky stack, lazy video (plays only while visible), copy-email toast, London clock.
-- `js/hero-gl.js`: raw WebGL particle form (~37k points: gyroid-rippled sphere, orbit ring, drifting dust). Each particle has its own random threshold, so lighting dithers it into 3 tones (hidden, warm grey, signal orange) in 3D. Particles near the mouse part and brighten slightly; the form turns toward the mouse. Pauses off-screen.
+- `js/hero-gl.js`: raw WebGL. The hero background plays the same video as the hero pill as a one-colour 4 px Bayer dither, dimmed behind the heading, and cross-fades when the pill changes. Near the mouse the cells get finer and turn signal orange. Pauses off-screen.
 - Motion language: text types in (chars fade up from a soft blur), elements focus in (blur 10px to 0), media and the preloader dissolve with the same Bayer dither.
 - `js/vendor/`: GSAP 3.13 (+ ScrollTrigger, SplitText), Lenis 1.3.4. No CDN.
 - `fonts/`: Inter Tight (variable), Instrument Serif (+ italic), Geist Mono. Self-hosted, latin only.
