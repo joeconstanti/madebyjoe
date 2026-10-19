@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>madebyjoe 2.0 — entities ring prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dark: #060403;
+      --light: #e9eae4;
+      --grey: #676767;
+      --pad: 20px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--dark); color: var(--light); overflow: hidden; }
+    body { font-family: "Inter Tight", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center;
+      padding: var(--pad);
+    }
+    .logo { font-family: "Instrument Serif", serif; font-size: 44px; line-height: 1; letter-spacing: -0.02em; }
+    nav a, .bar { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
+    .nav-mid { justify-self: center; }
+    .nav-right { justify-self: end; display: flex; gap: 40px; }
+    nav a { opacity: 0.85; transition: opacity .2s; }
+    nav a:hover { opacity: 1; }
+
+    .bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 16px var(--pad);
+    }
+    .bar .m { justify-self: center; }
+    .bar .r { justify-self: end; text-decoration: underline; text-underline-offset: 3px; }
+    .bar span { transition: opacity .25s; }
+
+    .centre-mark {
+      position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 5;
+      font-family: "Instrument Serif", serif; font-size: 22px; pointer-events: none; opacity: .9;
+    }
+
+    #loader {
+      position: fixed; inset: 0; z-index: 20; background: var(--dark);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+      transition: opacity .8s ease, visibility .8s;
+    }
+    #loader .word { font-family: "Instrument Serif", serif; font-size: clamp(48px, 12vw, 180px); letter-spacing: -0.03em; }
+    #loader .pct { font-size: 11px; letter-spacing: .12em; }
+    #loader.done { opacity: 0; visibility: hidden; }
+
+    @media (max-width: 768px) {
+      .nav-right { gap: 18px; }
+      .bar .m { display: none; }
+      .bar { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="loader"><div class="word">madebyjoe</div><div class="pct">0%</div></div>
+
+  <header>
+    <a class="logo" href="#">madebyjoe</a>
+    <nav class="nav-mid"><a href="#entities">Entities</a></nav>
+    <nav class="nav-right">
+      <a href="#contact">Contact</a>
+      <a href="#about">About</a>
+    </nav>
+  </header>
+
+  <div class="centre-mark">◎</div>
+
+  <div class="bar">
+    <span class="l" id="idx">001</span>
+    <span class="m" id="title"></span>
+    <a class="r" id="more" href="#" target="_blank" rel="noopener">Visit site ↗</a>
+  </div>
+
+  <script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.169.0/build/three.module.js" } }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    // ---- Content: the five entities, one card each (later: content/entities.json) ----
+    const M = '../media/entities/';
+    const entities = [
+      { name: 'From the Root Studio', line: '3D, motion and AI studio', url: 'https://fromtheroot.studio',
+        media: ['ftr-hero.mp4'] },
+      { name: 'joe.graphics', line: 'Digital design and development archive', url: 'https://joe.graphics',
+        media: ['jg-hero.mp4'] },
+      { name: 'Synthetic Labs', line: 'AI and ML research, resources and automations', url: 'https://syntheticlabs.xyz',
+        media: ['syn-hero.mp4'] },
+      { name: 'Cerebral', line: 'Private, secure AI hosting', url: 'https://cerebral.studio',
+        media: ['cer-hero.mp4'] },
+      { name: 'Automate Digital', line: 'Custom AI automation for agencies', url: 'https://automatedigital.ai',
+        media: ['aut-hero.mp4'] },
+    ];
+    const cards = entities.flatMap((e, ei) => e.media.map((file) => ({ ei, file })));
+
+    // ---- Renderer / scene ----
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setClearColor(0x060403, 1);
+    document.body.prepend(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+    camera.position.z = 10;
+
+    // ---- Dot-matrix background (full-screen, behind everything) ----
+    const bgMat = new THREE.ShaderMaterial({
+      depthWrite: false, depthTest: false,
+      uniforms: { uTime: { value: 0 }, uRes: { value: new THREE.Vector2() }, uMouse: { value: new THREE.Vector2(.5, .5) } },
+      vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }`,
+      fragmentShader: `
+        precision highp float;
+        uniform float uTime; uniform vec2 uRes; uniform vec2 uMouse; varying vec2 vUv;
+        float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float noise(vec2 p){
+          vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+          return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y);
+        }
+        float fbm(vec2 p){ float v = 0., a = .5; for(int i=0;i<4;i++){ v += a*noise(p); p *= 2.; a *= .5; } return v; }
+        void main(){
+          float spacing = 7.0;                       // px between dots
+          vec2 px = vUv * uRes;
+          vec2 cell = fract(px / spacing) - .5;
+          vec2 id = floor(px / spacing);
+          float n = fbm(id * .035 + vec2(uTime*.03, -uTime*.02));
+          // keep the centre clear so the ring reads; dots live at the edges
+          vec2 c = vUv - .5; c.x *= uRes.x / uRes.y;
+          float edge = smoothstep(.35, .75, length(c));
+          float on = step(.56, n) * edge;
+          float dot = 1. - smoothstep(.12, .22, length(cell));
+          gl_FragColor = vec4(vec3(.6) * dot * on * .28, 1.);
+        }`,
+    });
+    const bg = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat);
+    bg.renderOrder = -1;
+    bg.frustumCulled = false;
+    scene.add(bg);
+
+    // ---- Ring of media planes ----
+    const planeMat = (tex) => new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: { uTex: { value: tex }, uGray: { value: 0 }, uDim: { value: 0 }, uAlpha: { value: 0 }, uCover: { value: new THREE.Vector2(1, 1) } },
+      vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
+      fragmentShader: `
+        uniform sampler2D uTex; uniform float uGray, uDim, uAlpha; uniform vec2 uCover; varying vec2 vUv;
+        void main(){
+          vec2 uv = (vUv - .5) * uCover + .5;      // object-fit: cover
+          vec3 c = texture2D(uTex, uv).rgb;
+          float g = dot(c, vec3(.299, .587, .114));
+          c = mix(c, vec3(g), uGray);
+          c = mix(c, vec3(0.), uDim);
+          // thin light frame so dark heroes still read against the dark page
+          vec2 e = min(vUv, 1. - vUv);
+          float frame = 1. - step(.004, e.x) * step(.0064, e.y);
+          c = mix(c, vec3(.18), frame * (1. - uDim));
+          gl_FragColor = vec4(c, uAlpha);
+          #include <colorspace_fragment>
+        }`,
+    });
+
+    const N = cards.length;
+    const PLANE_W = 1.6, PLANE_H = 1.0;          // all cards share one frame size
+    const group = new THREE.Group();
+    scene.add(group);
+    const items = [];
+
+    const manager = new THREE.LoadingManager();
+    const pctEl = document.querySelector('#loader .pct');
+    manager.onProgress = (_, loaded, total) => { pctEl.textContent = Math.round(loaded / total * 100) + '%'; };
+    manager.onLoad = () => {
+      pctEl.textContent = '100%';
+      setTimeout(() => { document.getElementById('loader').classList.add('done'); intro.start = performance.now(); }, 350);
+    };
+    const loader = new THREE.TextureLoader(manager);
+
+    const coverFit = (mesh, w, h) => {
+      const ia = w / h, pa = PLANE_W / PLANE_H;
+      mesh.material.uniforms.uCover.value.set(ia > pa ? pa / ia : 1, ia > pa ? 1 : ia / pa);
+    };
+
+    cards.forEach(({ ei, file }, i) => {
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_W, PLANE_H), planeMat(null));
+      mesh.userData = { i, ei };
+      let tex;
+      if (file.endsWith('.mp4')) {
+        // video card: muted inline loop → VideoTexture; counts as loaded once it can play
+        const v = Object.assign(document.createElement('video'), { src: M + file, muted: true, loop: true, playsInline: true, crossOrigin: 'anonymous', preload: 'auto' });
+        manager.itemStart(file);
+        v.addEventListener('loadeddata', () => { coverFit(mesh, v.videoWidth, v.videoHeight); v.play().catch(() => {}); manager.itemEnd(file); }, { once: true });
+        v.addEventListener('error', () => { manager.itemError(file); manager.itemEnd(file); }, { once: true });
+        tex = new THREE.VideoTexture(v);
+        mesh.userData.video = v;
+      } else {
+        tex = loader.load(M + file, (t) => coverFit(mesh, t.image.width, t.image.height));
+      }
+      tex.colorSpace = THREE.SRGBColorSpace;
+      mesh.material.uniforms.uTex.value = tex;
+      group.add(mesh);
+      items.push(mesh);
+    });
+
+    // Ring shape: a circle tilted back and turned, so it reads as a diagonal ellipse with depth.
+    const RADIUS = 2.3;
+    const TILT_X = 0.62, TILT_Z = -0.55;
+    const tilt = new THREE.Euler(TILT_X, 0, TILT_Z);
+    const tmp = new THREE.Vector3();
+
+    // ---- Input: wheel/touch adds velocity; mouse adds parallax and hover ----
+    const state = { offset: 0, vel: 0, auto: 0.0025, mouse: new THREE.Vector2(), mouseS: new THREE.Vector2(), hovered: null, active: 0 };
+    const intro = { start: Infinity };
+
+    addEventListener('wheel', (e) => { state.vel += e.deltaY * 0.00012; }, { passive: true });
+    let touchY = null;
+    addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+    addEventListener('touchmove', (e) => { const y = e.touches[0].clientY; state.vel += (touchY - y) * 0.0004; touchY = y; }, { passive: true });
+
+    const ray = new THREE.Raycaster();
+    const ndc = new THREE.Vector2(9, 9);
+    addEventListener('pointermove', (e) => {
+      ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+      state.mouse.copy(ndc);
+    });
+    addEventListener('click', () => { if (state.hovered) window.open(entities[state.hovered.userData.ei].url, '_blank', 'noopener'); });
+
+    // ---- Bottom bar ----
+    const idxEl = document.getElementById('idx'), titleEl = document.getElementById('title'), moreEl = document.getElementById('more');
+    let shown = -1;
+    function setActive(ei) {
+      if (ei === shown) return;
+      shown = ei;
+      const e = entities[ei];
+      idxEl.textContent = String(ei + 1).padStart(2, '0') + ' / ' + String(entities.length).padStart(2, '0');
+      titleEl.textContent = e.name;
+      titleEl.title = e.line;
+      moreEl.href = e.url;
+    }
+
+    // ---- Resize ----
+    function resize() {
+      renderer.setSize(innerWidth, innerHeight, false);
+      camera.aspect = innerWidth / innerHeight;
+      // pull the camera back on narrow screens so the ring still fits
+      camera.position.z = camera.aspect < 1 ? 10 / camera.aspect * 0.8 : 10;
+      camera.updateProjectionMatrix();
+      bgMat.uniforms.uRes.value.set(innerWidth * renderer.getPixelRatio(), innerHeight * renderer.getPixelRatio());
+    }
+    addEventListener('resize', resize);
+    resize();
+
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ease = (t) => 1 - Math.pow(1 - Math.min(Math.max(t, 0), 1), 3);
+    const lerp = (a, b, t) => a + (b - a) * t;
+
+    // ---- Loop ----
+    const clock = new THREE.Clock();
+    function frame() {
+      const dt = Math.min(clock.getDelta(), 0.05) * 60;   // normalise to 60fps steps
+      const t = clock.elapsedTime;
+      bgMat.uniforms.uTime.value = t;
+
+      // inertia: velocity decays, constant slow auto-spin underneath
+      state.vel *= Math.pow(0.92, dt);
+      state.offset += ((reduce ? 0 : state.auto) + state.vel) * dt;
+
+      // whole-ring parallax toward the mouse
+      state.mouseS.lerp(state.mouse, 0.06 * dt);
+      group.rotation.set(state.mouseS.y * -0.12, state.mouseS.x * 0.18, 0);
+
+      // intro: ring unfurls from the centre after the loader
+      const k = ease((performance.now() - intro.start) / 1600);
+
+      // hover pick
+      ray.setFromCamera(ndc, camera);
+      const hit = ray.intersectObjects(items)[0];
+      state.hovered = hit ? hit.object : null;
+      document.body.style.cursor = state.hovered ? 'pointer' : '';
+
+      // place each card on the tilted circle; cards always face the camera
+      let frontZ = -Infinity, front = 0;
+      items.forEach((m, i) => {
+        const a = (i / N) * Math.PI * 2 + state.offset;
+        tmp.set(Math.cos(a) * RADIUS * k, Math.sin(a) * RADIUS * k, 0).applyEuler(tilt);
+        m.position.copy(tmp);
+        m.quaternion.copy(group.quaternion).invert();   // cancel parallax rotation → billboard
+        m.renderOrder = Math.round(tmp.z * 100);         // back-to-front for clean overlap
+        if (tmp.z > frontZ) { frontZ = tmp.z; front = i; }
+
+        const u = m.material.uniforms;
+        const focusEi = state.hovered ? state.hovered.userData.ei : -1;
+        const out = focusEi >= 0 && m.userData.ei !== focusEi;
+        u.uAlpha.value = lerp(u.uAlpha.value, k, 0.1 * dt);
+        u.uGray.value = lerp(u.uGray.value, out ? 1 : 0, 0.08 * dt);
+        u.uDim.value = lerp(u.uDim.value, out ? 0.5 : 0, 0.08 * dt);
+        const s = focusEi === m.userData.ei ? 1.06 : 1;
+        m.scale.setScalar(lerp(m.scale.x, s, 0.1 * dt));
+      });
+
+      setActive(state.hovered ? state.hovered.userData.ei : items[front].userData.ei);
+      renderer.render(scene, camera);
+      requestAnimationFrame(frame);
+    }
+    frame();
+  </script>
+</body>
+</html>

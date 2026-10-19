@@ -1,0 +1,847 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║          ███╗   ███╗ █████╗ ██████╗ ███████╗    ██████╗ ██╗   ██╗            ║
+║          ████╗ ████║██╔══██╗██╔══██╗██╔════╝    ██╔══██╗╚██╗ ██╔╝            ║
+║          ██╔████╔██║███████║██║  ██║█████╗      ██████╔╝ ╚████╔╝             ║
+║          ██║╚██╔╝██║██╔══██║██║  ██║██╔══╝      ██╔══██╗  ╚██╔╝              ║
+║          ██║ ╚═╝ ██║██║  ██║██████╔╝███████╗    ██████╔╝   ██║               ║
+║          ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝    ╚═════╝    ╚═╝               ║
+║                                                                              ║
+║                             ██╗ ██████╗ ███████╗                             ║
+║                        ██   ██║██╔═══██╗██╔════╝                             ║
+║                        ██   ██║██║   ██║█████╗                               ║
+║                        ██   ██║██║   ██║██╔══╝                               ║
+║                        ╚█████╔╝╚██████╔╝███████╗                             ║
+║                         ╚════╝  ╚═════╝ ╚══════╝                             ║
+║                                                                              ║
+║  ┌─────────────────────────────────────────────────────────────────────────┐ ║
+║  │  Portfolio • Graphics • AI Research • Digital Solutions • Automation    │ ║
+║  └─────────────────────────────────────────────────────────────────────────┘ ║
+║                                                                              ║
+║  🎨 joe.graphics          🎬 fromtheroot.studio     🤖 syntheticlabs.xyz      ║
+║  🖥️  cerebral.studio       🔧 automatedigital.ai        📧 hello@madebyjoe.co     ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="img/j.jpg">
+    <link rel="shortcut icon" type="image/jpeg" href="img/j.jpg">
+
+    <!-- HTML Meta Tags -->
+    <meta name="description" content="Explore the work of Joe, a designer and technologist who loves to make things. Visit joe.graphics for design work, fromtheroot.studio for 3D and digital assets, syntheticlabs.xyz for AI tools, cerebral.studio for compute services, and automatedigital.ai for automation solutions. Contact: hello@madebyjoe.co.">
+
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="https://madebyjoe.co">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Joe - Designer & Technologist">
+    <meta property="og:description" content="Explore the work of Joe, a designer and technologist who loves to make things. Visit joe.graphics for design work, fromtheroot.studio for 3D and digital assets, syntheticlabs.xyz for AI tools, cerebral.studio for compute services, and automatedigital.ai for automation solutions. Contact: hello@madebyjoe.co.">
+    <meta property="og:image" content="https://madebyjoe.co/img/OG.jpg">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="madebyjoe.co">
+    <meta property="twitter:url" content="https://madebyjoe.co">
+    <meta name="twitter:title" content="Joe - Designer & Technologist">
+    <meta name="twitter:description" content="Explore the work of Joe, a designer and technologist who loves to make things. Visit joe.graphics for design work, fromtheroot.studio for 3D and digital assets, syntheticlabs.xyz for AI tools, cerebral.studio for compute services, and automatedigital.ai for automation solutions. Contact: hello@madebyjoe.co.">
+    <meta name="twitter:image" content="https://madebyjoe.co/img/OG.jpg">
+
+    <!-- Meta Tags Generated via https://www.opengraph.xyz -->
+
+    <title>Joe - Designer & Technologist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+         :root {
+            /* Global speed variable - change this to control all animation speeds */
+            --global-speed: 2;
+            /* You can also define other speed-related variables */
+            --word-delay: calc(0.3s / var(--global-speed));
+            --fade-duration: calc(0.4s / var(--global-speed));
+            --base-delay: calc(0.2s / var(--global-speed));
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #191919;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5em;
+            line-height: 1.5;
+            padding: 60px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .terminal-container {
+            max-width: 1200px;
+            width: 100%;
+            background-color: transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content {
+            position: relative;
+            min-height: 400px;
+        }
+        
+        .line {
+            margin-bottom: 30px;
+        }
+        
+        .line:nth-child(1) {
+            color: #ffffff;
+        }
+        
+        .line:nth-child(2) {
+            color: #cccccc;
+        }
+        
+        .line:nth-child(3) {
+            color: #999999;
+        }
+        
+        .line:nth-child(4) {
+            color: #ffffff;
+        }
+        
+        .line:nth-child(5) {
+            color: #cccccc;
+        }
+        
+        .word {
+            opacity: 0;
+            display: inline-block;
+            animation: wordFadeIn var(--fade-duration) ease-out forwards;
+        }
+        
+        @keyframes wordFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+                filter: blur(8px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0px);
+            }
+        }
+        /* Efficient word-by-word animation using calc() */
+        
+        .line:nth-child(1) .word {
+            animation-delay: calc(var(--base-delay) + var(--word-delay) * var(--i));
+        }
+        
+        .line:nth-child(1) .word:nth-child(1) {
+            --i: 0;
+        }
+        
+        .line:nth-child(1) .word:nth-child(2) {
+            --i: 2;
+        }
+        
+        .line:nth-child(1) .word:nth-child(3) {
+            --i: 3;
+        }
+        
+        .line:nth-child(2) .word {
+            animation-delay: calc(calc(2.3s / var(--global-speed)) + calc(0.2s / var(--global-speed)) * var(--i));
+        }
+        
+        .line:nth-child(2) .word:nth-child(1) {
+            --i: 0;
+        }
+        
+        .line:nth-child(2) .word:nth-child(2) {
+            --i: 1.5;
+        }
+        
+        .line:nth-child(2) .word:nth-child(3) {
+            --i: 2.5;
+        }
+        
+        .line:nth-child(2) .word:nth-child(4) {
+            --i: 4;
+        }
+        
+        .line:nth-child(2) .word:nth-child(5) {
+            --i: 7;
+        }
+        
+        .line:nth-child(3) .word {
+            animation-delay: calc(calc(4.9s / var(--global-speed)) + calc(0.25s / var(--global-speed)) * var(--i));
+        }
+        
+        .line:nth-child(3) .word:nth-child(1) {
+            --i: 0;
+        }
+        
+        .line:nth-child(3) .word:nth-child(2) {
+            --i: 0.8;
+        }
+        
+        .line:nth-child(3) .word:nth-child(3) {
+            --i: 1.6;
+        }
+        
+        .line:nth-child(3) .word:nth-child(4) {
+            --i: 3.2;
+        }
+        
+        .line:nth-child(3) .word:nth-child(5) {
+            --i: 5.2;
+        }
+        
+        .line:nth-child(3) .word:nth-child(6) {
+            --i: 6;
+        }
+        
+        .line:nth-child(3) .word:nth-child(7) {
+            --i: 7.2;
+        }
+        
+        .line:nth-child(3) .word:nth-child(8) {
+            --i: 8;
+        }
+        
+        .line:nth-child(3) .word:nth-child(9) {
+            --i: 9.2;
+        }
+        
+        .line:nth-child(3) .word:nth-child(10) {
+            --i: 10;
+        }
+        
+        .line:nth-child(3) .word:nth-child(11) {
+            --i: 11.6;
+        }
+        
+        .line:nth-child(3) .word:nth-child(12) {
+            --i: 17.6;
+        }
+        
+        .line:nth-child(3) .word:nth-child(13) {
+            --i: 18.4;
+        }
+        
+        .line:nth-child(3) .word:nth-child(14) {
+            --i: 19.2;
+        }
+        
+        .line:nth-child(3) .word:nth-child(15) {
+            --i: 20;
+        }
+        
+        .line:nth-child(3) .word:nth-child(16) {
+            --i: 20.8;
+        }
+        
+        .line:nth-child(3) .word:nth-child(17) {
+            --i: 22;
+        }
+        
+        .line:nth-child(3) .word:nth-child(18) {
+            --i: 24;
+        }
+        
+        .line:nth-child(3) .word:nth-child(19) {
+            --i: 24.8;
+        }
+        
+        .line:nth-child(3) .word:nth-child(20) {
+            --i: 25.6;
+        }
+        
+        .line:nth-child(3) .word:nth-child(21) {
+            --i: 26.4;
+        }
+        
+        .line:nth-child(3) .word:nth-child(22) {
+            --i: 27.6;
+        }
+        
+        .line:nth-child(3) .word:nth-child(23) {
+            --i: 33.2;
+        }
+        
+        .line:nth-child(3) .word:nth-child(24) {
+            --i: 34;
+        }
+        
+        .line:nth-child(3) .word:nth-child(25) {
+            --i: 35.2;
+        }
+        
+        .line:nth-child(3) .word:nth-child(26) {
+            --i: 36;
+        }
+        
+        .line:nth-child(3) .word:nth-child(27) {
+            --i: 36.8;
+        }
+        
+        .line:nth-child(3) .word:nth-child(28) {
+            --i: 38.8;
+        }
+        
+        .line:nth-child(3) .word:nth-child(29) {
+            --i: 39.6;
+        }
+        
+        .line:nth-child(3) .word:nth-child(30) {
+            --i: 40.4;
+        }
+        
+        .line:nth-child(3) .word:nth-child(31) {
+            --i: 45.2;
+        }
+        
+        .line:nth-child(3) .word:nth-child(32) {
+            --i: 46.4;
+        }
+        
+        .line:nth-child(3) .word:nth-child(33) {
+            --i: 48;
+        }
+        
+        .line:nth-child(3) .word:nth-child(34) {
+            --i: 48.8;
+        }
+        
+        .line:nth-child(3) .word:nth-child(35) {
+            --i: 50;
+        }
+        
+        .line:nth-child(3) .word:nth-child(36) {
+            --i: 50.8;
+        }
+        
+        .line:nth-child(3) .word:nth-child(37) {
+            --i: 55.6;
+        }
+        
+        .line:nth-child(3) .word:nth-child(38) {
+            --i: 56.8;
+        }
+        
+        .line:nth-child(3) .word:nth-child(39) {
+            --i: 58.8;
+        }
+        
+        .line:nth-child(3) .word:nth-child(40) {
+            --i: 59.6;
+        }
+        
+        .line:nth-child(3) .word:nth-child(41) {
+            --i: 60.4;
+        }
+        
+        .line:nth-child(3) .word:nth-child(42) {
+            --i: 61.2;
+        }
+        
+        .line:nth-child(3) .word:nth-child(43) {
+            --i: 62;
+        }
+        
+        .line:nth-child(3) .word:nth-child(44) {
+            --i: 63.2;
+        }
+        
+        .line:nth-child(3) .word:nth-child(45) {
+            --i: 64.8;
+        }
+        
+        .line:nth-child(3) .word:nth-child(46) {
+            --i: 65.6;
+        }
+        
+        .line:nth-child(3) .word:nth-child(47) {
+            --i: 66.8;
+        }
+        
+        .line:nth-child(3) .word:nth-child(48) {
+            --i: 67.6;
+        }
+        
+        .line:nth-child(3) .word:nth-child(49) {
+            --i: 68.4;
+        }
+        
+        .line:nth-child(4) .word {
+            animation-delay: calc(calc(23.2s / var(--global-speed)) + calc(0.25s / var(--global-speed)) * var(--i));
+        }
+        
+        .line:nth-child(4) .word:nth-child(1) {
+            --i: 0;
+        }
+        
+        .line:nth-child(4) .word:nth-child(2) {
+            --i: 0.8;
+        }
+        
+        .line:nth-child(4) .word:nth-child(3) {
+            --i: 1.6;
+        }
+        
+        .line:nth-child(4) .word:nth-child(4) {
+            --i: 2.8;
+        }
+        
+        .line:nth-child(4) .word:nth-child(5) {
+            --i: 4.4;
+        }
+        
+        .line:nth-child(4) .word:nth-child(6) {
+            --i: 5.2;
+        }
+        
+        .line:nth-child(4) .word:nth-child(7) {
+            --i: 6.4;
+        }
+        
+        .line:nth-child(5) .word {
+            animation-delay: calc(calc(26.1s / var(--global-speed)) + calc(0.25s / var(--global-speed)) * var(--i));
+        }
+        
+        .line:nth-child(5) .word:nth-child(1) {
+            --i: 0;
+        }
+        
+        .line:nth-child(5) .word:nth-child(2) {
+            --i: 0.8;
+        }
+        
+        .line:nth-child(5) .word:nth-child(3) {
+            --i: 1.6;
+        }
+        
+        .line:nth-child(5) .word:nth-child(4) {
+            --i: 2.8;
+        }
+        
+        .line:nth-child(5) .word:nth-child(5) {
+            --i: 4.4;
+        }
+        
+        .line:nth-child(6) .word {
+            animation-delay: calc(28s / var(--global-speed));
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            justify-content: flex-start;
+            margin-top: 10px;
+            padding: 30px 0 30px 10px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all calc(0.3s / var(--global-speed)) ease;
+            text-decoration: none;
+            color: #ffffff;
+            transform: scale(1.6);
+        }
+        
+        .social-icon:hover {
+            color: #f74f14;
+        }
+        
+        .link {
+            color: #f74f14;
+            text-decoration: none;
+            transition: all calc(0.3s / var(--global-speed)) ease;
+            position: relative;
+            font-weight: 600;
+            display: inline;
+        }
+        
+        .link:hover {
+            color: #ff6b35;
+            text-shadow: 0 0 12px rgba(247, 79, 20, 0.6);
+        }
+        
+        .link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #f74f14;
+            transition: width calc(0.3s / var(--global-speed)) ease;
+        }
+        
+        .link:hover::after {
+            width: 100%;
+        }
+        /* Subtle pulse animation for emphasis - disabled at high speeds */
+        
+        .emphasis {
+            animation: subtlePulse calc(3s / var(--global-speed)) ease-in-out infinite;
+            animation-delay: calc(25s / var(--global-speed));
+        }
+        
+        @keyframes subtlePulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        /* Disable pulse animation when speed is too high to prevent flashing */
+        
+        .emphasis {
+            animation: none;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 30px;
+                font-size: 27px;
+            }
+            .content {
+                font-size: 27px;
+            }
+            .line {
+                margin-bottom: 20px;
+            }
+        }
+        /* Burger menu and overlay navigation */
+        
+        .burger {
+            position: fixed;
+            top: 22px;
+            right: 24px;
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 1000;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .burger .bars {
+            position: relative;
+            width: 26px;
+            height: 18px;
+        }
+        
+        .burger .bars span {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #ffffff;
+            border-radius: 1px;
+            transition: transform calc(0.35s / var(--global-speed)) ease, opacity calc(0.25s / var(--global-speed)) ease, top calc(0.35s / var(--global-speed)) ease, background-color calc(0.2s / var(--global-speed)) ease;
+        }
+        
+        .burger .bars span:nth-child(1) {
+            top: 0;
+        }
+        
+        .burger .bars span:nth-child(2) {
+            top: 8px;
+        }
+        
+        .burger .bars span:nth-child(3) {
+            top: 16px;
+        }
+        
+        .burger[aria-expanded="true"] .bars span:nth-child(1) {
+            top: 8px;
+            transform: rotate(45deg);
+        }
+        
+        .burger[aria-expanded="true"] .bars span:nth-child(2) {
+            opacity: 0;
+            transform: translateX(6px);
+        }
+        
+        .burger[aria-expanded="true"] .bars span:nth-child(3) {
+            top: 8px;
+            transform: rotate(-45deg);
+        }
+        
+        .burger:focus-visible {
+            outline: 2px solid rgba(255, 255, 255, 0.6);
+            outline-offset: 4px;
+            border-radius: 6px;
+        }
+        
+        .nav-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(25, 25, 25, 0.96);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity calc(0.35s / var(--global-speed)) ease, transform calc(0.35s / var(--global-speed)) ease;
+            z-index: 900;
+        }
+        
+        body.menu-open .nav-overlay {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        
+        body.menu-open {
+            overflow: hidden;
+        }
+        
+        body.menu-open .terminal-container {
+            opacity: 0.28;
+            filter: blur(3px);
+            transform: scale(0.98);
+            transition: opacity calc(0.35s / var(--global-speed)) ease, filter calc(0.35s / var(--global-speed)) ease, transform calc(0.35s / var(--global-speed)) ease;
+        }
+        
+        .nav-menu {
+            width: min(760px, 92vw);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .nav-menu a {
+            color: #f74f14;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: clamp(22px, 4.5vw, 36px);
+            transition: color calc(0.25s / var(--global-speed)) ease, transform calc(0.25s / var(--global-speed)) ease, text-shadow calc(0.25s / var(--global-speed)) ease;
+        }
+        
+        .nav-menu a:hover {
+            color: #ff6b35;
+            transform: translateX(6px);
+            text-shadow: 0 0 12px rgba(247, 79, 20, 0.35);
+        }
+        
+        .nav-menu .small {
+            font-size: clamp(16px, 3.2vw, 22px);
+            opacity: 0.9;
+        }
+        
+        .nav-menu .icons {
+            display: flex;
+            gap: 26px;
+            margin-top: 8px;
+        }
+        
+        .nav-menu .icons a {
+            transform: none;
+        }
+        
+        .nav-menu .icons a:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="burger" aria-label="Open navigation" aria-expanded="false">
+        <span class="bars" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+        </span>
+    </button>
+    <div class="nav-overlay" aria-hidden="true">
+        <nav class="nav-menu" role="navigation"></nav>
+    </div>
+    <div class="terminal-container">
+        <div class="content">
+            <div class="line">
+                <span class="word">Hello!</span> <span class="word">I'm</span> <span class="word">Joe.</span>
+            </div>
+            <div class="line">
+                <span class="word">I</span> <span class="word">like</span> <span class="word">to</span> <span class="word">make</span> <span class="word">things.</span>
+            </div>
+            <div class="line">
+                <span class="word">You</span> <span class="word">can</span> <span class="word">explore</span> <span class="word"><a href="https://joe.graphics" class="link" target="_blank">joe.graphics</a>,</span> <span class="word">where</span>
+                <span class="word">I</span> <span class="word">share</span> <span class="word">graphics</span> <span class="word">work</span> <span class="word">I've</span> <span class="word">made.</span> <span class="word"><a href="https://fromtheroot.studio" class="link" target="_blank">fromtheroot.studio</a>,</span>                <span class="word">where</span> <span class="word">I</span> <span class="word">make</span> <span class="word">digital</span> <span class="word">assets,</span> <span class="word">3D</span> <span class="word">animation</span> <span class="word">visuals</span>                <span class="word">and</span> <span class="word">solutions.</span> <span class="word"><a href="https://syntheticlabs.xyz" class="link" target="_blank">syntheticlabs.xyz</a>,</span> <span class="word">where</span> <span class="word">I</span>                <span class="word">research</span> <span class="word">AI</span> <span class="word">and</span> <span class="word">make</span> <span class="word">tools.</span> <span class="word"><a href="https://cerebral.studio" class="link" target="_blank">cerebral.studio</a>,</span>                <span class="word">housing</span> <span class="word">compute</span> <span class="word">and</span> <span class="word">infrastructure</span> <span class="word">services.</span> <span class="word"><a href="https://automatedigital.ai" class="link" target="_blank">automatedigital.ai</a>,</span>                <span class="word">offering</span> <span class="word">templated</span> <span class="word">and</span> <span class="word">bespoke</span> <span class="word">automation</span> <span class="word">solutions</span> <span class="word">I've</span>                <span class="word">made.</span>
+            </div>
+            <div class="line emphasis">
+                <span class="word">Want</span> <span class="word">me</span> <span class="word">to</span> <span class="word">make</span> <span class="word">something</span> <span class="word">for</span> <span class="word">you?</span>
+            </div>
+            <div class="line">
+                <span class="word">Get</span> <span class="word">in</span> <span class="word">touch</span> <span class="word">at</span> <span class="word"><a href="mailto:hello@madebyjoe.co" class="link">hello@madebyjoe.co</a></span>
+            </div>
+            <div class="line">
+                <span class="word">
+                    <div class="social-icons">
+                        <a href="https://www.linkedin.com/in/joeconstanti/" class="social-icon linkedin" target="_blank" title="LinkedIn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                        </a>
+                        <a href="https://www.instagram.com/ftr.studio/" class="social-icon instagram" target="_blank" title="Instagram">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                        <a href="https://github.com/joeconstanti/" class="social-icon github" target="_blank" title="GitHub">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                        <a href="https://www.discord.com/" class="social-icon discord" target="_blank" title="Discord">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419-.019 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1568 2.4189Z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </span>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function() {
+            const body = document.body;
+            const burger = document.querySelector('.burger');
+            const overlay = document.querySelector('.nav-overlay');
+            const menu = document.querySelector('.nav-menu');
+
+            function getMenuLabelForAnchor(anchor) {
+                const href = anchor.getAttribute('href') || anchor.href || '';
+                try {
+                    const url = new URL(href, window.location.origin);
+                    const hostname = (url.hostname || '').toLowerCase();
+                    if (hostname.includes('linkedin.com')) return 'Linkedin';
+                    if (hostname.includes('instagram.com')) return 'Instagram';
+                    if (hostname.includes('github.com')) return 'GitHub';
+                    if (hostname.includes('discord.com')) return 'Discord';
+                } catch (e) {}
+                const text = (anchor.textContent || '').replace(/[\,\s]+$/, '').trim();
+                return text || href;
+            }
+
+            function collectLinks() {
+                const anchors = Array.from(document.querySelectorAll('.content a'));
+                const uniqueByHref = new Map();
+                anchors.forEach(a => {
+                    const href = a.getAttribute('href');
+                    if (!href) return;
+                    if (!uniqueByHref.has(href)) {
+                        uniqueByHref.set(href, a);
+                    }
+                });
+                const list = Array.from(uniqueByHref.values());
+                menu.innerHTML = '';
+
+                // Primary links (non-mailto)
+                const primary = list.filter(a => !a.href.startsWith('mailto:'));
+                primary.forEach(a => {
+                    const item = document.createElement('a');
+                    item.href = a.href;
+                    item.target = a.target || '_self';
+                    item.rel = a.rel || (item.target === '_blank' ? 'noopener noreferrer' : '');
+                    item.textContent = getMenuLabelForAnchor(a);
+                    menu.appendChild(item);
+                });
+
+                // Email link, if present
+                const email = list.find(a => a.href.startsWith('mailto:'));
+                if (email) {
+                    const small = document.createElement('a');
+                    small.href = email.href;
+                    small.textContent = email.textContent.trim();
+                    small.className = 'small';
+                    menu.appendChild(small);
+                }
+
+                // Social icons row, if present
+                const socials = document.querySelectorAll('.social-icons a');
+                if (socials.length) {
+                    const row = document.createElement('div');
+                    row.className = 'icons';
+                    socials.forEach(a => {
+                        const link = document.createElement('a');
+                        link.href = a.href;
+                        link.target = a.target || '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.title = a.title || '';
+                        link.innerHTML = a.innerHTML; // copy SVG icon
+                        row.appendChild(link);
+                    });
+                    menu.appendChild(row);
+                }
+            }
+
+            function openMenu() {
+                collectLinks();
+                body.classList.add('menu-open');
+                burger.setAttribute('aria-expanded', 'true');
+                burger.setAttribute('aria-label', 'Close navigation');
+                overlay.setAttribute('aria-hidden', 'false');
+            }
+
+            function closeMenu() {
+                body.classList.remove('menu-open');
+                burger.setAttribute('aria-expanded', 'false');
+                burger.setAttribute('aria-label', 'Open navigation');
+                overlay.setAttribute('aria-hidden', 'true');
+            }
+
+            function toggleMenu() {
+                if (body.classList.contains('menu-open')) closeMenu();
+                else openMenu();
+            }
+
+            burger.addEventListener('click', toggleMenu);
+            menu.addEventListener('click', (e) => {
+                const target = e.target;
+                if (target && target.closest('a')) {
+                    closeMenu();
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && body.classList.contains('menu-open')) {
+                    closeMenu();
+                }
+            });
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeMenu();
+            });
+        })();
+    </script>
+</body>
+
+</html>
