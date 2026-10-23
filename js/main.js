@@ -59,10 +59,15 @@
   /* ---------- Lazy video ---------- */
   function load(v) { if (v.dataset.poster && !v.poster) v.poster = v.dataset.poster; if (!v.src && v.dataset.src) { v.src = v.dataset.src; v.load(); } }
   function play(v) {
-    if (reduce || document.hidden) return;
+    if ((reduce && !(window.heroMotionRequested && v.closest('.hero__pill'))) || document.hidden) return Promise.resolve(false);
     load(v);
     v.muted = true; v.defaultMuted = true; v.playsInline = true;
-    const p = v.play(); if (p) p.catch(() => {});
+    v.autoplay = true;
+    return v.play().then(() => true, (error) => {
+      v.dataset.playbackError = error.name;
+      if (v.closest('.hero__pill')) $('.js-hero-play').hidden = false;
+      return false;
+    });
   }
   function pause(v) { if (!v.paused) v.pause(); }
 
@@ -75,7 +80,7 @@
     if (document.hidden) $$('video').forEach(pause);
     else {
       activeChapterVideos.forEach(play);
-      if (heroVisible) play(pillVids[pillI]);
+      if (heroVisible) startPill();
     }
   });
 
@@ -145,25 +150,38 @@
   const pill = $('.js-pill');
   const pillVids = $$('video', pill);
   const pillLabel = $('.js-pill-label');
-  let pillI = 0, pillTimer = null, heroVisible = true;
-  function showPill(i) {
-    pillVids.forEach((v, j) => {
-      v.classList.toggle('on', j === i);
-      if (j === i) play(v); else setTimeout(() => j !== pillI && pause(v), 700);
-    });
-
-    pillLabel.textContent = ENTITIES[i];
+  let pillI = 0, pillTimer = null, heroVisible = true, pillChanging = false;
+  async function showPill(i) {
+    if (pillChanging) return;
+    pillChanging = true;
+    const video = pillVids[i];
+    const playing = await play(video);
+    if (playing) {
+      // Keep the previous clip visible until the new one is actually playing.
+      pillI = i;
+      pillVids.forEach((v, j) => {
+        v.classList.toggle('on', j === i);
+        if (j !== i) setTimeout(() => j !== pillI && pause(v), 700);
+      });
+      pillLabel.textContent = ENTITIES[i];
+      $('.js-hero-play').hidden = true;
+    }
+    pillChanging = false;
+    clearTimeout(pillTimer);
+    if (playing) pillTimer = setTimeout(() => {
+      if (heroVisible) showPill((pillI + 1) % pillVids.length);
+    }, 2400);
   }
   function startPill() {
+    clearTimeout(pillTimer);
     showPill(pillI);
-    if (reduce) return;
-    clearInterval(pillTimer);
-    pillTimer = setInterval(() => { if (!heroVisible) return; pillI = (pillI + 1) % pillVids.length; showPill(pillI); }, 2400);
   }
+  addEventListener('hero:play', startPill);
   new IntersectionObserver((es) => {
     heroVisible = es[0].isIntersecting;
     const v = pillVids[pillI];
-    heroVisible ? play(v) : pause(v);
+    if (heroVisible) startPill();
+    else { clearTimeout(pillTimer); pause(v); }
   }).observe($('.hero'));
 
   // Retry muted playback in a trusted gesture if a mobile browser initially blocks it.

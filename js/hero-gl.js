@@ -7,7 +7,7 @@
   const canvas = document.querySelector('.hero__gl');
   const vids = [...document.querySelectorAll('.hero__pill video')];
   if (!canvas || !vids.length) return;
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (window.heroGL || (matchMedia('(prefers-reduced-motion: reduce)').matches && !window.heroMotionRequested)) return;
   const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
   if (!gl) { canvas.remove(); return; }
 

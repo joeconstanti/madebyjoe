@@ -342,3 +342,12 @@ verify decoded video frames advance, its poster image decodes, and its reveal
 mask clears. Repeat with reduced motion enabled: the page must remain readable
 with real poster images, without applying hidden reveal states. Browser autoplay
 restrictions may retain the poster until the first trusted gesture.
+
+
+The first hero clip has a native `autoplay muted playsinline` source in the HTML,
+independent of animation-library loading. All hero clips use dedicated 480px-wide,
+silent H.264 Baseline encodes. The cycle waits for successful playback before
+replacing the current clip. If the browser refuses autoplay or reduced motion is
+active, a Play animation button lets the visitor explicitly start the hero.
+HTML uses revalidation so returning browsers can pick up deployed bootstrap changes;
+versioned static assets keep long cache lifetimes.
