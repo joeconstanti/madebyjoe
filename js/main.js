@@ -6,9 +6,6 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   if (reduce) html.classList.add('reduce');
-  // Always start at the top, so the intro plays where it should.
-
-
   gsap.registerPlugin(ScrollTrigger, SplitText);
   const ENTITIES = ['From the Root', 'Synthetic Labs', 'Cerebral', 'Automate', 'joe.graphics'];
 
@@ -61,7 +58,12 @@
 
   /* ---------- Lazy video ---------- */
   function load(v) { if (v.dataset.poster && !v.poster) v.poster = v.dataset.poster; if (!v.src && v.dataset.src) { v.src = v.dataset.src; v.load(); } }
-  function play(v) { if (reduce) return; load(v); const p = v.play(); if (p) p.catch(() => {}); }
+  function play(v) {
+    if (reduce || document.hidden) return;
+    load(v);
+    v.muted = true; v.defaultMuted = true; v.playsInline = true;
+    const p = v.play(); if (p) p.catch(() => {});
+  }
   function pause(v) { if (!v.paused) v.pause(); }
 
   // In-flow videos (not hero pill, not hover preview, not chapters): play while visible.
@@ -71,7 +73,10 @@
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) $$('video').forEach(pause);
-    else activeChapterVideos.forEach(play);
+    else {
+      activeChapterVideos.forEach(play);
+      if (heroVisible) play(pillVids[pillI]);
+    }
   });
 
   /* ---------- Cursor ---------- */
@@ -161,6 +166,14 @@
     heroVisible ? play(v) : pause(v);
   }).observe($('.hero'));
 
+  // Retry muted playback in a trusted gesture if a mobile browser initially blocks it.
+  function resumeVisibleVideos() {
+    if (heroVisible) play(pillVids[pillI]);
+    activeChapterVideos.forEach(play);
+  }
+  document.addEventListener('pointerdown', resumeVisibleVideos, { passive: true });
+  document.addEventListener('keydown', resumeVisibleVideos);
+
   /* ---------- Marquee ---------- */
   const track = $('.js-marquee');
   if (track && !reduce) {
@@ -196,6 +209,21 @@
     vids.forEach(pause);
     activeChapterVideos = activeChapterVideos.filter((v) => !vids.includes(v));
   }
+
+  // Playback follows actual media visibility, independently of scroll effects.
+  const chapterVideoObserver = new IntersectionObserver((entries) => {
+    entries.forEach(({ target, isIntersecting }) => {
+      const videos = $$('video', target);
+      if (isIntersecting) {
+        if (isStack() && !reduce) setActiveChapter(target);
+        else {
+          videos.forEach(play);
+          activeChapterVideos = [...new Set([...activeChapterVideos, ...videos])];
+        }
+      } else leaveChapter(target);
+    });
+  }, { rootMargin: '150px 0px' });
+  chapters.forEach((chapter) => chapterVideoObserver.observe(chapter));
 
   /* ---------- Reveal helpers ---------- */
   // Text types in: characters appear one by one and fade up from a soft blur.
@@ -243,6 +271,7 @@
   }
 
   function scrollAnimations() {
+    if (reduce) return;
     // Headings and lead text type in.
     $$('[data-split]').forEach((el) => {
       if (el.classList.contains('hero__statement')) return;
@@ -306,12 +335,6 @@
         const tl = introTl(ch);
         ScrollTrigger.create({ start: () => chapTop(i) - H() * 0.35, onEnter: () => tl.play(), invalidateOnRefresh: true });
 
-        // Active panel owns the playing videos.
-        ScrollTrigger.create({
-          start: () => chapTop(i) - H() * 0.9, end: () => chapTop(i) + H() * 0.9, invalidateOnRefresh: true,
-          onToggle: (s) => (s.isActive ? setActiveChapter(ch) : leaveChapter(ch)),
-        });
-
         if (i < chapters.length - 1) {
           gsap.timeline({ scrollTrigger: { start: () => chapTop(i), end: () => chapTop(i) + H(), scrub: true, invalidateOnRefresh: true } })
             .to(inner, { scale: 0.9, yPercent: -4, ease: 'none' }, 0)
@@ -328,7 +351,6 @@
         p.media.forEach((m) => ditherReveal(m, { trigger: m, start: 'top 95%', end: 'top 45%' }));
         const tl = introTl(ch);
         ScrollTrigger.create({ trigger: $('.ch__text', ch), start: 'top 85%', once: true, onEnter: () => tl.play() });
-        ScrollTrigger.create({ trigger: ch, start: 'top bottom', end: 'bottom top', onToggle: (s) => (s.isActive ? setActiveChapter(ch) : leaveChapter(ch)) });
       });
     });
   }

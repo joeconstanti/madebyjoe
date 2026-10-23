@@ -300,9 +300,10 @@ While this is a personal portfolio, suggestions and improvements are welcome! He
 The complete page renders before optional animation libraries load. The branded
 loading overlay counts font/poster readiness, then fades out; it does not wait for
 video, and has a 1.2-second timeout plus a CSS fallback. A small static
-ordered-dither hero and WebP video posters provide the first view. Pointer, touch,
-keyboard or scroll interaction loads motion; reduced-motion users keep the static
-version. Analytics runs on page entry through the vendored Partytown 1.0.2 worker
+ordered-dither hero and WebP video posters provide the first view. Motion loads automatically on page entry, without waiting for a gesture.
+Muted inline videos play while visible and retry on a gesture if browser policy
+blocks autoplay. Real poster URLs remain available even without JavaScript or with
+reduced motion enabled. Chapter playback is independent of scroll reveal effects. Analytics runs on page entry through the vendored Partytown 1.0.2 worker
 (`js/vendor/partytown-1.0.2/`, MIT license), with normal-script fallback in browsers
 without worker support. The document CSP stays separate from the worker sandbox
 policy. Verify a GA4 `page_view` collection request after changes; a successful
@@ -325,9 +326,19 @@ npx lighthouse http://localhost:8000 --chrome-flags='--headless' --output=html -
 npx lighthouse http://localhost:8000 --preset=desktop --chrome-flags='--headless' --output=html --output=json --output-path=/tmp/madebyjoe-desktop
 ```
 
-Local Lighthouse 13 runs with the overlay and worker-based Analytics scored 100 in
+Before restoring automatic motion startup, local Lighthouse 13 runs with the overlay
+and worker-based Analytics scored 100 in
 Performance, Accessibility, Best Practices and SEO on both profiles. The mobile run
 with the production CSP applied had FCP 1.2 s, LCP 1.7 s and TBT 0 ms, with no
 console errors and a successful GA4 page-view request. Repeat against production:
 local results do not establish deployed PageSpeed scores. Scores vary with server,
 network and test conditions. Python's standard server does not apply `.htaccess`.
+
+
+Mobile regression verification: test a fresh page without clicking, touching or
+scrolling first; the hero video must advance automatically and the WebGL canvas
+must become ready. Scroll each of the five chapter media blocks into view and
+verify decoded video frames advance, its poster image decodes, and its reveal
+mask clears. Repeat with reduced motion enabled: the page must remain readable
+with real poster images, without applying hidden reveal states. Browser autoplay
+restrictions may retain the poster until the first trusted gesture.

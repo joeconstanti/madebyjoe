@@ -1,4 +1,4 @@
-/* The page works without motion. Load decorative effects on the first interaction. */
+/* Start motion automatically; content and media do not depend on a gesture. */
 (() => {
   const format = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   const tick = () => document.querySelectorAll('.js-clock').forEach((el) => { el.textContent = format.format(new Date()); });
@@ -40,14 +40,11 @@
       addEventListener('keydown', finish, { once: true });
     }
   }
-  const events = ['pointerdown', 'pointermove', 'keydown', 'touchstart', 'scroll'];
   let started = false;
   async function enhance() {
     if (started) return;
     started = true;
-    events.forEach((event) => removeEventListener(event, enhance));
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'hero-gl.js?v=20261023a', 'main.js?v=20261023a']) {
+    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'hero-gl.js?v=20261023b', 'main.js?v=20261023b']) {
       const loaded = await new Promise((resolve) => {
         const script = document.createElement('script');
         script.src = 'js/' + src;
@@ -58,5 +55,5 @@
       if (!loaded) { console.warn('Optional motion could not load: ' + src); return; }
     }
   }
-  events.forEach((event) => addEventListener(event, enhance, { passive: true }));
+  enhance();
 })();
