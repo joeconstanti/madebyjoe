@@ -293,4 +293,33 @@ While this is a personal portfolio, suggestions and improvements are welcome! He
 
 [Visit Portfolio](https://madebyjoe.co) • [Get in Touch](mailto:hello@madebyjoe.co) • [LinkedIn](https://www.linkedin.com/in/joeconstanti/)
 
-</div> 
+</div>
+
+## PageSpeed optimisation (23 October 2026)
+
+The complete page renders before optional animation libraries load. The branded
+loading overlay counts font/poster readiness, then fades out; it does not wait for
+video, and has a 1.8-second timeout plus a CSS fallback. A small static
+ordered-dither hero and WebP video posters provide the first view. Pointer, touch,
+keyboard or scroll interaction loads motion; reduced-motion users keep the static
+version. Analytics still loads on page entry. The animated hero renders at half CSS
+resolution, at up to 24 fps, and stops when offscreen or the tab is hidden.
+
+Edit `css/main.css`, then run `node scripts/sync-styles.mjs` to update the inline
+stylesheet in `index.html`. Inlining removes the render-blocking stylesheet request.
+
+Validate using a local server and Lighthouse (repeat against the deployed URL after
+publication; local results do not establish production PageSpeed scores):
+
+```sh
+python3 -m http.server 8000
+npx lighthouse http://localhost:8000 --chrome-flags='--headless' --output=html --output=json --output-path=/tmp/madebyjoe-mobile
+npx lighthouse http://localhost:8000 --preset=desktop --chrome-flags='--headless' --output=html --output=json --output-path=/tmp/madebyjoe-desktop
+```
+
+Local Lighthouse 13 runs, including a repeat with the short loading overlay restored,
+scored 100 in Performance, Accessibility, Best Practices
+and SEO on both profiles. Mobile: FCP 0.8 s, LCP 1.8 s, TBT 20 ms, CLS 0.
+Desktop: FCP 0.2 s, LCP 0.4 s, TBT 0 ms, CLS 0. Scores vary with server,
+network, third-party scripts and test conditions. Apache cache/header changes need
+verification on the deployed host because Python's server does not apply `.htaccess`.

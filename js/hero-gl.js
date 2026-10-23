@@ -11,7 +11,8 @@
   if (!gl) { canvas.remove(); return; }
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const DPR = Math.min(devicePixelRatio || 1, 2);
+  // Dither cells are 4 CSS pixels; rendering at half resolution preserves them.
+  const DPR = 0.5;
   const CELL = 4; // dither cell in CSS px
 
   const vert = `
@@ -109,11 +110,12 @@ void main(){
   gl.uniform1i(U.uA, 0); gl.uniform1i(U.uB, 1);
 
   // Posters stand in until a video has frames (and for reduced motion, where videos do not play).
-  const posters = new Map(vids.map((v) => { const i = new Image(); i.src = v.poster; return [v, i]; }));
+  const posters = new Map(vids.map((v) => { const i = new Image(); if (v.poster) i.src = v.poster; return [v, i]; }));
   function upload(unit, v) {
     let src = v, w = v.videoWidth, h = v.videoHeight;
     if (v.readyState < 2) {
       src = posters.get(v);
+      if (v.poster && src.src !== v.poster) src.src = v.poster;
       if (!src.complete || !src.naturalWidth) return null;
       w = src.naturalWidth; h = src.naturalHeight;
     }
@@ -148,7 +150,7 @@ void main(){
   let cur = vids[0], prev = vids[0], mixT = 1, last = 0;
   const sizes = [[1, 1], [1, 1]];
 
-  let visible = true, raf = 0, frame = 0;
+  let visible = true, raf = 0, frame = 0, painted = 0;
   const t0 = performance.now();
   new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible && !raf) loop(); }).observe(canvas);
 
@@ -180,12 +182,14 @@ void main(){
     gl.uniform1f(U.uFade, state.fade * (1 - state.scroll * .6));
     gl.uniform1f(U.uTime, (now - t0) / 1000);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if (sizes[1][0] > 1) canvas.classList.add('is-ready');
   }
   function loop(now = performance.now()) {
     raf = 0;
-    if (!visible) return;
-    draw(now);
+    if (!visible || document.hidden) return;
+    if (now - painted >= 1000 / 24) { draw(now); painted = now; }
     raf = requestAnimationFrame(loop);
   }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && !raf) loop(); });
   loop();
 })();

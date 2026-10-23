@@ -7,17 +7,10 @@
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   if (reduce) html.classList.add('reduce');
   // Always start at the top, so the intro plays where it should.
-  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-  if (!location.hash) window.scrollTo(0, 0);
+
 
   gsap.registerPlugin(ScrollTrigger, SplitText);
   const ENTITIES = ['From the Root', 'Synthetic Labs', 'Cerebral', 'Automate', 'joe.graphics'];
-
-  /* ---------- Clock + year ---------- */
-  const clockFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  const tick = () => { const t = clockFmt.format(new Date()); $$('.js-clock').forEach((c) => (c.textContent = t)); };
-  tick(); setInterval(tick, 1000);
-  $$('.js-year').forEach((y) => (y.textContent = new Date().getFullYear()));
 
   /* ---------- Fit text to its container width ---------- */
   const range = document.createRange();
@@ -67,7 +60,7 @@
   }));
 
   /* ---------- Lazy video ---------- */
-  function load(v) { if (!v.src && v.dataset.src) { v.src = v.dataset.src; v.load(); } }
+  function load(v) { if (v.dataset.poster && !v.poster) v.poster = v.dataset.poster; if (!v.src && v.dataset.src) { v.src = v.dataset.src; v.load(); } }
   function play(v) { if (reduce) return; load(v); const p = v.play(); if (p) p.catch(() => {}); }
   function pause(v) { if (!v.paused) v.pause(); }
 
@@ -153,7 +146,7 @@
       v.classList.toggle('on', j === i);
       if (j === i) play(v); else setTimeout(() => j !== pillI && pause(v), 700);
     });
-    load(pillVids[(i + 1) % pillVids.length]);
+
     pillLabel.textContent = ENTITIES[i];
   }
   function startPill() {
@@ -207,7 +200,12 @@
   /* ---------- Reveal helpers ---------- */
   // Text types in: characters appear one by one and fade up from a soft blur.
   function typeIn(el, { delay = 0, total = 0.9 } = {}) {
-    const split = SplitText.create(el, { type: 'words,chars', wordsClass: 'tw', charsClass: 'tc' });
+    const split = SplitText.create(el, { type: 'words,chars', wordsClass: 'tw', charsClass: 'tc', aria: el.tagName === 'P' ? 'none' : 'auto' });
+    if (el.tagName === 'P') {
+      const text = document.createElement('span'); text.className = 'sr-only'; text.textContent = el.textContent;
+      [...el.children].forEach((child) => child.setAttribute('aria-hidden', 'true'));
+      el.append(text);
+    }
     const n = split.chars.length || 1;
     return gsap.from(split.chars, {
       opacity: 0, filter: 'blur(6px)', duration: 0.45, ease: 'power2.out', delay,
@@ -335,67 +333,14 @@
     });
   }
 
-  /* ---------- Loader + intro ---------- */
-  const loader = $('.loader');
-  const countEl = $('.js-count');
-  const bar = $('.js-bar');
-  const names = $$('.loader__names span');
-  const seen = sessionStorage.getItem('mbj-seen');
-
-  function intro() {
-    const statement = $('.hero__statement');
-    const tl = gsap.timeline();
-    const gl = window.heroGL;
-    tl.from('.hero__mark .mk', { yPercent: 120, opacity: 0, filter: 'blur(12px)', duration: 1.4, stagger: 0.08, ease: 'expo.out', clearProps: 'filter' }, 0)
-      .from('.hero__pill', { scale: 0, duration: 1.2, ease: 'expo.out' }, 0.25)
-      .add(typeIn(statement, { total: 0.8 }), 0.3)
-      .add(focusIn('.hero__meta > *'), 0.5)
-      .add(focusIn('.hdr > *', { y: -8 }), 0.4);
-    if (gl) tl.to(gl, { fade: 1, duration: 2.4, ease: 'power2.out' }, 0);
-    return tl;
-  }
-
-  function finish() {
-    sessionStorage.setItem('mbj-seen', '1');
+  // Content is visible immediately; decoration never gates first paint.
+  document.fonts.ready.then(() => {
     fitAll();
     scrollAnimations();
     ScrollTrigger.refresh();
-    startPill();
-    if (reduce) { loader.remove(); if (window.heroGL) window.heroGL.fade = 1; return; }
-    gsap.timeline()
-      .to({ p: 1 }, { p: 0, duration: 0.9, ease: 'power2.in', onUpdate() { dither(loader, this.targets()[0].p); }, onComplete: () => loader.remove() })
-      .add(intro(), 0.35);
-  }
-
-  // Real progress: fonts, the first hero video and window load, plus a short minimum time.
-  const steps = { fonts: 0, video: 0, load: 0, time: 0 };
-  const weights = { fonts: 30, video: 30, load: 25, time: 15 };
-  const shown = { v: 0 };
-  let done = false;
-  const target = () => Object.keys(steps).reduce((s, k) => s + steps[k] * weights[k], 0);
-  function update() {
-    const t = target();
-    gsap.to(shown, {
-      v: t, duration: seen ? 0.25 : 0.8, ease: 'power2.out', overwrite: true,
-      onUpdate: () => {
-        const v = Math.round(shown.v);
-        countEl.textContent = v;
-        bar.style.transform = `scaleX(${v / 100})`;
-        names.forEach((n, i) => n.classList.toggle('on', v >= (i + 1) * 20 - 10));
-      },
-      onComplete: () => { if (t >= 100 && !done) { done = true; finish(); } },
-    });
-  }
-  const step = (k) => { if (steps[k]) return; steps[k] = 1; update(); };
-
-  document.fonts.ready.then(() => { fitAll(); step('fonts'); });
-  const v0 = pillVids[0];
-  v0.addEventListener('loadeddata', () => step('video'), { once: true });
-  v0.addEventListener('error', () => step('video'), { once: true });
-  load(v0);
-  if (document.readyState === 'complete') step('load'); else addEventListener('load', () => step('load'));
-  setTimeout(() => step('time'), seen || reduce ? 0 : 1200);
-  setTimeout(() => Object.keys(steps).forEach(step), 6000); // never block on a slow asset
+  });
+  if (window.heroGL) window.heroGL.fade = 1;
+  startPill();
 
   /* ---------- Resize ---------- */
   let rz;

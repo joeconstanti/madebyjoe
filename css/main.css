@@ -9,7 +9,7 @@
   --ink: #0e0d0c;
   --paper: #ecebe6;
   --signal: #f74f14;
-  --mute: rgba(236, 235, 230, .5);
+  --mute: rgba(236, 235, 230, .65);
   --line: rgba(236, 235, 230, .14);
 
   --sans: "Inter Tight", system-ui, sans-serif;
@@ -327,3 +327,22 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* First paint is complete before optional motion is loaded. */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.hero__poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.hero > .hero__poster { position: absolute; z-index: 0; }
+.hero__gl { opacity: 0; transition: opacity .4s; }
+.hero__gl.is-ready { opacity: 1; }
+.hero__meta .m1 a { display: inline-block; min-height: 24px; line-height: 24px; }
+.hero__mark { font-size: calc((100vw - 2 * var(--pad)) * .16435); }
+.contact__mail { font-size: calc((100vw - 2 * var(--pad)) * .12272); }
+.ftr__mark { font-size: calc((100vw - 2 * var(--pad)) * .22322); }
+.ftr__grid .lbl { opacity: .9; }
+.ftr__grid p:first-child a { display: inline-block; min-height: 24px; line-height: 24px; }
+
+/* Short branded intro; never waits for video or optional motion scripts. */
+.js .loader { animation: loader-failsafe 0s 2s forwards; transition: opacity .24s ease; pointer-events: auto; }
+.js .loader.is-finished { opacity: 0; pointer-events: none; }
+@keyframes loader-failsafe { to { visibility: hidden; pointer-events: none; } }
+@media (prefers-reduced-motion: reduce) { .js .loader { display: none; } }

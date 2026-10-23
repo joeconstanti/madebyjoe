@@ -36,6 +36,8 @@
 <IfModule mod_expires.c>
     ExpiresActive On
     
+    ExpiresByType video/mp4 "access plus 1 year"
+
     # Images
     ExpiresByType image/jpg "access plus 1 year"
     ExpiresByType image/jpeg "access plus 1 year"
@@ -70,7 +72,7 @@
 # Cache-Control Headers (fallback for servers without mod_expires)
 <IfModule mod_headers.c>
     # Static assets
-    <FilesMatch "\.(css|js|png|jpg|jpeg|gif|webp|svg|woff|woff2|ttf|eot|ico)$">
+    <FilesMatch "\.(css|js|png|jpg|jpeg|gif|webp|mp4|svg|woff|woff2|ttf|eot|ico)$">
         Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
     
@@ -140,15 +142,6 @@ RewriteRule ^ %1 [R=301,L]
     AddType application/font-woff2 .woff2
 </IfModule>
 
-# Preload critical resources
-<IfModule mod_headers.c>
-    # Preload critical fonts
-    <FilesMatch "index\.html$">
-        Header add Link "</fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap>; rel=preload; as=style"
-        Header add Link "</fonts.gstatic.com/s/montserrat/v26/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw5aXpsog.woff2>; rel=preload; as=font; type=font/woff2; crossorigin"
-    </FilesMatch>
-</IfModule>
-
 # Disable unnecessary Apache modules for performance
 <IfModule mod_rewrite.c>
     # Remove trailing slashes for better caching
@@ -160,6 +153,5 @@ RewriteRule ^ %1 [R=301,L]
 
 # Optimize for mobile
 <IfModule mod_headers.c>
-    # Vary header for mobile optimization
-    Header append Vary User-Agent
+    # Content is responsive; it does not vary by User-Agent.
 </IfModule>
