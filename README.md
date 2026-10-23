@@ -9,7 +9,6 @@
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-madebyjoe.co-orange?style=for-the-badge)](https://madebyjoe.co)
 [![Performance](https://img.shields.io/badge/Performance-Optimized-green?style=for-the-badge)](https://pagespeed.web.dev/report?url=https://madebyjoe.co)
-[![Mobile Friendly](https://img.shields.io/badge/Mobile-Friendly-Responsive-blue?style=for-the-badge)](https://madebyjoe.co)
 
 ---
 
