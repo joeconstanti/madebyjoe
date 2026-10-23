@@ -258,31 +258,6 @@
     opacity: 0, filter: 'blur(10px)', y: 10, duration: 1.3, stagger: 0.06, ease: 'power3.out', clearProps: 'filter', ...vars,
   });
 
-  // Ordered-dither masks: 17 steps of a 4x4 Bayer pattern, 3 CSS px per cell.
-  const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
-  const CELL = 3;
-  const ditherMasks = Array.from({ length: 17 }, (_, k) => {
-    const c = document.createElement('canvas'); c.width = c.height = 4 * CELL;
-    const x = c.getContext('2d'); x.fillStyle = '#000';
-    BAYER.forEach((b, i) => { if (b < k) x.fillRect((i % 4) * CELL, Math.floor(i / 4) * CELL, CELL, CELL); });
-    return `url(${c.toDataURL()})`;
-  });
-  function dither(el, p) {
-    const k = Math.round(gsap.utils.clamp(0, 1, p) * 16);
-    if (k >= 16) { el.style.maskImage = el.style.webkitMaskImage = ''; return; }
-    el.style.maskImage = el.style.webkitMaskImage = ditherMasks[k];
-    el.style.maskSize = el.style.webkitMaskSize = `${4 * CELL}px`;
-  }
-  // Scrubbed media reveal: dither dissolve plus a fading blur.
-  function ditherReveal(el, st) {
-    dither(el, 0);
-    const o = { p: 0 };
-    return gsap.to(o, {
-      p: 1, ease: 'none', scrollTrigger: { ...st, scrub: true },
-      onUpdate: () => { dither(el, o.p); el.style.filter = o.p < 1 ? `blur(${(1 - o.p) * 8}px)` : ''; },
-    });
-  }
-
   function scrollAnimations() {
     if (reduce) return;
     // Headings and lead text type in.
@@ -318,7 +293,6 @@
       name: $('.ch__name', ch),
       quote: $('.ch__quote', ch),
       bits: $$('.ch__stats, .ch__tags, .btn, .ch__top', ch),
-      media: $$('.ch__media', ch),
       nums: $$('.js-num', ch),
     });
     function introTl(ch) {
@@ -341,10 +315,6 @@
         let shade = $('.ch__shade', ch);
         if (!shade) { shade = document.createElement('div'); shade.className = 'ch__shade'; ch.append(shade); }
         const H = () => ch.offsetHeight;
-        const p = chapterParts(ch);
-
-        // Media opens from an inset frame while the panel slides up.
-        p.media.forEach((m) => ditherReveal(m, { start: () => chapTop(i) - H() * 0.85, end: () => chapTop(i) - H() * 0.1, invalidateOnRefresh: true }));
         const tl = introTl(ch);
         ScrollTrigger.create({ start: () => chapTop(i) - H() * 0.35, onEnter: () => tl.play(), invalidateOnRefresh: true });
 
@@ -366,8 +336,6 @@
     // Small screens: normal flow.
     mm.add('(max-width: 999px), (max-height: 639px)', () => {
       chapters.forEach((ch) => {
-        const p = chapterParts(ch);
-        p.media.forEach((m) => ditherReveal(m, { trigger: m, start: 'top 95%', end: 'top 45%' }));
         const tl = introTl(ch);
         ScrollTrigger.create({ trigger: $('.ch__text', ch), start: 'top 85%', once: true, onEnter: () => tl.play() });
       });

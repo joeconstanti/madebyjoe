@@ -331,7 +331,7 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .hero__poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 .hero > .hero__poster { position: absolute; z-index: 0; }
-.hero__gl { opacity: 0; transition: opacity .4s; }
+.hero__gl { opacity: 0; }
 .hero__gl.is-ready { opacity: 1; }
 .hero__meta .m1 a { display: inline-block; min-height: 24px; line-height: 24px; }
 .hero__mark { font-size: calc((100vw - 2 * var(--pad)) * .16435); }

@@ -8,6 +8,7 @@
   const vids = [...document.querySelectorAll('.hero__pill video')];
   if (!canvas || !vids.length) return;
   if (window.heroGL) return;
+  performance.mark('hero-init');
   const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
   if (!gl) { canvas.remove(); return; }
 
@@ -145,7 +146,7 @@ void main(){
   }, { passive: true });
 
   // The page sets these: fade-in after the loader, and scroll progress through the hero.
-  const state = window.heroGL = { fade: 0, scroll: 0 };
+  const state = window.heroGL = { fade: 1, scroll: 0 };
 
   // Follow the pill: when its video changes, the old one becomes A and we fade to the new B.
   let cur = vids[0], prev = vids[0], mixT = 1, last = 0;
@@ -183,7 +184,10 @@ void main(){
     gl.uniform1f(U.uFade, state.fade * (1 - state.scroll * .6));
     gl.uniform1f(U.uTime, (now - t0) / 1000);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
-    if (sizes[1][0] > 1) canvas.classList.add('is-ready');
+    if (sizes[1][0] > 1 && !canvas.classList.contains('is-ready')) {
+      canvas.classList.add('is-ready');
+      performance.mark('hero-first-frame');
+    }
   }
   function loop(now = performance.now()) {
     raf = 0;

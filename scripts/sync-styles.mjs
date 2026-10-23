@@ -16,6 +16,10 @@ html = html.replace(/<!-- partytown:start -->[\s\S]*?<!-- partytown:end -->/, `<
 ${snippet}
   </script>
   <!-- partytown:end -->`);
+const hero = readFileSync(new URL('js/hero-gl.js', root), 'utf8');
+html = html.replace(/  <!-- inline-hero:start -->[\s\S]*?<!-- inline-hero:end -->/, `  <!-- inline-hero:start -->\n  <script>\n${hero}\n  </script>\n  <!-- inline-hero:end -->`);
+const poster = readFileSync(new URL('media/v2/hero-dither.webp', root)).toString('base64');
+html = html.replace(/(<img class="hero__poster" src=")[^"]+"/, `$1data:image/webp;base64,${poster}"`);
 const enhance = readFileSync(new URL('js/enhance.js', root), 'utf8');
 html = html.replace(/  <!-- inline-enhance:start -->[\s\S]*?<!-- inline-enhance:end -->/, `  <!-- inline-enhance:start -->\n  <script>\n${enhance}\n  </script>\n  <!-- inline-enhance:end -->`);
 writeFileSync(file, html);

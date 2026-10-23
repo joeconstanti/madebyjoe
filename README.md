@@ -338,8 +338,7 @@ network and test conditions. Python's standard server does not apply `.htaccess`
 Mobile regression verification: test a fresh page without clicking, touching or
 scrolling first; the hero video must advance automatically and the WebGL canvas
 must become ready. Scroll each of the five chapter media blocks into view and
-verify decoded video frames advance, its poster image decodes, and its reveal
-mask clears. Repeat with reduced motion enabled: videos still autoplay while scroll effects
+verify decoded video frames advance, its poster image decodes, and it has no reveal mask at any scroll position. Repeat with reduced motion enabled: videos still autoplay while scroll effects
 remain disabled, and no hidden reveal states may be applied. Browser autoplay
 restrictions may retain the poster until the first trusted gesture.
 
@@ -353,3 +352,9 @@ HTML uses revalidation so returning browsers can pick up deployed bootstrap chan
 versioned static assets keep long cache lifetimes.
 
 The marquee also runs automatically on mobile regardless of reduced motion, as requested.
+
+
+Dithering is restricted to the hero. Its renderer and initial dithered poster are
+embedded in the HTML and initialise before optional animation libraries. The canvas
+starts at full visibility as soon as its first source frame is available, with no
+fade-in delay. Chapter media has no dither masks or scrubbed dither reveals.
