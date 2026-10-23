@@ -349,7 +349,3 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .loader__count { position: relative; width: 3ch; }
 .loader__count sup { position: absolute; left: 100%; top: 0; }
 .loader__count .js-count { display: block; text-align: right; }
-
-.hero > .hero__play { position: absolute; z-index: 3; top: 70px; right: var(--pad); }
-.hero__play { border: 1px solid var(--line); border-radius: 99px; padding: 12px 16px; background: var(--ink); color: var(--paper); font: 400 11px/1 var(--mono); cursor: pointer; }
-.hero__play[hidden] { display: none; }

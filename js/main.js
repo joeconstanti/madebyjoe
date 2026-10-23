@@ -59,13 +59,12 @@
   /* ---------- Lazy video ---------- */
   function load(v) { if (v.dataset.poster && !v.poster) v.poster = v.dataset.poster; if (!v.src && v.dataset.src) { v.src = v.dataset.src; v.load(); } }
   function play(v) {
-    if ((reduce && !(window.heroMotionRequested && v.closest('.hero__pill'))) || document.hidden) return Promise.resolve(false);
+    if (document.hidden) return Promise.resolve(false);
     load(v);
     v.muted = true; v.defaultMuted = true; v.playsInline = true;
     v.autoplay = true;
     return v.play().then(() => true, (error) => {
       v.dataset.playbackError = error.name;
-      if (v.closest('.hero__pill')) $('.js-hero-play').hidden = false;
       return false;
     });
   }
@@ -164,7 +163,6 @@
         if (j !== i) setTimeout(() => j !== pillI && pause(v), 700);
       });
       pillLabel.textContent = ENTITIES[i];
-      $('.js-hero-play').hidden = true;
     }
     pillChanging = false;
     clearTimeout(pillTimer);
@@ -176,7 +174,6 @@
     clearTimeout(pillTimer);
     showPill(pillI);
   }
-  addEventListener('hero:play', startPill);
   new IntersectionObserver((es) => {
     heroVisible = es[0].isIntersecting;
     const v = pillVids[pillI];

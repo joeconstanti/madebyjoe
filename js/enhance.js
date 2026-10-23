@@ -2,26 +2,9 @@
 (() => {
   // Native hero playback must not wait for GSAP, scroll setup, or a gesture.
   const firstVideo = document.querySelector('.hero__pill video.on');
-  const playButton = document.querySelector('.js-hero-play');
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function startNativeHero() {
-    firstVideo.muted = true; firstVideo.defaultMuted = true; firstVideo.playsInline = true;
-    firstVideo.autoplay = true;
-    firstVideo.play().then(() => { playButton.hidden = true; }, () => { playButton.hidden = false; });
-  }
-  if (reduceMotion) { firstVideo.autoplay = false; firstVideo.pause(); playButton.hidden = false; }
-  else startNativeHero();
-  playButton.addEventListener('click', () => {
-    window.heroMotionRequested = true;
-    startNativeHero();
-    dispatchEvent(new Event('hero:play'));
-    if (!window.heroGL) {
-      const script = document.createElement('script');
-      script.src = 'js/hero-gl.js?v=20261023d';
-      script.onload = () => { if (window.heroGL) window.heroGL.fade = 1; };
-      document.body.append(script);
-    }
-  });
+  firstVideo.muted = true; firstVideo.defaultMuted = true; firstVideo.playsInline = true;
+  firstVideo.autoplay = true;
+  firstVideo.play().catch(() => {});
   const format = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   const tick = () => document.querySelectorAll('.js-clock').forEach((el) => { el.textContent = format.format(new Date()); });
   tick(); setInterval(tick, 1000);
@@ -66,7 +49,7 @@
   async function enhance() {
     if (started) return;
     started = true;
-    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'hero-gl.js?v=20261023d', 'main.js?v=20261023d']) {
+    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'hero-gl.js?v=20261023e', 'main.js?v=20261023e']) {
       const loaded = await new Promise((resolve) => {
         const script = document.createElement('script');
         script.src = 'js/' + src;

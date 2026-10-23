@@ -380,10 +380,6 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .loader__count sup { position: absolute; left: 100%; top: 0; }
 .loader__count .js-count { display: block; text-align: right; }
 
-.hero > .hero__play { position: absolute; z-index: 3; top: 70px; right: var(--pad); }
-.hero__play { border: 1px solid var(--line); border-radius: 99px; padding: 12px 16px; background: var(--ink); color: var(--paper); font: 400 11px/1 var(--mono); cursor: pointer; }
-.hero__play[hidden] { display: none; }
-
   </style>
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
 </head>
@@ -432,7 +428,6 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
     <section class="hero" id="top">
       <img class="hero__poster" src="media/v2/hero-dither.webp" width="960" height="540" alt="" fetchpriority="high">
       <canvas class="hero__gl" aria-hidden="true"></canvas>
-      <button class="hero__play js-hero-play" type="button" hidden>Play animation</button>
       <div class="hero__meta grid">
         <p class="m1"><span class="lbl">(Index)</span><a href="#e-ftr">From the Root</a><br><a href="#e-syn">Synthetic Labs</a><br><a href="#e-cer">Cerebral</a><br><a href="#e-aut">Automate Digital</a><br><a href="#e-jg">joe.graphics</a></p>
         <p class="m3"><span class="lbl">(Based)</span>London, UK.<br>Working worldwide.</p>
@@ -661,26 +656,9 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 (() => {
   // Native hero playback must not wait for GSAP, scroll setup, or a gesture.
   const firstVideo = document.querySelector('.hero__pill video.on');
-  const playButton = document.querySelector('.js-hero-play');
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function startNativeHero() {
-    firstVideo.muted = true; firstVideo.defaultMuted = true; firstVideo.playsInline = true;
-    firstVideo.autoplay = true;
-    firstVideo.play().then(() => { playButton.hidden = true; }, () => { playButton.hidden = false; });
-  }
-  if (reduceMotion) { firstVideo.autoplay = false; firstVideo.pause(); playButton.hidden = false; }
-  else startNativeHero();
-  playButton.addEventListener('click', () => {
-    window.heroMotionRequested = true;
-    startNativeHero();
-    dispatchEvent(new Event('hero:play'));
-    if (!window.heroGL) {
-      const script = document.createElement('script');
-      script.src = 'js/hero-gl.js?v=20261023d';
-      script.onload = () => { if (window.heroGL) window.heroGL.fade = 1; };
-      document.body.append(script);
-    }
-  });
+  firstVideo.muted = true; firstVideo.defaultMuted = true; firstVideo.playsInline = true;
+  firstVideo.autoplay = true;
+  firstVideo.play().catch(() => {});
   const format = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   const tick = () => document.querySelectorAll('.js-clock').forEach((el) => { el.textContent = format.format(new Date()); });
   tick(); setInterval(tick, 1000);
@@ -725,7 +703,7 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
   async function enhance() {
     if (started) return;
     started = true;
-    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'hero-gl.js?v=20261023d', 'main.js?v=20261023d']) {
+    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'hero-gl.js?v=20261023e', 'main.js?v=20261023e']) {
       const loaded = await new Promise((resolve) => {
         const script = document.createElement('script');
         script.src = 'js/' + src;
