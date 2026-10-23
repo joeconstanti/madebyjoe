@@ -44,7 +44,7 @@
   async function enhance() {
     if (started) return;
     started = true;
-    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'hero-gl.js?v=20261023b', 'main.js?v=20261023b']) {
+    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'hero-gl.js?v=20261023b', 'main.js?v=20261023c']) {
       const loaded = await new Promise((resolve) => {
         const script = document.createElement('script');
         script.src = 'js/' + src;
