@@ -212,14 +212,12 @@
 
   // Playback follows actual media visibility, independently of scroll effects.
   const chapterVideoObserver = new IntersectionObserver((entries) => {
+    if (isStack() && !reduce) return;
     entries.forEach(({ target, isIntersecting }) => {
       const videos = $$('video', target);
       if (isIntersecting) {
-        if (isStack() && !reduce) setActiveChapter(target);
-        else {
-          videos.forEach(play);
-          activeChapterVideos = [...new Set([...activeChapterVideos, ...videos])];
-        }
+        videos.forEach(play);
+        activeChapterVideos = [...new Set([...activeChapterVideos, ...videos])];
       } else leaveChapter(target);
     });
   }, { rootMargin: '150px 0px' });
@@ -334,6 +332,12 @@
         p.media.forEach((m) => ditherReveal(m, { start: () => chapTop(i) - H() * 0.85, end: () => chapTop(i) - H() * 0.1, invalidateOnRefresh: true }));
         const tl = introTl(ch);
         ScrollTrigger.create({ start: () => chapTop(i) - H() * 0.35, onEnter: () => tl.play(), invalidateOnRefresh: true });
+
+        // Sticky desktop panels need their flow positions to determine ownership.
+        ScrollTrigger.create({
+          start: () => chapTop(i) - H() * 0.9, end: () => chapTop(i) + H() * 0.9, invalidateOnRefresh: true,
+          onToggle: (s) => (s.isActive ? setActiveChapter(ch) : leaveChapter(ch)),
+        });
 
         if (i < chapters.length - 1) {
           gsap.timeline({ scrollTrigger: { start: () => chapTop(i), end: () => chapTop(i) + H(), scrub: true, invalidateOnRefresh: true } })
