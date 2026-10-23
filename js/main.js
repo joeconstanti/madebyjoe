@@ -191,7 +191,7 @@
 
   /* ---------- Marquee ---------- */
   const track = $('.js-marquee');
-  if (track && !reduce) {
+  if (track) {
     const loop = gsap.to(track, { xPercent: -50, repeat: -1, duration: 28, ease: 'none' });
     if (lenis) {
       let boost = 1;

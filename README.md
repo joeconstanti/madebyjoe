@@ -351,3 +351,5 @@ replacing the current clip. Videos autoplay regardless of the reduced-motion pre
 that preference still disables scroll effects. No Play animation button is shown.
 HTML uses revalidation so returning browsers can pick up deployed bootstrap changes;
 versioned static assets keep long cache lifetimes.
+
+The marquee also runs automatically on mobile regardless of reduced motion, as requested.
