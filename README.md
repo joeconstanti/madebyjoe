@@ -299,14 +299,22 @@ While this is a personal portfolio, suggestions and improvements are welcome! He
 
 The complete page renders before optional animation libraries load. The branded
 loading overlay counts font/poster readiness, then fades out; it does not wait for
-video, and has a 1.8-second timeout plus a CSS fallback. A small static
+video, and has a 1.2-second timeout plus a CSS fallback. A small static
 ordered-dither hero and WebP video posters provide the first view. Pointer, touch,
 keyboard or scroll interaction loads motion; reduced-motion users keep the static
-version. Analytics still loads on page entry. The animated hero renders at half CSS
+version. Analytics runs on page entry through the vendored Partytown 1.0.2 worker
+(`js/vendor/partytown-1.0.2/`, MIT license), with normal-script fallback in browsers
+without worker support. The document CSP stays separate from the worker sandbox
+policy. Verify a GA4 `page_view` collection request after changes; a successful
+transport request does not prove dashboard attribution. The animated hero renders at half CSS
 resolution, at up to 24 fps, and stops when offscreen or the tab is hidden.
 
 Edit `css/main.css`, then run `node scripts/sync-styles.mjs` to update the inline
-stylesheet in `index.html`. Inlining removes the render-blocking stylesheet request.
+stylesheet, font subsets, bootstrap and loader in `index.html`. Inlining removes
+the extra first-view font and loader requests. After copy changes run
+`python3 scripts/subset-fonts.py` (requires fonttools and brotli), then sync again
+so the embedded fonts include every character in the updated copy. Keep the original
+font files as the subset source.
 
 Validate using a local server and Lighthouse (repeat against the deployed URL after
 publication; local results do not establish production PageSpeed scores):
@@ -317,9 +325,9 @@ npx lighthouse http://localhost:8000 --chrome-flags='--headless' --output=html -
 npx lighthouse http://localhost:8000 --preset=desktop --chrome-flags='--headless' --output=html --output=json --output-path=/tmp/madebyjoe-desktop
 ```
 
-Local Lighthouse 13 runs, including a repeat with the short loading overlay restored,
-scored 100 in Performance, Accessibility, Best Practices
-and SEO on both profiles. Mobile: FCP 0.8 s, LCP 1.8 s, TBT 20 ms, CLS 0.
-Desktop: FCP 0.2 s, LCP 0.4 s, TBT 0 ms, CLS 0. Scores vary with server,
-network, third-party scripts and test conditions. Apache cache/header changes need
-verification on the deployed host because Python's server does not apply `.htaccess`.
+Local Lighthouse 13 runs with the overlay and worker-based Analytics scored 100 in
+Performance, Accessibility, Best Practices and SEO on both profiles. The mobile run
+with the production CSP applied had FCP 1.2 s, LCP 1.7 s and TBT 0 ms, with no
+console errors and a successful GA4 page-view request. Repeat against production:
+local results do not establish deployed PageSpeed scores. Scores vary with server,
+network and test conditions. Python's standard server does not apply `.htaccess`.

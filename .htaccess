@@ -101,7 +101,7 @@
     Header set Referrer-Policy "strict-origin-when-cross-origin"
     
     # Allow the Google tag and GA4 collection endpoints.
-    Header set Content-Security-Policy "default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;"
+    Header set Content-Security-Policy "default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; worker-src 'self' blob:; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;"
 </IfModule>
 
 # Remove Server Signature
@@ -154,4 +154,12 @@ RewriteRule ^ %1 [R=301,L]
 # Optimize for mobile
 <IfModule mod_headers.c>
     # Content is responsive; it does not vary by User-Agent.
+</IfModule>
+
+# Partytown evaluates vendor code inside its isolated analytics worker only.
+# Keep the document policy above unchanged for application scripts.
+<IfModule mod_headers.c>
+    <Files "partytown-sandbox-sw.html">
+        Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googletagmanager.com; worker-src 'self' blob:; connect-src 'self' https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com; img-src 'self' data: https:;"
+    </Files>
 </IfModule>

@@ -17,7 +17,7 @@
         if (done) return;
         done = true;
         loader.classList.add('is-finished');
-        setTimeout(() => loader.remove(), 240);
+        setTimeout(() => loader.remove(), 160);
       };
       const step = () => { progress = Math.min(100, progress + 50); };
       document.fonts.ready.then(step);
@@ -26,7 +26,7 @@
       else { poster.addEventListener('load', step, { once: true }); poster.addEventListener('error', step, { once: true }); }
       function frame(now) {
         if (done) return;
-        shown = Math.min(progress, shown + (now - last) / 6);
+        shown = Math.min(progress, shown + (now - last) / 2);
         last = now;
         const value = Math.round(shown);
         count.textContent = value;
@@ -35,7 +35,7 @@
         if (shown >= 100) finish(); else requestAnimationFrame(frame);
       }
       requestAnimationFrame(frame);
-      setTimeout(finish, 1800);
+      setTimeout(finish, 1200);
       loader.addEventListener('pointerdown', finish, { once: true });
       addEventListener('keydown', finish, { once: true });
     }
