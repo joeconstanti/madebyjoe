@@ -2,6 +2,24 @@
 <html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
+  <!-- Staff mode is browser-specific and runs before Analytics starts. -->
+  <script>
+    (() => {
+      const url = new URL(location.href);
+      const choice = url.searchParams.get('mbj_staff');
+      let staff = false;
+      try {
+        if (choice === '1') localStorage.setItem('mbj_staff', '1');
+        if (choice === '0') localStorage.removeItem('mbj_staff');
+        staff = localStorage.getItem('mbj_staff') === '1';
+      } catch (_) { staff = choice === '1'; }
+      if (staff) document.documentElement.dataset.staffTraffic = 'internal';
+      if (choice === '1' || choice === '0') {
+        url.searchParams.delete('mbj_staff');
+        history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+      }
+    })();
+  </script>
   <!-- Google tag (gtag.js) -->
   <!-- partytown:start -->
   <script>window.partytown = { lib: '/js/vendor/partytown-1.0.2/', forward: ['dataLayer.push', 'gtag'] };
@@ -14,7 +32,7 @@
     window.dataLayer = window.dataLayer || [];
     window.gtag = function(){dataLayer.push(arguments);};
     gtag('js', new Date());
-    gtag('config', 'G-MEYN9YX3MM');
+    gtag('config', 'G-MEYN9YX3MM', document.documentElement.dataset.staffTraffic === 'internal' ? { traffic_type: 'internal' } : {});
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>madebyjoe | Joe, designer &amp; technologist</title>
