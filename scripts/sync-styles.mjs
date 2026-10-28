@@ -12,7 +12,7 @@ let html = readFileSync(file, 'utf8');
 if (!html.includes('  <style>')) throw new Error('Inline stylesheet not found');
 html = html.replace(/  <style>[\s\S]*?<\/style>/, `  <style>\n${css}\n  </style>`);
 html = html.replace(/<!-- partytown:start -->[\s\S]*?<!-- partytown:end -->/, `<!-- partytown:start -->
-  <script>window.partytown = { lib: '/js/vendor/partytown-1.0.2/', forward: ['dataLayer.push'] };
+  <script>window.partytown = { lib: '/js/vendor/partytown-1.0.2/', forward: ['dataLayer.push', 'gtag'] };
 ${snippet}
   </script>
   <!-- partytown:end -->`);

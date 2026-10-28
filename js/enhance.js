@@ -49,9 +49,7 @@
   let toastTimer;
   function contactIntent(method) {
     if (location.hostname !== 'madebyjoe.co') return;
-    window.dataLayer = window.dataLayer || [];
-    function send() { window.dataLayer.push(arguments); }
-    send('event', 'contact_intent', { contact_method: method, send_to: 'G-MEYN9YX3MM' });
+    window.gtag('event', 'contact_intent', { contact_method: method, send_to: 'G-MEYN9YX3MM' });
   }
   document.querySelectorAll('.js-copy').forEach((link) => {
     link.addEventListener('click', (event) => {
