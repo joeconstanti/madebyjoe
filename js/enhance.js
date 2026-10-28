@@ -47,10 +47,35 @@
   }
   // Contact works even if the optional motion bundle fails to load.
   let toastTimer;
-  function contactIntent(method) {
-    if (location.hostname !== 'madebyjoe.co') return;
-    window.gtag('event', 'contact_intent', { contact_method: method, send_to: 'G-MEYN9YX3MM' });
+  function trackEvent(name, parameters) {
+    if (location.hostname !== 'madebyjoe.co' || typeof window.gtag !== 'function') return;
+    window.gtag('event', name, { ...parameters, send_to: 'G-MEYN9YX3MM' });
   }
+  function contactIntent(method) { trackEvent('contact_intent', { contact_method: method }); }
+  // Record each section once, after it stays visible for one second.
+  if ('IntersectionObserver' in window) {
+    const timers = new Map();
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(({ target, isIntersecting }) => {
+        clearTimeout(timers.get(target));
+        timers.delete(target);
+        if (!isIntersecting || document.visibilityState !== 'visible') return;
+        timers.set(target, setTimeout(() => {
+          timers.delete(target);
+          if (document.visibilityState !== 'visible') return;
+          trackEvent('section_view', { section_id: target.id });
+          observer.unobserve(target);
+        }, 1000));
+      });
+    }, { threshold: 0.25 });
+    document.querySelectorAll('section[id], article.ch[id]').forEach((section) => observer.observe(section));
+  }
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href]');
+    const chapter = link?.closest('article.ch[id]');
+    if (!chapter || !/^https?:/.test(link.protocol) || link.hostname === location.hostname) return;
+    trackEvent('project_click', { section_id: chapter.id, link_domain: link.hostname, link_url: link.href });
+  });
   document.querySelectorAll('.js-copy').forEach((link) => {
     link.addEventListener('click', (event) => {
       if (!navigator.clipboard) { contactIntent('email_link'); return; }
