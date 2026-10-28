@@ -45,11 +45,34 @@
       addEventListener('keydown', finish, { once: true });
     }
   }
+  // Contact works even if the optional motion bundle fails to load.
+  let toastTimer;
+  function contactIntent(method) {
+    if (location.hostname !== 'madebyjoe.co') return;
+    window.dataLayer = window.dataLayer || [];
+    function send() { window.dataLayer.push(arguments); }
+    send('event', 'contact_intent', { contact_method: method, send_to: 'G-MEYN9YX3MM' });
+  }
+  document.querySelectorAll('.js-copy').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (!navigator.clipboard) { contactIntent('email_link'); return; }
+      event.preventDefault();
+      navigator.clipboard.writeText(link.textContent.trim()).then(() => {
+        contactIntent('email_copy');
+        const toast = document.querySelector('.toast');
+        if (!toast) return;
+        toast.textContent = 'Copied ' + link.textContent.trim();
+        toast.classList.add('on');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('on'), 2200);
+      }, () => { contactIntent('email_link'); location.href = link.href; });
+    });
+  });
   let started = false;
   async function enhance() {
     if (started) return;
     started = true;
-    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'main.js?v=20261023g']) {
+    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'main.js?v=20261028-seo']) {
       const loaded = await new Promise((resolve) => {
         const script = document.createElement('script');
         script.src = 'js/' + src;

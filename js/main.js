@@ -200,16 +200,6 @@
     }
   }
 
-  /* ---------- Copy email ---------- */
-  const toast = $('.toast');
-  let toastT;
-  function say(msg) { toast.textContent = msg; toast.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove('on'), 2200); }
-  $$('.js-copy').forEach((a) => a.addEventListener('click', (e) => {
-    if (!navigator.clipboard) return;
-    e.preventDefault();
-    navigator.clipboard.writeText(a.textContent.trim()).then(() => say('Copied ' + a.textContent.trim()), () => (location.href = a.href));
-  }));
-
   /* ---------- Scroll animations ---------- */
   let activeChapterVideos = [];
   function setActiveChapter(ch) {

@@ -19,9 +19,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>madebyjoe | Joe, designer &amp; technologist</title>
   <meta name="description" content="Joe is a London designer and technologist who makes things: From the Root Studio (3D, motion &amp; AI), Synthetic Labs (AI research), Cerebral (private AI hosting), Automate Digital (AI automation) and joe.graphics (personal design work).">
+  <link rel="canonical" href="https://madebyjoe.co/">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://madebyjoe.co/#person",
+      "name": "Joe Constanti",
+      "alternateName": "madebyjoe",
+      "url": "https://madebyjoe.co/",
+      "jobTitle": "Designer and technologist",
+      "sameAs": [
+        "https://www.linkedin.com/in/joeconstanti/",
+        "https://joe.graphics/"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://madebyjoe.co/#website",
+      "url": "https://madebyjoe.co/",
+      "name": "madebyjoe",
+      "publisher": {
+        "@id": "https://madebyjoe.co/#person"
+      }
+    },
+    {
+      "@type": "ProfilePage",
+      "@id": "https://madebyjoe.co/#webpage",
+      "url": "https://madebyjoe.co/",
+      "name": "madebyjoe | Joe, designer & technologist",
+      "mainEntity": {
+        "@id": "https://madebyjoe.co/#person"
+      },
+      "isPartOf": {
+        "@id": "https://madebyjoe.co/#website"
+      }
+    }
+  ]
+}
+  </script>
   <meta name="theme-color" content="#0e0d0c">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://madebyjoe.co">
+  <meta property="og:url" content="https://madebyjoe.co/">
   <meta property="og:title" content="madebyjoe | Joe, designer &amp; technologist">
   <meta property="og:description" content="From the Root Studio, Synthetic Labs, Cerebral, Automate Digital and joe.graphics.">
   <meta property="og:image" content="https://madebyjoe.co/img/OG.jpg">
@@ -904,11 +945,34 @@ void main(){
       addEventListener('keydown', finish, { once: true });
     }
   }
+  // Contact works even if the optional motion bundle fails to load.
+  let toastTimer;
+  function contactIntent(method) {
+    if (location.hostname !== 'madebyjoe.co') return;
+    window.dataLayer = window.dataLayer || [];
+    function send() { window.dataLayer.push(arguments); }
+    send('event', 'contact_intent', { contact_method: method, send_to: 'G-MEYN9YX3MM' });
+  }
+  document.querySelectorAll('.js-copy').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (!navigator.clipboard) { contactIntent('email_link'); return; }
+      event.preventDefault();
+      navigator.clipboard.writeText(link.textContent.trim()).then(() => {
+        contactIntent('email_copy');
+        const toast = document.querySelector('.toast');
+        if (!toast) return;
+        toast.textContent = 'Copied ' + link.textContent.trim();
+        toast.classList.add('on');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('on'), 2200);
+      }, () => { contactIntent('email_link'); location.href = link.href; });
+    });
+  });
   let started = false;
   async function enhance() {
     if (started) return;
     started = true;
-    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'main.js?v=20261023g']) {
+    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'main.js?v=20261028-seo']) {
       const loaded = await new Promise((resolve) => {
         const script = document.createElement('script');
         script.src = 'js/' + src;
