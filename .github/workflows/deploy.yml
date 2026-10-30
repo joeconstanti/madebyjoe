@@ -22,5 +22,18 @@ jobs:
           protocol: ftp
           local-dir: ./                 # the root of your repo
           server-dir: ${{ secrets.FTP_REMOTE_PATH }}
+          exclude: |
+            **/.git*
+            **/node_modules/**
+            .agents/**
+            .agent/**
+            .claude/**
+            .codex/**
+            .cursor/**
+            .gemini/**
+            .opencode/**
+            .pi/**
+            .impeccable/**
+            AGENTS.md
           log-level: verbose
           timeout: 60000
