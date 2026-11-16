@@ -1,0 +1,38 @@
+name: Validate static site
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate sources and failure paths
+        run: |
+          node scripts/sync-styles.mjs --check
+          python3 scripts/validate-site.py
+          python3 scripts/test-validation.py
+          for file in js/*.js scripts/*.mjs; do node --check "$file"; done
+      - name: Verify Apache behavior using the public artifact
+        run: |
+          python3 scripts/stage-public.py /tmp/madebyjoe-public
+          sudo a2enmod rewrite headers expires
+          sudo tee /etc/apache2/sites-available/000-default.conf >/dev/null <<'APACHE'
+          <VirtualHost *:80>
+            DocumentRoot /tmp/madebyjoe-public
+            <Directory /tmp/madebyjoe-public>
+              AllowOverride All
+              Require all granted
+            </Directory>
+          </VirtualHost>
+          APACHE
+          sudo apache2ctl configtest
+          sudo systemctl restart apache2
+          python3 scripts/check-server.py http://127.0.0.1
