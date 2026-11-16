@@ -34,6 +34,16 @@ jobs:
             .opencode/**
             .pi/**
             .impeccable/**
-            AGENTS.md
+            .github/**
+            .kiro/**
+            .trae/**
+            .qoder/**
+            .rovodev/**
+            .windsurf/**
+            .cpanel.yml
+            .cursorignore
+            archive/**
+            scripts/**
+            *.md
           log-level: verbose
           timeout: 60000
