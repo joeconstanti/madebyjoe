@@ -5,12 +5,32 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
+# Never interrupt a partial FTP upload, and never upload two releases together.
+concurrency:
+  group: production-ftp
+  cancel-in-progress: false
+
 jobs:
   ftp-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate public sources
+        run: |
+          node scripts/sync-styles.mjs --check
+          python3 scripts/validate-site.py
+          for file in js/*.js scripts/*.mjs; do node --check "$file"; done
+      - name: Stage public files
+        run: python3 scripts/stage-public.py "${{ runner.temp }}/public-site"
 
       - name: Sync files to GoDaddy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -20,30 +40,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
-          local-dir: ./                 # the root of your repo
+          local-dir: ${{ runner.temp }}/public-site/
           server-dir: ${{ secrets.FTP_REMOTE_PATH }}
-          exclude: |
-            **/.git*
-            **/node_modules/**
-            .agents/**
-            .agent/**
-            .claude/**
-            .codex/**
-            .cursor/**
-            .gemini/**
-            .opencode/**
-            .pi/**
-            .impeccable/**
-            .github/**
-            .kiro/**
-            .trae/**
-            .qoder/**
-            .rovodev/**
-            .windsurf/**
-            .cpanel.yml
-            .cursorignore
-            archive/**
-            scripts/**
-            *.md
           log-level: verbose
           timeout: 60000
