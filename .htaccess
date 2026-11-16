@@ -71,9 +71,9 @@
 
 # Cache-Control Headers (fallback for servers without mod_expires)
 <IfModule mod_headers.c>
-    # Static assets
+    # Asset URLs are mutable; revalidate instead of retaining stale releases.
     <FilesMatch "\.(css|js|png|jpg|jpeg|gif|webp|mp4|svg|woff|woff2|ttf|eot|ico)$">
-        Header set Cache-Control "public, max-age=31536000, immutable"
+        Header set Cache-Control "public, no-cache, must-revalidate"
     </FilesMatch>
     
     # HTML files
