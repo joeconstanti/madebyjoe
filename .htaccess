@@ -113,7 +113,7 @@
 # Keep repo internals off the public web: agent config, docs, archive and tooling.
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteRule ^(?:\.(?!well-known/)[^/]+|archive|scripts)(?:/|$) - [R=404,L]
+    RewriteRule ^(?:\.(?!well-known/)[^/]+|archive|scripts|docs)(?:/|$) - [R=404,L]
     RewriteRule ^(?:AGENTS|DESIGN|PLAN|PRODUCT|README|CLAUDE|GEMINI)\.md$ - [R=404,L,NC]
 </IfModule>
 
