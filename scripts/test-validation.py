@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""Exercise validation failure paths in disposable copies, never the real page."""
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+class ValidationTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name) / 'checkout'
+        self.root.mkdir()
+        for name in ('index.html', '.htaccess', 'robots.txt', 'sitemap.xml'):
+            shutil.copy2(ROOT / name, self.root / name)
+        for name in ('css', 'fonts', 'img', 'js', 'media', 'scripts'):
+            shutil.copytree(ROOT / name, self.root / name)
+        self.page = self.root / 'index.html'
+
+    def run_script(self, *args):
+        return subprocess.run(args, cwd=self.root, capture_output=True, text=True)
+
+    def test_current_sources_pass(self):
+        for args in [('node', 'scripts/sync-styles.mjs', '--check'),
+                     ('python3', 'scripts/validate-site.py')]:
+            result = self.run_script(*args)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_stale_inline_check_does_not_write(self):
+        source = self.root / 'css/main.css'
+        source.write_text(source.read_text() + '\n/* changed source */\n')
+        before = self.page.read_bytes()
+        result = self.run_script('node', 'scripts/sync-styles.mjs', '--check')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('stale', result.stderr)
+        self.assertEqual(self.page.read_bytes(), before)
+
+    def test_missing_marker_fails(self):
+        self.page.write_text(self.page.read_text().replace('<!-- inline-hero:end -->', ''))
+        result = self.run_script('node', 'scripts/sync-styles.mjs', '--check')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Expected exactly one', result.stderr)
+
+    def test_missing_asset_fails(self):
+        self.page.write_text(self.page.read_text() + '<img src="missing-test.webp">')
+        result = self.run_script('python3', 'scripts/validate-site.py')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Missing local asset: missing-test.webp', result.stderr)
+
+    def test_missing_fragment_fails(self):
+        self.page.write_text(self.page.read_text() + '<a href="#missing-test">test</a>')
+        result = self.run_script('python3', 'scripts/validate-site.py')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Missing fragment', result.stderr)
+
+    def test_staging_excludes_private_files_and_rejects_checkout(self):
+        (self.root / 'PRIVATE.md').write_text('Do not publish')
+        result = self.run_script('python3', 'scripts/stage-public.py', str(self.root / 'release'))
+        self.assertNotEqual(result.returncode, 0)
+        destination = Path(self.temp.name) / 'public'
+        result = self.run_script('python3', 'scripts/stage-public.py', str(destination))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual({p.name for p in destination.iterdir()},
+                         {'.htaccess', 'index.html', 'robots.txt', 'sitemap.xml', 'css', 'fonts', 'img', 'js', 'media'})
+
+
+if __name__ == '__main__':
+    unittest.main()
