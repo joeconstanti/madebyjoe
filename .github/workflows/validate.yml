@@ -22,12 +22,12 @@ jobs:
           for file in js/*.js scripts/*.mjs; do node --check "$file"; done
       - name: Verify Apache behavior using the public artifact
         run: |
-          python3 scripts/stage-public.py /tmp/madebyjoe-public
+          sudo python3 scripts/stage-public.py /var/www/madebyjoe-public
           sudo a2enmod rewrite headers expires
           sudo tee /etc/apache2/sites-available/000-default.conf >/dev/null <<'APACHE'
           <VirtualHost *:80>
-            DocumentRoot /tmp/madebyjoe-public
-            <Directory /tmp/madebyjoe-public>
+            DocumentRoot /var/www/madebyjoe-public
+            <Directory /var/www/madebyjoe-public>
               AllowOverride All
               Require all granted
             </Directory>
