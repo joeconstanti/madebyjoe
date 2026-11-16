@@ -1,9 +1,7 @@
 ---
 deployment:
   tasks:
-    # 1. Update this to your exact full path:
+    # Match the public-only FTP deployment; never copy agent tooling or Git data.
     - export DEPLOYPATH=/home/joeconstanti/public_html/madebyjoe.co/
-
-    # 2. Copy everything (except .git) into that folder:
-    - /bin/cp -R . $DEPLOYPATH
-    - /bin/rm -rf $DEPLOYPATH/.git
+    - /bin/cp .htaccess index.html robots.txt sitemap.xml "$DEPLOYPATH"
+    - /bin/cp -R css fonts img js media "$DEPLOYPATH"
