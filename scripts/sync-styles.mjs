@@ -8,7 +8,17 @@ css = css.replace(/url\(\.\.\/fonts\/([^)]*\.woff2)\)/g, (_, name) => {
 });
 const snippet = readFileSync(new URL('js/vendor/partytown-1.0.2/partytown.js', root), 'utf8');
 const file = new URL('index.html', root);
-let html = readFileSync(file, 'utf8');
+const original = readFileSync(file, 'utf8');
+let html = original;
+for (const marker of ['partytown', 'inline-hero', 'inline-enhance']) {
+  for (const edge of ['start', 'end']) {
+    const token = `<!-- ${marker}:${edge} -->`;
+    if (html.split(token).length !== 2) throw new Error(`Expected exactly one ${token}`);
+  }
+  if (html.indexOf(`<!-- ${marker}:start -->`) > html.indexOf(`<!-- ${marker}:end -->`)) {
+    throw new Error(`Reversed markers: ${marker}`);
+  }
+}
 if (!html.includes('  <style>')) throw new Error('Inline stylesheet not found');
 html = html.replace(/  <style>[\s\S]*?<\/style>/, `  <style>\n${css}\n  </style>`);
 html = html.replace(/<!-- partytown:start -->[\s\S]*?<!-- partytown:end -->/, `<!-- partytown:start -->
@@ -22,4 +32,9 @@ const poster = readFileSync(new URL('media/v2/hero-dither.webp', root)).toString
 html = html.replace(/(<img class="hero__poster" src=")[^"]+"/, `$1data:image/webp;base64,${poster}"`);
 const enhance = readFileSync(new URL('js/enhance.js', root), 'utf8');
 html = html.replace(/  <!-- inline-enhance:start -->[\s\S]*?<!-- inline-enhance:end -->/, `  <!-- inline-enhance:start -->\n  <script>\n${enhance}\n  </script>\n  <!-- inline-enhance:end -->`);
-writeFileSync(file, html);
+if (process.argv.includes('--check')) {
+  if (html !== original) {
+    console.error('Generated index.html is stale. Run node scripts/sync-styles.mjs');
+    process.exitCode = 1;
+  } else console.log('Generated HTML is in sync');
+} else writeFileSync(file, html);
