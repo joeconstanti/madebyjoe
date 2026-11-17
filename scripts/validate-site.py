@@ -15,11 +15,17 @@ class Page(HTMLParser):
         super().__init__()
         self.ids = set()
         self.references = []
+        self.canonicals = []
+        self.in_head = False
         self.errors = []
         self.json_parts = None
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if tag == 'head':
+            self.in_head = True
+        if tag == 'link' and 'canonical' in (attrs.get('rel') or '').lower().split():
+            self.canonicals.append(attrs.get('href') if self.in_head else None)
         if 'id' in attrs:
             if attrs['id'] in self.ids:
                 self.errors.append(f"Duplicate id: {attrs['id']}")
@@ -35,6 +41,8 @@ class Page(HTMLParser):
             self.json_parts.append(data)
 
     def handle_endtag(self, tag):
+        if tag == 'head':
+            self.in_head = False
         if tag == 'script' and self.json_parts is not None:
             try:
                 json.loads(''.join(self.json_parts))
@@ -69,6 +77,8 @@ def validate():
     locations = [node.text for node in tree.iter('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
     if locations != ['https://madebyjoe.co/']:
         page.errors.append('Unexpected canonical sitemap URLs')
+    if len(page.canonicals) != 1 or page.canonicals != locations:
+        page.errors.append('Expected exactly one homepage canonical matching the sitemap URL in the head')
     if 'Sitemap: https://madebyjoe.co/sitemap.xml' not in (ROOT / 'robots.txt').read_text():
         page.errors.append('Missing sitemap discovery')
     if page.errors:

@@ -59,6 +59,27 @@ class ValidationTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('Expected exactly one', result.stderr)
 
+    def test_homepage_canonical_matches_sitemap(self):
+        original = self.page.read_text()
+        tag = '<link rel="canonical" href="https://madebyjoe.co/">'
+        for canonical in ('', tag + tag,
+                          '<link rel="CANONICAL" href="https://www.madebyjoe.co/">',
+                          '<link rel="canonical" href="/">'):
+            with self.subTest(canonical=canonical):
+                self.page.write_text(original.replace(tag, canonical))
+                result = self.run_script('python3', 'scripts/validate-site.py')
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('Expected exactly one homepage canonical matching the sitemap URL',
+                              result.stderr)
+        self.page.write_text(original.replace(tag, tag.replace('canonical', 'CANONICAL')))
+        result = self.run_script('python3', 'scripts/validate-site.py')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.page.write_text(original.replace(tag, '').replace('</body>', tag + '</body>'))
+        result = self.run_script('python3', 'scripts/validate-site.py')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Expected exactly one homepage canonical matching the sitemap URL',
+                      result.stderr)
+
     def test_missing_asset_fails(self):
         self.page.write_text(self.page.read_text() + '<img src="missing-test.webp">')
         result = self.run_script('python3', 'scripts/validate-site.py')
