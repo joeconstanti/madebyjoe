@@ -15,6 +15,18 @@ def stage(destination):
         raise ValueError('Staging directory must be outside the checkout')
     if destination.exists():
         raise ValueError('Use a new, empty staging directory')
+    # Inspect the complete source tree before creating any upload artifact. Links
+    # are never public inputs, even when their current target is inside the repo.
+    for name in (*FILES, *DIRECTORIES):
+        source = ROOT / name
+        paths = [source]
+        if source.is_dir() and not source.is_symlink():
+            paths.extend(source.rglob('*'))
+        for path in paths:
+            if path.is_symlink():
+                raise ValueError(f'Symbolic links are not public assets: {path.relative_to(ROOT)}')
+            if not path.is_file() and not path.is_dir():
+                raise ValueError(f'Public asset is not a regular file or directory: {path.relative_to(ROOT)}')
     destination.mkdir(parents=True)
     for name in FILES:
         shutil.copy2(ROOT / name, destination / name)
