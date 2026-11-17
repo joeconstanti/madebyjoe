@@ -85,7 +85,8 @@ To inspect an upload artifact without deploying:
 python3 scripts/stage-public.py /tmp/madebyjoe-public-review
 ```
 
-Choose a new path outside the checkout. For rollback, revert the faulty change on
+Choose a new path outside the checkout. Public inputs must be regular files and
+directories; staging rejects symbolic links before creating the upload directory. For rollback, revert the faulty change on
 `main` through a reviewed PR and let the same deployment workflow publish it.
 Check the Action conclusion, public homepage, headers and affected interactions.
 A green upload alone does not prove the live page. Asset URLs revalidate; older

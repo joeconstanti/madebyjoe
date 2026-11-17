@@ -57,6 +57,30 @@ class ValidationTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('Missing fragment', result.stderr)
 
+    def test_staging_rejects_symlinks_before_creating_destination(self):
+        private = Path(self.temp.name) / 'private.txt'
+        private.write_text('must not publish')
+        for name, target in [('external.txt', private),
+                             ('internal.txt', self.root / 'index.html'),
+                             ('dangling.txt', self.root / 'missing'),
+                             ('directory', self.root / 'scripts')]:
+            with self.subTest(name=name):
+                link = self.root / 'media' / name
+                link.symlink_to(target)
+                destination = Path(self.temp.name) / ('rejected-' + name)
+                result = self.run_script('python3', 'scripts/stage-public.py', str(destination))
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('Symbolic links are not public assets', result.stderr)
+                self.assertFalse(destination.exists())
+                link.unlink()
+        top = self.root / 'robots.txt'
+        top.unlink()
+        top.symlink_to(private)
+        destination = Path(self.temp.name) / 'rejected-top'
+        result = self.run_script('python3', 'scripts/stage-public.py', str(destination))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(destination.exists())
+
     def test_staging_excludes_private_files_and_rejects_checkout(self):
         (self.root / 'PRIVATE.md').write_text('Do not publish')
         result = self.run_script('python3', 'scripts/stage-public.py', str(self.root / 'release'))
