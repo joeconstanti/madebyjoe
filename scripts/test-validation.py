@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from urllib.robotparser import RobotFileParser
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -29,6 +30,19 @@ class ValidationTests(unittest.TestCase):
                      ('python3', 'scripts/validate-site.py')]:
             result = self.run_script(*args)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_rendering_resources_are_crawlable(self):
+        robots = RobotFileParser()
+        robots.parse((self.root / 'robots.txt').read_text().splitlines())
+        for path in ('/', '/js/main.js', '/js/vendor/gsap.min.js',
+                     '/js/vendor/ScrollTrigger.min.js', '/js/vendor/SplitText.min.js',
+                     '/js/vendor/lenis.min.js'):
+            with self.subTest(path=path):
+                self.assertTrue(robots.can_fetch('Googlebot', path))
+        for path in ('/~partytown/partytown-sw.js',
+                     '/js/vendor/partytown-1.0.2/partytown.js'):
+            with self.subTest(path=path):
+                self.assertFalse(robots.can_fetch('Googlebot', path))
 
     def test_stale_inline_check_does_not_write(self):
         source = self.root / 'css/main.css'

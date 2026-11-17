@@ -1,6 +1,5 @@
 User-agent: *
-Allow: /
 Disallow: /~partytown/
-Disallow: /js/vendor/
+Disallow: /js/vendor/partytown-1.0.2/
 
 Sitemap: https://madebyjoe.co/sitemap.xml
