@@ -57,6 +57,37 @@ class ValidationTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('Missing fragment', result.stderr)
 
+    def test_runtime_media_and_explicit_home_fragments(self):
+        original = self.page.read_text()
+        for markup, message in [
+            ('<video data-poster="missing-poster.webp"></video>', 'Missing local asset'),
+            ('<img src="media/">', 'Missing local asset'),
+            ('<a href="index.html#missing">bad</a>', 'Missing fragment'),
+            ('<a href="/?q=1#missing">bad</a>', 'Missing fragment'),
+        ]:
+            with self.subTest(markup=markup):
+                self.page.write_text(original + markup)
+                result = self.run_script('python3', 'scripts/validate-site.py')
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(message, result.stderr)
+        self.page.write_text(original + '<a href="/index.html?q=1#top">ok</a>' +
+                             '<video data-poster="/media/v2/aut-pipes.webp"></video>')
+        result = self.run_script('python3', 'scripts/validate-site.py')
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_css_root_urls_and_containment(self):
+        css = self.root / 'css/main.css'
+        original = css.read_text()
+        css.write_text(original + '\n.test { background: url(/media/v2/aut-pipes.webp); filter: url(#filter); }')
+        result = self.run_script('python3', 'scripts/validate-site.py')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        outside = Path(self.temp.name) / 'outside.webp'
+        outside.write_bytes(b'not public')
+        css.write_text(original + '\n.test { background: url(../../outside.webp); }')
+        result = self.run_script('python3', 'scripts/validate-site.py')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Missing CSS asset', result.stderr)
+
     def test_staging_rejects_symlinks_before_creating_destination(self):
         private = Path(self.temp.name) / 'private.txt'
         private.write_text('must not publish')

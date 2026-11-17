@@ -24,9 +24,9 @@ class Page(HTMLParser):
             if attrs['id'] in self.ids:
                 self.errors.append(f"Duplicate id: {attrs['id']}")
             self.ids.add(attrs['id'])
-        for name in ('src', 'href', 'poster', 'data-src'):
+        for name in ('src', 'href', 'poster', 'data-src', 'data-poster'):
             if attrs.get(name):
-                self.references.append(attrs[name])
+                self.references.append((attrs[name], name != 'href'))
         if tag == 'script' and attrs.get('type') == 'application/ld+json':
             self.json_parts = []
 
@@ -46,21 +46,24 @@ class Page(HTMLParser):
 def validate():
     page = Page()
     page.feed((ROOT / 'index.html').read_text())
-    for reference in page.references:
+    for reference, resource in page.references:
         url = urlsplit(reference)
         if url.scheme or url.netloc:
             continue
-        if not url.path:
-            if url.fragment and unquote(url.fragment) not in page.ids:
-                page.errors.append(f'Missing fragment: {reference}')
-            continue
-        path = (ROOT / unquote(url.path).lstrip('/')).resolve()
-        if not path.is_relative_to(ROOT) or not path.exists():
+        path = (ROOT / unquote(url.path).lstrip('/')).resolve() if url.path else ROOT / 'index.html'
+        is_home = path == ROOT or path == ROOT / 'index.html'
+        if url.fragment and is_home and unquote(url.fragment) not in page.ids:
+            page.errors.append(f'Missing fragment: {reference}')
+        if not path.is_relative_to(ROOT) or not path.exists() or (resource and not path.is_file()):
             page.errors.append(f'Missing local asset: {reference}')
     css = ROOT / 'css/main.css'
     for reference in re.findall(r'url\([\'"]?([^\)\'"\s]+)', css.read_text()):
         url = urlsplit(reference)
-        if not url.scheme and not url.netloc and not (css.parent / unquote(url.path)).is_file():
+        if url.scheme or url.netloc or not url.path:
+            continue
+        decoded = unquote(url.path)
+        path = (ROOT / decoded.lstrip('/') if decoded.startswith('/') else css.parent / decoded).resolve()
+        if not path.is_relative_to(ROOT) or not path.is_file():
             page.errors.append(f'Missing CSS asset: {reference}')
     tree = ET.parse(ROOT / 'sitemap.xml')
     locations = [node.text for node in tree.iter('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
