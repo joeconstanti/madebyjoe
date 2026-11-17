@@ -109,3 +109,12 @@ request explicitly changes them.
 sources, repository evidence and follow-up opportunities. Third-party vendored
 code retains its own license notices. This repository does not currently contain
 a root license file; do not infer an MIT grant from historical README badges.
+
+## Workflow dependencies
+
+Actions are pinned to full upstream commit SHAs, with the reviewed version in a
+comment. Dependabot proposes weekly updates for review; it does not merge them.
+For each update, verify the upstream repository and release commit, review its
+changes and run PR validation before merging. FTP Action updates also require
+checking the merge-triggered deployment result. Preserve least-privilege workflow
+permissions and keep FTP secrets restricted to deployment.
