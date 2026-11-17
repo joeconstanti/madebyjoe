@@ -33,6 +33,8 @@ then sync again. Keep original fonts as subset sources.
 ```sh
 node scripts/sync-styles.mjs --check
 python3 scripts/validate-site.py
+python3 scripts/test-validation.py
+python3 scripts/test-generation.py
 for file in js/*.js scripts/*.mjs; do node --check "$file"; done
 ```
 
