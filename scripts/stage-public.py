@@ -5,7 +5,7 @@ from pathlib import Path
 import shutil
 
 ROOT = Path(__file__).resolve().parent.parent
-FILES = ('.htaccess', 'index.html', 'robots.txt', 'sitemap.xml')
+FILES = ('.htaccess', 'index.html', '404.html', 'robots.txt', 'sitemap.xml')
 DIRECTORIES = ('css', 'fonts', 'img', 'js', 'media')
 
 

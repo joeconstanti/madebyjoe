@@ -77,7 +77,7 @@ stages an explicit public-only directory and uploads that directory with FTP.
 Production uploads are serialized and are not canceled mid-transfer. The workflow
 uses repository FTP secrets; never place credentials in source or logs.
 
-Public files are `.htaccess`, `index.html`, `robots.txt`, `sitemap.xml`, and the
+Public files are `.htaccess`, `index.html`, `404.html`, `robots.txt`, `sitemap.xml`, and the
 `css`, `fonts`, `img`, `js`, and `media` directories. Agent folders, docs, scripts,
 archives and Git data must not be uploaded. `.cpanel.yml` uses the same public
 paths but is a legacy manual deployment route. Neither route guarantees removal
