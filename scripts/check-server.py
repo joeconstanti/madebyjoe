@@ -10,11 +10,43 @@ class NoRedirect(HTTPRedirectHandler):
         return None
 
 
+def check_security(headers, worker=False):
+    """Keep analytics' eval exception confined to its isolated worker document."""
+    for name, expected in [('X-Frame-Options', 'SAMEORIGIN'),
+                           ('X-Content-Type-Options', 'nosniff'),
+                           ('Referrer-Policy', 'strict-origin-when-cross-origin')]:
+        assert headers.get(name) == expected, f'{name}: expected {expected}'
+    policies = headers.get_all('Content-Security-Policy', [])
+    assert len(policies) == 1, 'Expected one Content-Security-Policy header'
+    directives = {}
+    for part in policies[0].split(';'):
+        tokens = part.split()
+        if not tokens:
+            continue
+        name, *values = tokens
+        assert name not in directives, f'Duplicate CSP directive: {name}'
+        directives[name] = set(values)
+    scripts = {"'self'", "'unsafe-inline'", 'https://*.googletagmanager.com'}
+    connections = {"'self'", 'https://*.google-analytics.com',
+                   'https://*.analytics.google.com', 'https://*.googletagmanager.com'}
+    if worker:
+        scripts.add("'unsafe-eval'")
+    else:
+        scripts.add('https://*.clarity.ms')
+        connections.add('https://*.clarity.ms')
+        assert "'unsafe-eval'" not in policies[0], 'Document must not allow unsafe-eval'
+    assert directives.get('script-src') == scripts, 'Unexpected CSP script sources'
+    assert directives.get('connect-src') == connections, 'Unexpected CSP collection endpoints'
+    assert directives.get('worker-src') == {"'self'", 'blob:'}, 'Unexpected CSP worker sources'
+    expected_default = {"'self'"} if worker else {"'self'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com'}
+    assert directives.get('default-src') == expected_default, 'Unexpected CSP default sources'
+
+
 def check(base):
     opener = build_opener(NoRedirect())
     count = 0
 
-    def request(path, status=200, mime=None, revalidate=False, host=None, location=None):
+    def request(path, status=200, mime=None, revalidate=False, host=None, location=None, security=None):
         nonlocal count
         headers = {'Host': host} if host else {}
         try:
@@ -28,11 +60,15 @@ def check(base):
             if revalidate:
                 cache = response.headers.get('Cache-Control', '')
                 assert 'no-cache' in cache and 'immutable' not in cache, f'{path}: stale cache policy {cache}'
+            if security:
+                check_security(response.headers, worker=security == 'worker')
             if location:
                 assert response.headers.get('Location') == location, f'{path}: wrong redirect'
         count += 1
 
-    request('/', mime='text/html', revalidate=True)
+    request('/', mime='text/html', revalidate=True, security='document')
+    request('/js/vendor/partytown-1.0.2/partytown-sandbox-sw.html',
+            mime='text/html', revalidate=True, security='worker')
     request('/css/main.css', mime='text/css', revalidate=True)
     request('/js/main.js', mime='application/javascript', revalidate=True)
     request('/media/v2/aut-pipes.webp', mime='image/webp', revalidate=True)

@@ -35,6 +35,7 @@ node scripts/sync-styles.mjs --check
 python3 scripts/validate-site.py
 python3 scripts/test-validation.py
 python3 scripts/test-generation.py
+python3 scripts/test-server.py
 for file in js/*.js scripts/*.mjs; do node --check "$file"; done
 ```
 
@@ -48,7 +49,8 @@ Against a real Apache origin configured to serve this checkout with AllowOverrid
 python3 scripts/check-server.py http://127.0.0.1:8088
 ```
 
-This tests headers, internal path denial and canonical redirects. Host overrides
+This tests MIME/cache and security headers, the isolated analytics-worker CSP
+exception, internal path denial and canonical redirects. Host overrides
 are intended for direct-origin testing; a CDN may route them differently.
 
 Browser acceptance after runtime or media changes:
