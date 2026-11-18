@@ -91,6 +91,10 @@ def check(base):
             body_contains=(b'<meta name="robots" content="noindex">',))
     # Host overrides exercise origin rules without relying on DNS or following redirects.
     request('/index.html?test=1', status=301, host='madebyjoe.co', location='https://madebyjoe.co/?test=1')
+    for host in ('madebyjoe.co', 'www.madebyjoe.co'):
+        request('/OG.jpg?test=1', status=301, host=host,
+                location='https://madebyjoe.co/img/OG.jpg?test=1')
+    request('/img/OG.jpg', mime='image/jpeg', revalidate=True)
     request('/?test=1', status=301, host='www.madebyjoe.co', location='https://madebyjoe.co/?test=1')
     print(f'Passed {count} server checks at {base}')
 
