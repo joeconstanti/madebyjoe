@@ -5,6 +5,12 @@ on:
     branches: [main]
 permissions:
   contents: read
+
+# Only a newer run for the same PR can replace obsolete validation.
+concurrency:
+  group: static-validation-${{ github.event.pull_request.number && format('pr-{0}', github.event.pull_request.number) || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.pull_request.number != null }}
+
 jobs:
   validate:
     runs-on: ubuntu-latest
