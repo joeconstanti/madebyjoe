@@ -40,18 +40,22 @@ class HeaderTests(unittest.TestCase):
                 response.code = 200
                 headers = response.headers = Message()
                 headers['Cache-Control'] = 'public, no-cache, must-revalidate'
-                types = {'.css': 'text/css', '.js': 'application/javascript', '.webp': 'image/webp', '.mp4': 'video/mp4'}
+                types = {'.css': 'text/css', '.js': 'application/javascript', '.webp': 'image/webp',
+                         '.mp4': 'video/mp4', '.jpg': 'image/jpeg'}
                 headers['Content-Type'] = types.get(Path(path).suffix, 'text/html')
                 headers['X-Frame-Options'] = 'SAMEORIGIN'
                 headers['X-Content-Type-Options'] = 'nosniff'
                 headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
                 headers['Content-Security-Policy'] = WORKER if worker else DOCUMENT
-                if path == '/index.html' or request.get_header('Host') == 'www.madebyjoe.co':
+                if path == '/OG.jpg':
+                    response.code = 301
+                    headers['Location'] = 'https://madebyjoe.co/img/OG.jpg?test=1'
+                elif path == '/index.html' or request.get_header('Host') == 'www.madebyjoe.co':
                     response.code = 301
                     headers['Location'] = 'https://madebyjoe.co/?test=1'
                 elif path not in ('/', '/css/main.css', '/js/main.js', '/media/v2/aut-pipes.webp',
                                   '/media/v2/aut-pipes.mp4', '/robots.txt', '/sitemap.xml',
-                                  '/404.html') and not worker:
+                                  '/404.html', '/img/OG.jpg') and not worker:
                     response.code = 404
                 if path == '/definitely-missing-mbj-page' and custom_404:
                     response.body = b'<h1>Page not found</h1><a href="/">Back to madebyjoe</a>'

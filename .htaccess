@@ -134,6 +134,10 @@ ErrorDocument 404 /404.html
     RewriteCond %{THE_REQUEST} \s/+index\.html(?:[?\s]) [NC]
     RewriteRule ^index\.html$ https://madebyjoe.co/ [R=301,L]
 
+    # Recover share previews that still use the former image URL.
+    RewriteCond %{HTTP_HOST} ^(?:www\.)?madebyjoe\.co(?::[0-9]+)?$ [NC]
+    RewriteRule ^OG\.jpg$ https://madebyjoe.co/img/OG.jpg [R=301,L]
+
     # Preserve paths and query parameters when removing www.
     RewriteCond %{HTTP_HOST} ^www\.madebyjoe\.co(?::[0-9]+)?$ [NC]
     RewriteRule ^ https://madebyjoe.co%{REQUEST_URI} [R=301,L,NE]
