@@ -18,6 +18,11 @@ WORKER = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' ht
 
 
 class Response:
+    body = b''
+
+    def read(self):
+        return self.body
+
     def __enter__(self):
         return self
 
@@ -26,7 +31,7 @@ class Response:
 
 
 class HeaderTests(unittest.TestCase):
-    def run_check(self, mutation=lambda headers, worker: None):
+    def run_check(self, mutation=lambda headers, worker: None, custom_404=True):
         class Opener:
             def open(self, request, **kwargs):
                 path = urlsplit(request.full_url).path
@@ -45,8 +50,13 @@ class HeaderTests(unittest.TestCase):
                     response.code = 301
                     headers['Location'] = 'https://madebyjoe.co/?test=1'
                 elif path not in ('/', '/css/main.css', '/js/main.js', '/media/v2/aut-pipes.webp',
-                                  '/media/v2/aut-pipes.mp4', '/robots.txt', '/sitemap.xml') and not worker:
+                                  '/media/v2/aut-pipes.mp4', '/robots.txt', '/sitemap.xml',
+                                  '/404.html') and not worker:
                     response.code = 404
+                if path == '/definitely-missing-mbj-page' and custom_404:
+                    response.body = b'<h1>Page not found</h1><a href="/">Back to madebyjoe</a>'
+                elif path == '/404.html':
+                    response.body = b'<meta name="robots" content="noindex">'
                 mutation(headers, worker)
                 return response
         with patch.object(server, 'build_opener', return_value=Opener()), redirect_stdout(io.StringIO()):
@@ -54,6 +64,10 @@ class HeaderTests(unittest.TestCase):
 
     def test_expected_headers_pass(self):
         self.run_check()
+
+    def test_bare_404_fails(self):
+        with self.assertRaisesRegex(AssertionError, '/definitely-missing-mbj-page: missing'):
+            self.run_check(custom_404=False)
 
     def test_missing_security_headers_fail(self):
         for name in ('X-Frame-Options', 'X-Content-Type-Options', 'Referrer-Policy', 'Content-Security-Policy'):

@@ -46,11 +46,13 @@ def check(base):
     opener = build_opener(NoRedirect())
     count = 0
 
-    def request(path, status=200, mime=None, revalidate=False, host=None, location=None, security=None):
+    def request(path, status=200, mime=None, revalidate=False, host=None, location=None,
+                security=None, body_contains=()):
         nonlocal count
         headers = {'Host': host} if host else {}
         try:
-            response = opener.open(Request(base.rstrip('/') + path, headers=headers, method='HEAD'), timeout=20)
+            method = 'GET' if body_contains else 'HEAD'
+            response = opener.open(Request(base.rstrip('/') + path, headers=headers, method=method), timeout=20)
         except HTTPError as error:
             response = error
         with response:
@@ -64,6 +66,10 @@ def check(base):
                 check_security(response.headers, worker=security == 'worker')
             if location:
                 assert response.headers.get('Location') == location, f'{path}: wrong redirect'
+            if body_contains:
+                body = response.read()
+                for fragment in body_contains:
+                    assert fragment in body, f'{path}: missing {fragment!r} in response body'
         count += 1
 
     request('/', mime='text/html', revalidate=True, security='document')
@@ -77,8 +83,12 @@ def check(base):
     request('/sitemap.xml', revalidate=True)
     for path in ['/README.md', '/PLAN.md', '/archive/index_v1.html', '/scripts/subset-fonts.py',
                  '/docs/improvements.md', '/.git/config', '/.github/workflows/deploy.yml',
-                 '/.agents/skills/impeccable/SKILL.md', '/definitely-missing-mbj-page']:
+                 '/.agents/skills/impeccable/SKILL.md']:
         request(path, status=404)
+    request('/definitely-missing-mbj-page', status=404, mime='text/html',
+            body_contains=(b'<h1>Page not found</h1>', b'<a href="/">Back to madebyjoe</a>'))
+    request('/404.html', mime='text/html',
+            body_contains=(b'<meta name="robots" content="noindex">',))
     # Host overrides exercise origin rules without relying on DNS or following redirects.
     request('/index.html?test=1', status=301, host='madebyjoe.co', location='https://madebyjoe.co/?test=1')
     request('/?test=1', status=301, host='www.madebyjoe.co', location='https://madebyjoe.co/?test=1')

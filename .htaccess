@@ -123,9 +123,8 @@ ServerSignature Off
 # Disable directory browsing
 Options -Indexes
 
-# Custom Error Pages (optional - create these files if needed)
-# ErrorDocument 404 /404.html
-# ErrorDocument 500 /500.html
+# Let visitors recover from a stale link while preserving the 404 status.
+ErrorDocument 404 /404.html
 
 # Use one public hostname and one homepage URL.
 # Match the requested URL, not Apache's internal DirectoryIndex lookup.
