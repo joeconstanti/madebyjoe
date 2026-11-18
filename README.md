@@ -40,8 +40,9 @@ for file in js/*.js scripts/*.mjs; do node --check "$file"; done
 ```
 
 The generation check is read-only. The static validator covers local HTML/CSS
-assets, local fragments, duplicate IDs, JSON-LD syntax and sitemap discovery. It
-does not check external links, visual layout or analytics attribution.
+assets, local fragments, duplicate IDs, JSON-LD syntax, sitemap discovery and
+the homepage share URL and image. It does not check external links, visual
+layout or analytics attribution.
 
 GitHub Actions schedules complete validation for every PR head and main push.
 A new run for the same PR cancels superseded validation still queued or running.

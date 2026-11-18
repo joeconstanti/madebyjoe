@@ -80,6 +80,30 @@ class ValidationTests(unittest.TestCase):
         self.assertIn('Expected exactly one homepage canonical matching the sitemap URL',
                       result.stderr)
 
+    def test_share_preview_uses_homepage_and_public_image(self):
+        original = self.page.read_text()
+        canonical = '<meta property="og:url" content="https://madebyjoe.co/">'
+        image = '<meta property="og:image" content="https://madebyjoe.co/img/OG.jpg">'
+        for tag, replacement, message in (
+            (canonical, '', 'Expected one og:url'),
+            (canonical, canonical + canonical, 'Expected one og:url'),
+            (canonical, canonical.replace('.co/', '.co/old'), 'Expected one og:url'),
+            (image, '', 'Expected one absolute og:image'),
+            (image, image + image, 'Expected one absolute og:image'),
+            (image, image.replace('madebyjoe.co', 'example.com'), 'Expected one absolute og:image'),
+            (image, image.replace('OG.jpg', 'missing.jpg'), 'Missing public og:image asset'),
+            (image, image.replace('img/OG.jpg', 'scripts/validate-site.py'), 'Missing public og:image asset'),
+        ):
+            with self.subTest(replacement=replacement):
+                self.page.write_text(original.replace(tag, replacement))
+                result = self.run_script('python3', 'scripts/validate-site.py')
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(message, result.stderr)
+        self.page.write_text(original.replace(image, '').replace('</body>', image + '</body>'))
+        result = self.run_script('python3', 'scripts/validate-site.py')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Expected one absolute og:image', result.stderr)
+
     def test_missing_asset_fails(self):
         self.page.write_text(self.page.read_text() + '<img src="missing-test.webp">')
         result = self.run_script('python3', 'scripts/validate-site.py')
