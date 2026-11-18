@@ -52,6 +52,9 @@ python3 scripts/check-server.py http://127.0.0.1:8088
 This tests MIME/cache and security headers, the isolated analytics-worker CSP
 exception, internal path denial and canonical redirects. Host overrides
 are intended for direct-origin testing; a CDN may route them differently.
+The Apache check also fetches the recovery page as a real GET to assert the
+404 status and homepage link. Run `python3 scripts/test-server.py` locally
+when changing HTTP checks or their fixtures.
 
 Browser acceptance after runtime or media changes:
 
