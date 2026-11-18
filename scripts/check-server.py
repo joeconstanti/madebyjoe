@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check actual Apache headers and private paths, locally or after deployment."""
 import argparse
+import re
 from urllib.error import HTTPError
 from urllib.request import build_opener, HTTPRedirectHandler, Request
 
@@ -47,11 +48,14 @@ def check(base):
     count = 0
 
     def request(path, status=200, mime=None, revalidate=False, host=None, location=None,
-                security=None, body_contains=()):
+                security=None, body_contains=(), byte_range=None):
         nonlocal count
         headers = {'Host': host} if host else {}
+        if byte_range:
+            first, last = byte_range
+            headers['Range'] = f'bytes={first}-{last}'
         try:
-            method = 'GET' if body_contains else 'HEAD'
+            method = 'GET' if body_contains or byte_range else 'HEAD'
             response = opener.open(Request(base.rstrip('/') + path, headers=headers, method=method), timeout=20)
         except HTTPError as error:
             response = error
@@ -66,6 +70,12 @@ def check(base):
                 check_security(response.headers, worker=security == 'worker')
             if location:
                 assert response.headers.get('Location') == location, f'{path}: wrong redirect'
+            if byte_range:
+                content_range = response.headers.get('Content-Range', '')
+                match = re.fullmatch(rf'bytes {first}-{last}/([0-9]+)', content_range)
+                assert match and int(match[1]) > last, f'{path}: wrong Content-Range {content_range!r}'
+                length = last - first + 1
+                assert len(response.read(length + 1)) == length, f'{path}: wrong range body length'
             if body_contains:
                 body = response.read()
                 for fragment in body_contains:
@@ -79,6 +89,7 @@ def check(base):
     request('/js/main.js', mime='application/javascript', revalidate=True)
     request('/media/v2/aut-pipes.webp', mime='image/webp', revalidate=True)
     request('/media/v2/aut-pipes.mp4', mime='video/mp4', revalidate=True)
+    request('/media/v2/aut-pipes.mp4', status=206, mime='video/mp4', byte_range=(0, 15))
     request('/robots.txt', revalidate=True)
     request('/sitemap.xml', revalidate=True)
     for path in ['/README.md', '/PLAN.md', '/archive/index_v1.html', '/scripts/subset-fonts.py',

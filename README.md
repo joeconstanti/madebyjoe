@@ -54,8 +54,8 @@ Against a real Apache origin configured to serve this checkout with AllowOverrid
 python3 scripts/check-server.py http://127.0.0.1:8088
 ```
 
-This tests MIME/cache and security headers, the isolated analytics-worker CSP
-exception, internal path denial and canonical redirects. Host overrides
+This tests MIME/cache and security headers, partial MP4 delivery, the isolated
+analytics-worker CSP exception, internal path denial and canonical redirects. Host overrides
 are intended for direct-origin testing; a CDN may route them differently.
 The Apache check also fetches the recovery page as a real GET to assert the
 404 status and homepage link. Run `python3 scripts/test-server.py` locally

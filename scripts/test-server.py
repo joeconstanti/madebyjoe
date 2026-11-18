@@ -20,8 +20,8 @@ WORKER = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' ht
 class Response:
     body = b''
 
-    def read(self):
-        return self.body
+    def read(self, size=-1):
+        return self.body if size < 0 else self.body[:size]
 
     def __enter__(self):
         return self
@@ -31,7 +31,7 @@ class Response:
 
 
 class HeaderTests(unittest.TestCase):
-    def run_check(self, mutation=lambda headers, worker: None, custom_404=True):
+    def run_check(self, mutation=lambda headers, worker: None, custom_404=True, range_mutation=None):
         class Opener:
             def open(self, request, **kwargs):
                 path = urlsplit(request.full_url).path
@@ -61,6 +61,13 @@ class HeaderTests(unittest.TestCase):
                     response.body = b'<h1>Page not found</h1><a href="/">Back to madebyjoe</a>'
                 elif path == '/404.html':
                     response.body = b'<meta name="robots" content="noindex">'
+                if (path == '/media/v2/aut-pipes.mp4' and request.get_method() == 'GET'
+                        and request.get_header('Range') == 'bytes=0-15'):
+                    response.code = 206
+                    headers['Content-Range'] = 'bytes 0-15/925504'
+                    response.body = bytes(16)
+                    if range_mutation:
+                        range_mutation(response)
                 mutation(headers, worker)
                 return response
         with patch.object(server, 'build_opener', return_value=Opener()), redirect_stdout(io.StringIO()):
@@ -72,6 +79,22 @@ class HeaderTests(unittest.TestCase):
     def test_bare_404_fails(self):
         with self.assertRaisesRegex(AssertionError, '/definitely-missing-mbj-page: missing'):
             self.run_check(custom_404=False)
+
+    def test_invalid_media_range_fails(self):
+        def ignore_range(response):
+            response.code = 200
+
+        def shift_range(response):
+            response.headers.replace_header('Content-Range', 'bytes 1-16/925504')
+
+        def truncate_range(response):
+            response.body = bytes(15)
+
+        for mutation, message in ((ignore_range, 'expected 206'),
+                                  (shift_range, 'wrong Content-Range'),
+                                  (truncate_range, 'wrong range body length')):
+            with self.subTest(mutation=mutation.__name__), self.assertRaisesRegex(AssertionError, message):
+                self.run_check(range_mutation=mutation)
 
     def test_missing_security_headers_fail(self):
         for name in ('X-Frame-Options', 'X-Content-Type-Options', 'Referrer-Policy', 'Content-Security-Policy'):
