@@ -249,24 +249,21 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 
 /* ---------- About ---------- */
 .about__grid { row-gap: clamp(32px, 5vh, 56px); padding-top: clamp(40px, 7vh, 80px); }
-.about__bio, .about__caps { grid-column: 2 / 12; width: 100%; max-width: 1080px; }
-.about__bio {
+.about__intro {
+  grid-column: 2 / -1;
   display: grid;
-  grid-template-columns: clamp(136px, 17vw, 224px) minmax(0, 1fr);
-  align-items: start;
-  gap: clamp(24px, 3vw, 48px);
+  gap: clamp(20px, 2vw, 32px);
 }
-.about__copy { display: grid; gap: clamp(20px, 2.4vw, 32px); }
-.about__lead { font: 400 var(--fs-lead)/1.1 var(--sans); letter-spacing: -.035em; }
+.about__lead { max-width: 58ch; font: 400 var(--fs-lead)/1.1 var(--sans); letter-spacing: -.035em; text-wrap: balance; }
 .about__lead em { color: var(--signal); }
-.about__body { display: grid; gap: 1em; color: var(--mute); max-width: 68ch; }
-.about__portrait { display: block; width: 100%; height: auto; aspect-ratio: 1; border-radius: 50%; object-fit: cover; }
+.about__body { grid-column: 2 / 7; display: grid; align-content: start; gap: 1em; color: var(--mute); max-width: 68ch; }
+.about__portrait { display: block; width: clamp(109px, 13.6vw, 179px); height: auto; aspect-ratio: 1; border-radius: 50%; object-fit: cover; }
 .about__caps {
+  grid-column: 8 / -1;
+  align-self: start;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 28px var(--gap);
-  padding-top: 24px;
-  border-top: 1px solid var(--line);
 }
 .about__caps dt { font: 400 var(--fs-mono)/1.3 var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--signal); margin-bottom: 10px; }
 .about__caps dd { font-size: 14px; line-height: 1.5; }
@@ -326,15 +323,15 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
   .ch__media { order: 3; aspect-ratio: 16 / 10; }
   .ch__stats { grid-template-columns: repeat(3, 1fr); }
   .brands__list { grid-template-columns: repeat(2, 1fr); }
-  .about__bio, .about__caps { grid-column: 1 / -1; }
+  .about__intro, .about__body, .about__caps { grid-column: 1 / -1; }
+  .about__caps { padding-top: 24px; border-top: 1px solid var(--line); }
   .ftr__grid p:nth-child(1) { grid-column: 1 / 7; }
   .ftr__grid p:nth-child(2) { grid-column: 7 / 13; }
   .ftr__grid p:nth-child(3) { grid-column: 1 / 7; margin-top: 20px; }
   .ftr__top { grid-column: 7 / 13; }
 }
 @media (max-width: 600px) {
-  .about__bio { grid-template-columns: minmax(0, 1fr); }
-  .about__portrait { width: min(44vw, 168px); }
+  .about__portrait { width: min(35.2vw, 134px); }
   .about__caps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero__pill-label { display: none; }
 }
