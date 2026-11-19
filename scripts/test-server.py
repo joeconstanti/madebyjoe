@@ -50,17 +50,23 @@ class HeaderTests(unittest.TestCase):
                 if path == '/OG.jpg':
                     response.code = 301
                     headers['Location'] = 'https://madebyjoe.co/img/OG.jpg?test=1'
+                elif path in ('/clients/audits/sported.html', '/clients/audits/sported/'):
+                    response.code = 301
+                    headers['Location'] = 'https://madebyjoe.co/clients/audits/sported?test=1'
                 elif path == '/index.html' or request.get_header('Host') == 'www.madebyjoe.co':
                     response.code = 301
                     headers['Location'] = 'https://madebyjoe.co/?test=1'
                 elif path not in ('/', '/css/main.css', '/js/main.js', '/media/v2/aut-pipes.webp',
                                   '/media/v2/aut-pipes.mp4', '/robots.txt', '/sitemap.xml',
-                                  '/404.html', '/img/OG.jpg') and not worker:
+                                  '/404.html', '/img/OG.jpg', '/clients/audits/sported') and not worker:
                     response.code = 404
                 if path == '/definitely-missing-mbj-page' and custom_404:
                     response.body = b'<h1>Page not found</h1><a href="/">Back to madebyjoe</a>'
                 elif path == '/404.html':
                     response.body = b'<meta name="robots" content="noindex">'
+                elif path == '/clients/audits/sported':
+                    response.body = (b'<title>Sported</title>'
+                                     b'<link rel="canonical" href="https://madebyjoe.co/clients/audits/sported">')
                 if (path == '/media/v2/aut-pipes.mp4' and request.get_method() == 'GET'
                         and request.get_header('Range') == 'bytes=0-15'):
                     response.code = 206
