@@ -20,6 +20,7 @@ class ValidationTests(unittest.TestCase):
             shutil.copy2(ROOT / name, self.root / name)
         for name in ('css', 'fonts', 'img', 'js', 'media', 'scripts'):
             shutil.copytree(ROOT / name, self.root / name)
+        shutil.copytree(ROOT / 'clients/audits', self.root / 'clients/audits')
         self.page = self.root / 'index.html'
 
     def run_script(self, *args):
@@ -173,6 +174,9 @@ class ValidationTests(unittest.TestCase):
 
     def test_staging_excludes_private_files_and_rejects_checkout(self):
         (self.root / 'PRIVATE.md').write_text('Do not publish')
+        audits = self.root / 'clients/audits'
+        (audits / 'private.html').write_text('Do not publish')
+        (audits / 'sported-assets/local/raw.json').write_text('Do not publish')
         result = self.run_script('python3', 'scripts/stage-public.py', str(self.root / 'release'))
         self.assertNotEqual(result.returncode, 0)
         destination = Path(self.temp.name) / 'public'
@@ -180,7 +184,15 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual({p.name for p in destination.iterdir()},
                          {'.htaccess', 'index.html', '404.html', 'robots.txt', 'sitemap.xml',
-                          'css', 'fonts', 'img', 'js', 'media'})
+                          'css', 'fonts', 'img', 'js', 'media', 'clients'})
+        expected = {'audits/sported.html', 'audits/sported-assets/sported-live-homepage-hero.png'}
+        expected.update(f'audits/sported-assets/{environment}/{page}-{device}.json'
+                        for environment in ('live', 'local')
+                        for page in ('home', 'programmes', 'support')
+                        for device in ('desktop', 'mobile'))
+        clients = destination / 'clients'
+        self.assertEqual({p.relative_to(clients).as_posix() for p in clients.rglob('*') if p.is_file()},
+                         expected)
 
 
 if __name__ == '__main__':

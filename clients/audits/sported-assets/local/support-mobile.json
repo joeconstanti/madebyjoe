@@ -1,0 +1,34 @@
+{
+  "environment": "Local build",
+  "route": "/get-supported-by-sported/",
+  "device": "mobile",
+  "lighthouseVersion": "13.0.1",
+  "capturedAt": "2026-11-19T12:37:33.864Z",
+  "scores": {
+    "performance": 0.56,
+    "accessibility": 0.97,
+    "best-practices": 1,
+    "seo": 0.58
+  },
+  "measurements": {
+    "largest-contentful-paint": {
+      "numericValue": 12906.1008,
+      "numericUnit": "millisecond"
+    },
+    "cumulative-layout-shift": {
+      "numericValue": 0.02930342756091614,
+      "numericUnit": "unitless"
+    },
+    "total-blocking-time": {
+      "numericValue": 5.5,
+      "numericUnit": "millisecond"
+    },
+    "total-byte-weight": {
+      "numericValue": 3356232,
+      "numericUnit": "byte"
+    }
+  },
+  "requestCount": 63,
+  "scriptTransferBytes": 1187674,
+  "warningCount": 0
+}

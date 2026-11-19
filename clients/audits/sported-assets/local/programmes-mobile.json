@@ -1,0 +1,34 @@
+{
+  "environment": "Local build",
+  "route": "/sported-programmes/",
+  "device": "mobile",
+  "lighthouseVersion": "13.0.1",
+  "capturedAt": "2026-11-19T12:37:57.437Z",
+  "scores": {
+    "performance": 0.55,
+    "accessibility": 0.97,
+    "best-practices": 1,
+    "seo": 0.5
+  },
+  "measurements": {
+    "largest-contentful-paint": {
+      "numericValue": 20412.933250000002,
+      "numericUnit": "millisecond"
+    },
+    "cumulative-layout-shift": {
+      "numericValue": 0.02746329432168363,
+      "numericUnit": "unitless"
+    },
+    "total-blocking-time": {
+      "numericValue": 9.5,
+      "numericUnit": "millisecond"
+    },
+    "total-byte-weight": {
+      "numericValue": 3601329,
+      "numericUnit": "byte"
+    }
+  },
+  "requestCount": 61,
+  "scriptTransferBytes": 1143091,
+  "warningCount": 0
+}

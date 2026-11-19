@@ -86,7 +86,9 @@ Production uploads are serialized and are not canceled mid-transfer. The workflo
 uses repository FTP secrets; never place credentials in source or logs.
 
 Public files are `.htaccess`, `index.html`, `404.html`, `robots.txt`, `sitemap.xml`, and the
-`css`, `fonts`, `img`, `js`, and `media` directories. Agent folders, docs, scripts,
+`css`, `fonts`, `img`, `js`, and `media` directories. The FTP workflow also includes
+`clients/audits/sported.html` and its explicitly listed PNG and Lighthouse metric
+extracts. Agent folders, docs, scripts,
 archives and Git data must not be uploaded. `.cpanel.yml` uses the same public
 paths but is a legacy manual deployment route. Neither route guarantees removal
 of files uploaded by older tooling; Apache blocks the known internal paths.
