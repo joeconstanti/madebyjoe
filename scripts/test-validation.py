@@ -185,7 +185,8 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual({p.name for p in destination.iterdir()},
                          {'.htaccess', 'index.html', '404.html', 'robots.txt', 'sitemap.xml',
                           'css', 'fonts', 'img', 'js', 'media', 'clients'})
-        expected = {'audits/sported.html', 'audits/sported-assets/sported-live-homepage-hero.png'}
+        expected = {'audits/sported.html', 'audits/sported-assets/sported-live-homepage-hero.png',
+                    'audits/sported-assets/sported-logo.png'}
         expected.update(f'audits/sported-assets/{environment}/{page}-{device}.json'
                         for environment in ('live', 'local')
                         for page in ('home', 'programmes', 'support')

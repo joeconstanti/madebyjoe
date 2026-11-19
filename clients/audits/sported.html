@@ -53,7 +53,8 @@ a:hover { color: var(--signal-text); }
 .mast .identity { font: 650 20px/1 var(--sans); letter-spacing: -.045em; text-decoration: none; }
 .identity sup { font-size: .52em; margin-left: .15em; }
 .navlinks { display: flex; justify-content: flex-end; gap: 12px 21px; flex-wrap: wrap; }
-.navlinks a, .kicker, .label, .stamp, .milestones > div > span, .stat > span {
+.navlinks a, .hero-logo { display: block; width: clamp(128px, 13vw, 176px); height: auto; margin-bottom: 18px; padding: 8px 12px; background: #0e0d0c; border-radius: 6px; }
+.kicker, .label, .stamp, .milestones > div > span, .stat > span {
   font: 400 11px/1.35 var(--mono); letter-spacing: .04em; text-transform: uppercase;
 }
 .navlinks a { text-decoration: none; }
@@ -158,6 +159,7 @@ footer { margin-top: 42px; border-top: 1px solid var(--line); padding: 18px 0 38
 @media print {
   :root, :root[data-theme="light"] { color-scheme: light; --ink: #fff; --paper: #171513; --muted: #444; --line: #ccc; --surface: #f1f1f1; }
   .hero, .section { padding-top: 16px; }
+  .hero-logo { print-color-adjust: exact; }
   .mast { position: static; }
   .navlinks, .toolbar, .pagenav { display: none; }
   .panel, .finding { break-inside: avoid; }
@@ -287,7 +289,7 @@ footer { margin-top: 42px; border-top: 1px solid var(--line); padding: 18px 0 38
 </style></head>
 <body>
 <header class="mast"><div class="shell"><nav aria-label="Report sections"><a class="identity" href="https://madebyjoe.co/" aria-label="Made by Joe home">madebyjoe<sup>®</sup></a><div class="navlinks"><a href="#seo">SEO</a><a href="#performance">Performance</a><a href="#payload">Page weight</a><a href="#sitemap">Sitemaps</a><a href="#rebuild">Rebuild roadmap</a><span class="nav-end"><a href="#method">Coverage</a><button id="theme-toggle" type="button" aria-label="Switch to light mode">Light mode</button></span></div></nav></div></header>
-<div class="hero-wrap"><div class="shell"><div class="hero"><div><div class="kicker">Website rebuild</div><h1>Sported <em>Site audit.</em></h1><p>Search readiness, loading performance and route coverage for the captured public site and its local rebuild.</p></div><div class="facts"><section class="previous-stack" aria-labelledby="previous-stack-title">
+<div class="hero-wrap"><div class="shell"><div class="hero"><div><img class="hero-logo" src="sported-assets/sported-logo.png" width="447" height="190" alt=""><div class="kicker">Website rebuild</div><h1>Sported <em>Site audit.</em></h1><p>Search readiness, loading performance and route coverage for the captured public site and its local rebuild.</p></div><div class="facts"><section class="previous-stack" aria-labelledby="previous-stack-title">
   <h2 id="previous-stack-title">Previous site setup</h2>
   <dl>
     <div><dt>Stack</dt><dd>PHP · Elementor Pro · Yoast SEO</dd></div>
