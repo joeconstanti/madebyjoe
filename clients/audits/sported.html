@@ -53,8 +53,7 @@ a:hover { color: var(--signal-text); }
 .mast .identity { font: 650 20px/1 var(--sans); letter-spacing: -.045em; text-decoration: none; }
 .identity sup { font-size: .52em; margin-left: .15em; }
 .navlinks { display: flex; justify-content: flex-end; gap: 12px 21px; flex-wrap: wrap; }
-.navlinks a, .hero-logo { display: block; width: clamp(128px, 13vw, 176px); height: auto; margin-bottom: 18px; padding: 8px 12px; background: #0e0d0c; border-radius: 6px; }
-.kicker, .label, .stamp, .milestones > div > span, .stat > span {
+.navlinks a, .kicker, .label, .stamp, .milestones > div > span, .stat > span {
   font: 400 11px/1.35 var(--mono); letter-spacing: .04em; text-transform: uppercase;
 }
 .navlinks a { text-decoration: none; }
@@ -64,6 +63,17 @@ a:hover { color: var(--signal-text); }
 #theme-toggle { font: 400 11px/1.35 var(--mono); letter-spacing: .04em; text-transform: uppercase; }
 #theme-toggle::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: var(--signal); }
 .hero { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: var(--gap); align-items: end; padding: clamp(56px, 9vw, 124px) 0 clamp(36px, 5vw, 76px); }
+.hero-logo {
+  --logo-inset: 12px;
+  display: block;
+  width: clamp(128px, 13vw, 176px);
+  height: auto;
+  margin-block-end: 18px;
+  margin-inline-start: calc(-1 * var(--logo-inset));
+  padding: 8px var(--logo-inset);
+  background: #0e0d0c;
+  border-radius: 6px;
+}
 .kicker, .label, .stamp { color: var(--muted); }
 .hero h1 { font-size: clamp(60px, 10vw, 134px); font-weight: 500; letter-spacing: -.064em; line-height: .88; margin: 17px 0 22px; }
 .hero h1 em { color: var(--signal-text); display: block; font: italic 400 .79em/.96 var(--serif); letter-spacing: -.035em; }
