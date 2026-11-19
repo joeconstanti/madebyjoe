@@ -44,7 +44,7 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Joe Constanti | Designer &amp; technologist | madebyjoe</title>
-  <meta name="description" content="Joe is a London designer and technologist who makes things: From the Root Studio (3D, motion &amp; AI), Synthetic Labs (AI research), Cerebral (private AI hosting), Automate Digital (AI automation) and joe.graphics (personal design work).">
+  <meta name="description" content="Joe is a London designer and technologist who makes things: From the Root Studio (3D, motion &amp; AI), Synthetic Labs (AI research), Cerebral (private AI hosting), Automate (AI automation) and joe.graphics (personal design work).">
   <link rel="canonical" href="https://madebyjoe.co/">
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://madebyjoe.co/">
   <meta property="og:title" content="Joe Constanti | Designer &amp; technologist | madebyjoe">
-  <meta property="og:description" content="From the Root Studio, Synthetic Labs, Cerebral, Automate Digital and joe.graphics.">
+  <meta property="og:description" content="From the Root Studio, Synthetic Labs, Cerebral, Automate and joe.graphics.">
   <meta property="og:image" content="https://madebyjoe.co/img/OG.jpg">
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
@@ -354,6 +354,7 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .about__lead { grid-column: 2 / 11; font: 400 var(--fs-lead)/1.1 var(--sans); letter-spacing: -.035em; }
 .about__lead em { color: var(--signal); }
 .about__body { grid-column: 2 / 6; display: grid; gap: 1em; color: var(--mute); max-width: 52ch; }
+.about__portrait { grid-column: 6 / 7; grid-row: 2; align-self: start; width: min(100%, 112px); aspect-ratio: 1; border-radius: 50%; object-fit: cover; }
 .about__caps { grid-column: 7 / 13; display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); }
 .about__caps dt { font: 400 var(--fs-mono)/1.3 var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--signal); margin-bottom: 10px; }
 .about__caps dd { font-size: 14px; line-height: 1.5; }
@@ -413,7 +414,8 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
   .ch__media { order: 3; aspect-ratio: 16 / 10; }
   .ch__stats { grid-template-columns: repeat(3, 1fr); }
   .brands__list { grid-template-columns: repeat(2, 1fr); }
-  .about__lead, .about__body, .about__caps { grid-column: 1 / -1; }
+  .about__lead, .about__body, .about__portrait, .about__caps { grid-column: 1 / -1; }
+  .about__portrait { grid-row: auto; width: 96px; }
   .about__caps { grid-template-columns: repeat(2, 1fr); row-gap: 28px; }
   .ftr__grid p:nth-child(1) { grid-column: 1 / 7; }
   .ftr__grid p:nth-child(2) { grid-column: 7 / 13; }
@@ -501,7 +503,7 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
       <img class="hero__poster" src="data:image/webp;base64,UklGRugDAABXRUJQVlA4TNwDAAAvv8OGAA/wBqU7OJ3BaP4DDxTbSJIkSdTA9NcyNLiv6+vpBLIHe0BE/xm2bRuG6txtpyR36nSflzwryXX76peg9HHaaF936YbO9m3SQ0kb7ZeqNtovQEn6Ad3SQZI22i9VbbSvvE6lD9VG+5O6DvogPdBG+3O6PkgXuiVttD+nS5I22v9fSg+10f7crwfSRvvNqdpov1NVdUP6GjHGgm20Dm20X6eKXjvRVwkYY8E2WYGqNtqvUvWq1w7aaCs1lmyDFYCq2mi/RdWroKoO+hKNq8YSbbWCEKg22u9QhQoCSfoaDYzTxgJttUJ1pqTvERhLtssqqk5UkgT68gzMOGss0H7q0Qnq9ATSRvv8xpLtoyTdVkkoCr1KkjbapzcYy7WHeigAUWijLdZgLNf2SUgPVKJUKkon0kb7zAYYxkLtqB6cQNf/N9pCjSXbPiH0QIWkKqUkbbQ1GpgxlmoP9VivIh161UZbp5mZsVy7JySkewpJ8ld/9VcdtNFWaGBeslB7qMd6VaLXNtpKDYyZmbFOm6inCvmrpP7qrzrVRvv0Bsa8ZJn2WAFBr220pRqMmZmxUPsnSXqiJFWpv/qrpI22TsMcslA7rF6lszbaSg0zzMxYqC1WglL1V1UbbaVmZjAzM9ZpixVF6aSvEoxjM2Ys0j4J1S2d6r6iSir1V7XRFmsMM2Ot9kf6YZUK0GsbbZXGGMDMWKQ9kg6qH5NUJZW/qkBCG+2Dm5kxMzAzFmmrpBO9XYWkiqo22krNADNj9l03JB2kH1F0tq853Y32+Y0ZZsZS7Y50ItD7FZKoKrXR1msMY7W2RTpISI91S1GVqvqrSghpo312M4OZMWOddkmgn1NIVSqpjbZoY8n2QacC1Y+qVCW9JoSkjbZGM4OxWHsj0F2dq5s6BKjUq6SN9vPNzHhL46PaMZ2oUN1SRRenKl3qLElVB2mjvbkZ427jToMBDMbPtKW6p6puP1VdqEqvoaqN9v7G88Z40viRdlFIEtQdVfWGH70GqpIuAqCN9pbG2xoMGMAcd2bGe9s7H12BKoTO2mhrNpZsDyRJl3ogSXqgQ4QOkbTRPrkxGKeNz29f9GZdLN1TpTqqqo22QuO6sUB7out9IEnRxZIudUxCpRK6txvrc5uTPTYWaE8kSY8k0I2lE13+6BhSCZCkTfbpjSXbCz1aOlkqCV0sXSxJQjpPiCdvG2qF5mSXaid0Z091snRrXfyHbv3o0EZbsjEWbAf03i1FFwudLt1YqLTRvuh600JCF0tIQuhz3rbR11sqz5bOttBBErpYerRAG+0Lrqs90cXSI0kCfRsA" width="960" height="540" alt="" fetchpriority="high">
       <canvas class="hero__gl" aria-hidden="true"></canvas>
       <div class="hero__meta grid">
-        <p class="m1"><span class="lbl">(Index)</span><a href="#e-ftr">From the Root</a><br><a href="#e-syn">Synthetic Labs</a><br><a href="#e-cer">Cerebral</a><br><a href="#e-aut">Automate Digital</a><br><a href="#e-jg">joe.graphics</a></p>
+        <p class="m1"><span class="lbl">(Index)</span><a href="#e-ftr">From the Root</a><br><a href="#e-syn">Synthetic Labs</a><br><a href="#e-cer">Cerebral</a><br><a href="#e-aut">Automate</a><br><a href="#e-jg">joe.graphics</a></p>
         <p class="m3"><span class="lbl">(Based)</span>London, UK.<br>Working worldwide.</p>
       </div>
 
@@ -531,6 +533,7 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
           <p>I started in digital design and development, making campaigns and builds for brands like Samsung, Audi and Absolut. The work grew, so it split into companies: a studio for design and 3D, a lab for AI research, a cloud to host it and an agency to automate it. joe.graphics is where my personal design work lives.</p>
           <p>Want me to make something for you? Pick the one that fits, or write to me and I will point you to the right one.</p>
         </div>
+        <img class="about__portrait" src="img/joe.jpg" alt="Joe Constanti" width="512" height="512" loading="lazy" decoding="async">
         <dl class="about__caps">
           <div><dt>Design</dt><dd>Art direction<br>Digital &amp; web<br>OOH &amp; DOOH<br>Motion graphics</dd></div>
           <div><dt>3D &amp; VFX</dt><dd>Characters<br>CGI animation<br>Anamorphic 3D<br>Archviz</dd></div>
@@ -553,7 +556,7 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
           <span class="row__n">03</span><span class="row__name">Cerebral</span><span class="row__verb">Hosting</span><span class="row__what">Private, secure AI hosting</span><span class="row__url">cerebral.studio</span><span class="row__arrow">→</span>
         </a></li>
         <li><a class="row" href="#e-aut" data-preview="3" data-cursor="Read">
-          <span class="row__n">04</span><span class="row__name">Automate Digital</span><span class="row__verb">Agency</span><span class="row__what">Custom AI automation for agencies</span><span class="row__url">automatedigital.ai</span><span class="row__arrow">→</span>
+          <span class="row__n">04</span><span class="row__name">Automate</span><span class="row__verb">Agency</span><span class="row__what">Custom AI automation for agencies</span><span class="row__url">automatedigital.ai</span><span class="row__arrow">→</span>
         </a></li>
         <li><a class="row" href="#e-jg" data-preview="4" data-cursor="Read">
           <span class="row__n">05</span><span class="row__name">joe.graphics</span><span class="row__verb">Personal</span><span class="row__what">My personal design work</span><span class="row__url">joe.graphics</span><span class="row__arrow">→</span>
@@ -564,13 +567,13 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
     <!-- Marquee -->
     <div class="marquee" aria-hidden="true">
       <div class="marquee__track js-marquee">
-        <span>From the Root Studio</span><b>✳</b><span>Synthetic Labs</span><b>✳</b><span>Cerebral</span><b>✳</b><span>Automate Digital</span><b>✳</b><span>joe.graphics</span><b>✳</b>
-        <span>From the Root Studio</span><b>✳</b><span>Synthetic Labs</span><b>✳</b><span>Cerebral</span><b>✳</b><span>Automate Digital</span><b>✳</b><span>joe.graphics</span><b>✳</b>
+        <span>From the Root Studio</span><b>✳</b><span>Synthetic Labs</span><b>✳</b><span>Cerebral</span><b>✳</b><span>Automate</span><b>✳</b><span>joe.graphics</span><b>✳</b>
+        <span>From the Root Studio</span><b>✳</b><span>Synthetic Labs</span><b>✳</b><span>Cerebral</span><b>✳</b><span>Automate</span><b>✳</b><span>joe.graphics</span><b>✳</b>
       </div>
     </div>
 
     <!-- Chapters (sticky stack) -->
-    <section class="chapters" aria-label="From the Root Studio, Synthetic Labs, Cerebral, Automate Digital and joe.graphics">
+    <section class="chapters" aria-label="From the Root Studio, Synthetic Labs, Cerebral, Automate and joe.graphics">
 
       <article class="ch" id="e-ftr" style="--bg:#0b0b0b; --fg:#ecebe6; --ac:#9db4ff; --line:rgba(236,235,230,.16)">
         <div class="ch__inner">
