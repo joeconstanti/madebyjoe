@@ -1,0 +1,34 @@
+{
+  "environment": "Local build",
+  "route": "/",
+  "device": "mobile",
+  "lighthouseVersion": "13.0.1",
+  "capturedAt": "2026-11-19T12:37:12.361Z",
+  "scores": {
+    "performance": 0.56,
+    "accessibility": 0.9,
+    "best-practices": 1,
+    "seo": 0.5
+  },
+  "measurements": {
+    "largest-contentful-paint": {
+      "numericValue": 18683.884500000004,
+      "numericUnit": "millisecond"
+    },
+    "cumulative-layout-shift": {
+      "numericValue": 0.02316526274169985,
+      "numericUnit": "unitless"
+    },
+    "total-blocking-time": {
+      "numericValue": 4,
+      "numericUnit": "millisecond"
+    },
+    "total-byte-weight": {
+      "numericValue": 3300126,
+      "numericUnit": "byte"
+    }
+  },
+  "requestCount": 62,
+  "scriptTransferBytes": 1156159,
+  "warningCount": 0
+}

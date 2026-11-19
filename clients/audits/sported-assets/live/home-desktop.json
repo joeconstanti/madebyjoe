@@ -1,0 +1,34 @@
+{
+  "environment": "Live baseline",
+  "route": "/",
+  "device": "desktop",
+  "lighthouseVersion": "13.0.1",
+  "capturedAt": "2026-11-18T15:46:07.495Z",
+  "scores": {
+    "performance": 0.84,
+    "accessibility": 0.91,
+    "best-practices": 0.96,
+    "seo": 0.85
+  },
+  "measurements": {
+    "largest-contentful-paint": {
+      "numericValue": 1287.9450000000002,
+      "numericUnit": "millisecond"
+    },
+    "cumulative-layout-shift": {
+      "numericValue": 0.18034684180092228,
+      "numericUnit": "unitless"
+    },
+    "total-blocking-time": {
+      "numericValue": 0,
+      "numericUnit": "millisecond"
+    },
+    "total-byte-weight": {
+      "numericValue": 3082891,
+      "numericUnit": "byte"
+    }
+  },
+  "requestCount": 70,
+  "scriptTransferBytes": 497746,
+  "warningCount": 0
+}
