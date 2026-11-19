@@ -81,7 +81,7 @@ a:hover { color: var(--signal-text); }
 .hero p { max-width: 52ch; margin: 0; color: var(--muted); font-size: clamp(16px, 1.45vw, 20px); }
 .hero-site-link { display: inline-block; margin-block-start: 12px; }
 .homepage-capture { margin: clamp(22px, 4vw, 48px) 0 clamp(18px, 3vw, 38px); }
-.homepage-capture a, .homepage-capture img { display: block; }
+.homepage-capture img { display: block; }
 .homepage-capture img { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; }
 .homepage-capture figcaption { margin-top: 8px; color: var(--muted); font: 400 11px/1.4 var(--mono); }
 .facts { border-top: 1px solid var(--line); padding-top: 10px; }
@@ -284,7 +284,7 @@ footer { margin-top: 42px; border-top: 1px solid var(--line); padding: 18px 0 38
 
 @media screen and (prefers-reduced-motion: no-preference) {
   .audit-fade.is-revealed:not(:focus-within) { animation: audit-letter-in var(--fade-duration, 460ms) ease-out both; }
-  .homepage-capture a { --fade-duration: 240ms; }
+  .homepage-capture img { --fade-duration: 240ms; }
   .audit-fade.awaiting-view:not(:focus-within) { opacity: 0; }
   :is(.audit-type, .audit-count).awaiting-view { opacity: 0; }
   .type-letter { animation: audit-letter-in 130ms ease-out var(--letter-delay) both; }
@@ -313,7 +313,7 @@ footer { margin-top: 42px; border-top: 1px solid var(--line); padding: 18px 0 38
 </section><p><strong>Built pages</strong> <span id="scope"></span></p><p><strong>Live baseline</strong> 18 November 2026</p><p><strong>Local audit</strong> <span id="date"></span></p></div></div></div></div>
 <main class="shell">
 <figure class="homepage-capture">
-  <a href="sported-assets/sported-live-homepage-hero.png"><img src="sported-assets/sported-live-homepage-hero.png" width="1440" height="900" alt="Sported homepage hero with the headline ‘Changing lives through Grassroots Sport’ and a photo of two people boxing"></a>
+  <img src="sported-assets/sported-live-homepage-hero.png" width="1440" height="900" alt="Sported homepage hero with the headline ‘Changing lives through Grassroots Sport’ and a photo of two people boxing">
   <figcaption>Live Sported homepage · 19 November 2026</figcaption>
 </figure>
 <div class="stats" id="stats"></div>
