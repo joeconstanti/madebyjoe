@@ -100,6 +100,12 @@ def check(base):
             body_contains=(b'<h1>Page not found</h1>', b'<a href="/">Back to madebyjoe</a>'))
     request('/404.html', mime='text/html',
             body_contains=(b'<meta name="robots" content="noindex">',))
+    audit = '/clients/audits/sported'
+    request(audit, mime='text/html', revalidate=True, security='document',
+            body_contains=(b'<title>Sported', f'<link rel="canonical" href="https://madebyjoe.co{audit}">'.encode()))
+    for suffix in ('.html', '/'):
+        request(f'{audit}{suffix}?test=1', status=301, host='madebyjoe.co',
+                location=f'https://madebyjoe.co{audit}?test=1')
     # Host overrides exercise origin rules without relying on DNS or following redirects.
     request('/index.html?test=1', status=301, host='madebyjoe.co', location='https://madebyjoe.co/?test=1')
     for host in ('madebyjoe.co', 'www.madebyjoe.co'):

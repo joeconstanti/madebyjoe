@@ -138,9 +138,16 @@ ErrorDocument 404 /404.html
     RewriteCond %{HTTP_HOST} ^(?:www\.)?madebyjoe\.co(?::[0-9]+)?$ [NC]
     RewriteRule ^OG\.jpg$ https://madebyjoe.co/img/OG.jpg [R=301,L]
 
+    # Redirect explicit requests for the audit file or trailing slash.
+    RewriteCond %{THE_REQUEST} \s/+clients/audits/sported(?:\.html|/)[?\s]
+    RewriteRule ^clients/audits/sported(?:\.html|/)$ https://madebyjoe.co/clients/audits/sported [R=301,L]
+
     # Preserve paths and query parameters when removing www.
     RewriteCond %{HTTP_HOST} ^www\.madebyjoe\.co(?::[0-9]+)?$ [NC]
     RewriteRule ^ https://madebyjoe.co%{REQUEST_URI} [R=301,L,NE]
+
+    # Serve the staged HTML at its extensionless public URL.
+    RewriteRule ^clients/audits/sported$ clients/audits/sported.html [END]
 </IfModule>
 
 # Redirect trailing slashes
