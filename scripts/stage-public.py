@@ -11,6 +11,7 @@ FILES = (
     '.htaccess', 'index.html', '404.html', 'robots.txt', 'sitemap.xml',
     f'{AUDIT}/sported.html',
     f'{SPORTED_ASSETS}/sported-live-homepage-hero.png',
+    f'{SPORTED_ASSETS}/sported-logo.png',
     *(f'{SPORTED_ASSETS}/{environment}/{page}-{device}.json'
       for environment in ('live', 'local')
       for page in ('home', 'programmes', 'support')
