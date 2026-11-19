@@ -252,7 +252,9 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .about__intro {
   grid-column: 2 / -1;
   display: grid;
-  gap: clamp(20px, 2vw, 32px);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(24px, 3vw, 48px);
 }
 .about__lead { max-width: 58ch; font: 400 var(--fs-lead)/1.1 var(--sans); letter-spacing: -.035em; text-wrap: balance; }
 .about__lead em { color: var(--signal); }
@@ -331,6 +333,7 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
   .ftr__top { grid-column: 7 / 13; }
 }
 @media (max-width: 600px) {
+  .about__intro { grid-template-columns: minmax(0, 1fr); }
   .about__portrait { width: min(35.2vw, 134px); }
   .about__caps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero__pill-label { display: none; }
