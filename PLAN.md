@@ -1,82 +1,49 @@
-# PLAN 14th October 2026 (rewritten 18 October 2026)
+# Portfolio Improvement Plan
 
-Branch: `madebyjoe-2.0`. One page that promotes the 5 entities.
+Updated: 20 November 2026
 
-## Our Content
-joe.graphics:https://joe.graphics
-fromtheroot.studio:https://fromtheroot.studio
-syntheticlabs.xyz:https://syntheticlabs.xyz
-cerebral.studio:https://cerebral.studio
-automatedigital.ai:https://automatedigital.ai
+## Product scope
 
-## Direction change (17 Oct 2026)
-The cipher.tv 3D ring was scrapped. The ring prototype is kept for reference in `archive/ring_prototype.html`.
-New reference = trends from Awwwards Sites of the Day, Sep–Oct 2026.
+Made by Joe is a static, single-page portfolio at `madebyjoe.co`. Keep its current
+visual design, copy, project links, analytics IDs, and motion behavior. Do not add
+new project pages until Joe supplies distinct source material and Search Console
+shows enough demand to guide the work. Keep deployment public-only and verify the
+live result after a release.
 
-## Awwwards research (12 Sites of the Day, 19 Sep – 16 Oct 2026)
-| Site | Date | What it shows |
-|---|---|---|
-| huyml.co | 14 Oct | Giant name type, `01 / 19` project index, red #FF4949 on #181818 |
-| heronaiapp.com | 12 Oct | Preloader, storytelling scroll, orange #F15534 on #282828 |
-| nickho-motorsports.nl | 11 Oct | Scroll-driven 3D, GSAP |
-| mariavasilyeva.com | 9 Oct | Preloader, hover effects, annotations |
-| odysseeclinic.com.au | 8 Oct | Minimal, 2 colours, transitions |
-| twks.ch | 7 Oct | Mono, loader, accordion, 404 |
-| jesperlandberg.com | 29 Sep | Infinite scroll, WebGL, black/white |
-| meermohsin.me | 26 Sep | Cinematic hero scroll + footer |
-| gilhuybrecht.com | 21 Sep | Info-dense header columns (availability, services, recognition), image grid |
-| boc.studio | 19 Sep | Marquee band with logo + meta, orange #FF4421 on #0D0E0E |
-| lxlcreative.co.uk | 17 Sep | Orange #FF5121 on #27201D, transitions |
-| offforum.com | 16 Oct | Video hero, clean gallery |
+The plan selects five small repository improvements from the project improvement
+backlog. It does not reopen work that has already merged, including source and
+Apache validation, public-only FTP staging, canonical checks, metadata and social
+preview fixes, renderer access, media autoplay, and the verified `/OG.jpg`
+redirect.
 
-Trends we use:
-1. **Two-colour palette, signal orange on near-black** (4 of 12). Our old orange `#f74f14` fits, so we keep it.
-2. **Oversized type**: full-width wordmark, big section titles, giant footer mark.
-3. **Small mono meta labels**: `(01)`, `01 / 05`, local clock, info columns in the header.
-4. **Video inside type**: a video pill inside the hero wordmark.
-5. **Index list + cursor-follow hover preview**.
-6. **Sticky stacked panels**: each entity is a full-screen chapter that slides over the last one.
-7. **Marquee band**, **word-by-word scroll reveal**, **custom cursor with labels**, **magnetic buttons**, **preloader with %**, **Lenis smooth scroll**.
+## Tasks
 
-## Built (18 Oct 2026)
-- `index.html`: one page: preloader → hero → index list → marquee → 5 chapters → How it fits → Selected brands → About → Contact → footer.
-- `css/main.css`: tokens, layout, responsive (stack below 1000 px), reduced motion.
-- `js/main.js`: Lenis, GSAP ScrollTrigger + SplitText, loader tied to real loading, hover preview, pill cycler, sticky stack, lazy video (plays only while visible), copy-email toast, London clock.
-- `js/hero-gl.js`: raw WebGL. The hero background plays the same video as the hero pill as a one-colour 4 px Bayer dither, dimmed behind the heading, and cross-fades when the pill changes. Near the mouse the cells get finer and turn signal orange. Pauses off-screen.
-- Motion language: text types in (chars fade up from a soft blur), elements focus in (blur 10px to 0), media and the preloader dissolve with the same Bayer dither.
-- `js/vendor/`: GSAP 3.13 (+ ScrollTrigger, SplitText), Lenis 1.3.4. No CDN.
-- `fonts/`: Inter Tight (variable), Instrument Serif (+ italic), Geist Mono. Self-hosted, latin only.
-- `media/v2/`: 5 videos + posters, 4.8 MB total, lazy-loaded. Source: each entity's own site media (no screen recordings, no site UI).
-- Old site moved to `archive/index_v1.html`.
+| ID | Owner | Task and acceptance criteria | Depends on | Risk or open question |
+| --- | --- | --- | --- | --- |
+| P1 | Agent 1 | Verify the existing Dependabot configuration checks GitHub Actions from the repository root (`directory: /`) once per week with a bounded open-PR limit. Confirm every current workflow Action remains pinned to a reviewed commit SHA. No configuration change is needed. **Complete:** config and all five Action refs were checked; `actionlint` and focused YAML validation passed. | None | Dependabot can propose routine updates. A maintainer must review and merge them. GitHub-side execution remains unverified. |
+| P2 | Agent 2 | Add `docs/vendor-maintenance.md`. Inventory the locally used GSAP modules, Lenis, and Partytown. Record versions and license evidence only when the checked-in files support it. Explain how to review upstream updates and preserve required notices. **Complete:** version and notice claims cite checked-in evidence; unknown license terms are identified. | None | Some vendor files do not expose a version or license. These remain marked unknown; vendor code was not changed. |
+| P3 | Agent 3 | Add `scripts/test-progressive-enhancement.py` using Python's standard library. It must check that the unexecuted HTML contains the page title, primary navigation links, five project links, five chapter video posters, and a working `mailto:` link. It must fail with a clear message when one required element is removed. **Complete:** the homepage passes and a temporary missing-poster fixture fails with a clear error. | None | This is a source-level check. It does not prove visual or browser behavior without JavaScript. |
+| P4 | Agent 4 | Run the P3 check in `.github/workflows/validate.yml` on pull requests and pushes to `main`. Keep it in the existing validation job and preserve the Apache checks. Confirm the workflow fails when P3's required markup is missing. **Complete:** one command was added to the existing validation step; a temporary missing-title fixture failed as expected. | P3 | No network browser package or new frontend dependency was added. Hosted Actions remains to be confirmed. |
+| P5 | Agent 5 | Add `docs/analytics-acceptance.md` and link it from `README.md`. Describe how to check GA4 request transport, the page-view event, and dashboard attribution as separate observations. Preserve existing tracking IDs and avoid recording account secrets. **Complete:** source and guide are linked; the procedure separates transport, GA4 event visibility, staff filtering, and attribution. | None | Live GA4 requests and property reports were not checked. Analytics dashboards can delay or filter events. |
 
-Each entity chapter uses its own brand colours:
-| Site | Role | Background | Accent | Main media |
-|---|---|---|---|---|
-| From the Root Studio | Studio (design & 3D) | #0b0b0b | #9db4ff | Netflix anamorphic billboard |
-| Synthetic Labs | Lab | #f0efeb (light) | #1f4fd1 | Generative coral study |
-| Cerebral | Hosting | #0f1309 | #c6f135 | Brand film |
-| Automate Digital | Agency | #141933 | #ff6a2b | 3D workflow pipes + stats |
-| joe.graphics | Personal design work | #05070c | #7fd6ff | The J logo film (from joe.graphics) |
+## Deferred work
 
-Run: `python3 -m http.server 5173`, open `localhost:5173`.
+- **Production 404 recovery:** `/404.html` is present and works in hosted Apache validation, but production requests still returned a bare 404 in the reviewed T3 thread. A repository-only review found no supported fix. Continue only after read-only access to the effective HTTPS virtual host, applicable overrides, and matching access/error logs. Do not add a blanket redirect or soft 404.
+- **Old share-image cache:** T3 verified the exact `/OG.jpg` redirect at the origin and on both hosts with a query string. A cached public request without a query string still returned an old 404 at that time. Recheck after cache expiry before closing this follow-up.
+- **More search landing pages:** the reviewed Search Console sample was eight impressions, zero clicks, and one indexed page. It does not support query-driven copy changes. Revisit only with distinct project material and a stronger demand signal.
+- **Browser and Lighthouse automation:** the site has documented browser acceptance steps and a previously measured mobile Lighthouse score of 95. Scores vary by run. Keep a browser or Lighthouse CI setup out of this change until a stable, low-noise approach is selected.
 
-## TASKS
+## Evidence reviewed
 
-### Must do before launch
-- [ ] Joe checks all copy (About text, Cerebral text, brand list, each quote)
-- [ ] New OG image (`img/OG.jpg`) from the new hero
-- [ ] `.htaccess`: long cache for `.mp4`, `.jpg`, `.woff2`, `.js`, `.css` (CSS/JS use `?v=` strings)
-- [ ] Test on real iOS Safari and Android Chrome (autoplay, sticky, `svh`)
-- [ ] Lighthouse: 90+ performance on mobile
+- T3 Code thread [“madebyjoe: research 25 improvements, ship top 10 PRs”](t3-thread://v2/7be29275-49a0-47f8-b6cd-0ddb476aa5c7/mcp:launch:9012909971ef741bc670fc53beb1c21d55df07c120e13594d15f1a8c297f8ce2) records the completed deployment, cache, generation, validation, and documentation work.
+- T3 Code thread [“Evolve traffic: madebyjoe — 5 PRs”](t3-thread://v2/7be29275-49a0-47f8-b6cd-0ddb476aa5c7/mcp:launch:1752174c75b3eb68fed061210d9fa3284517abddbee8c78a8962bb3587a68539) records the completed rendering-library access, profile schema, social preview, canonical validation, and recovery-page work. It also records the production 404 limitation and the `/OG.jpg` redirect follow-up.
+- T3 Code thread [“Grow Website Traffic”](t3-thread://v2/7be29275-49a0-47f8-b6cd-0ddb476aa5c7/cd3c10a9-61d6-402b-b7e0-bb252507121c) records the Search Console sample, crawler exclusions, profile links, and the need for distinct project content before adding pages.
+- T3 Code thread [“Improve Desktop and Mobile PageSpeed”](t3-thread://v2/7be29275-49a0-47f8-b6cd-0ddb476aa5c7/3919774c-dbe7-4882-a6ad-7665dde8c49f) records the autoplay, poster, marquee, and immediate hero-renderer fixes.
+- `docs/improvements.md` records the ranked follow-up candidates used for P1–P5.
 
-### Nice to have
-- [ ] Cerebral: cleaner footage without site UI text, when available
-- [ ] Per-entity favicon/logo marks in the index rows
-- [ ] Sound toggle for the films
-- [ ] Update README for 2.0
-- [ ] Open PR `madebyjoe-2.0` → `main`; merge deploys via cPanel
+## Completion evidence
 
-## Copy rules (18 Oct 2026)
-- Never say "entities" on the site. Just list the five by name.
-- Chapters stay lean: name, one quote, 3 tags (or stats), one button, one video.
-- No em-dashes anywhere.
+- [x] P1–P5 are complete locally and their focused acceptance checks pass.
+- [x] Run the source generation check, site validator, Python regression scripts, and JavaScript syntax checks from `README.md`.
+- [ ] Confirm the pull request validation job passes. Do not deploy from this branch.
+- [x] Report deferred items and their required evidence in the pull request.
