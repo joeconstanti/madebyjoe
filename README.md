@@ -36,6 +36,7 @@ python3 scripts/validate-site.py
 python3 scripts/test-validation.py
 python3 scripts/test-generation.py
 python3 scripts/test-server.py
+python3 scripts/test-progressive-enhancement.py
 python3 scripts/test-recovery.py
 for file in js/*.js scripts/*.mjs; do node --check "$file"; done
 ```
@@ -87,6 +88,7 @@ Browser acceptance after runtime or media changes:
   clipboard access is unavailable.
 - Check console errors and GA4 page-view transport. A successful request does not
   establish dashboard attribution. Preserve tracking IDs and worker CSP behavior.
+  See [GA4 acceptance checks](docs/analytics-acceptance.md).
 
 Use Lighthouse against local and deployed URLs when measuring performance; record
 conditions and dates. Historical local scores do not establish current live scores.

@@ -1,56 +1,89 @@
-# Portfolio release verification
+# Portfolio improvement and release verification plan
 
-## Scope and evidence
+Updated: 20 November 2026
 
-Keep madebyjoe.co a static portfolio for Joe and his five projects. Preserve the
-current design, copy, routes, tracking, and FTP deployment model. Start from
-GitHub main at `92c8da8425f0324ff3961c2ad885357fd8d1c5d9`. Keep the root
-checkout's unpublished tooling and About edits outside this branch.
+## Scope
 
-| Conversation reviewed | Evidence used | Decision |
+Made by Joe is a static, single-page portfolio at `madebyjoe.co`. Keep the
+current design, copy, project links, routes, analytics IDs, motion behavior, and
+FTP deployment model. Do not add new project pages until Joe supplies distinct
+source material and Search Console provides enough evidence to guide the work.
+Keep deployment public-only. A green upload does not prove the live site.
+
+## Conversation evidence
+
+| Conversation | Evidence | Decision |
 | --- | --- | --- |
-| Evolve madebyjoe, CI/CD | [PR #28](https://github.com/joeconstanti/madebyjoe/pull/28), [PR #29](https://github.com/joeconstanti/madebyjoe/pull/29), and [PR #30](https://github.com/joeconstanti/madebyjoe/pull/30) already cover canceled runs, social metadata, and partial video delivery. The handback identifies staged references, recovery assets, and browser smoke tests as gaps. | Cover those gaps without repeating merged work. |
-| Evolve madebyjoe, five PRs | [Repository backlog](docs/evolve-2026-11-17.md) ranks browser automation, focus behavior, and media lifecycle. | Test current browser behavior. Escalate failures that need product decisions. |
-| Evolve traffic and site outage | [PR #27](https://github.com/joeconstanti/madebyjoe/pull/27) restores the former share image. The thread distinguishes direct origin, CDN cache, and browser evidence. | Preserve the redirect and document how to distinguish these failure modes. |
-| About portrait and PageSpeed | The portrait layout and hero-only dither were deliberate product choices. | Test the current site without revising the layout or motion. |
-| Figma brand kit and social work | These threads produced Figma design assets and prototypes. | Keep Figma work and new journal routes out of this release. |
+| Evolve madebyjoe, CI/CD | PRs [#28](https://github.com/joeconstanti/madebyjoe/pull/28)–[#30](https://github.com/joeconstanti/madebyjoe/pull/30) cover canceled runs, social metadata, and partial video delivery. Later release work identified staged references, recovery assets, and browser smoke checks as gaps. | Add validation and browser coverage without repeating merged work. |
+| Evolve madebyjoe, five PRs | `docs/evolve-2026-11-17.md` ranks browser automation, keyboard focus, and media lifecycle. | Test existing browser behavior. Keep product changes out of these checks. |
+| Evolve traffic and site outage | [PR #27](https://github.com/joeconstanti/madebyjoe/pull/27) restores the old share image. The T3 thread separates direct-origin, CDN cache, and browser evidence. | Preserve the redirect and report each proof level separately. |
+| About portrait and PageSpeed | The portrait layout and hero-only dither were deliberate choices. | Check the current page without changing layout or motion. |
+| Figma brand kit and social work | The threads produced brand assets and prototypes. | Keep Figma work and new routes out of this release. |
+| Grow Website Traffic | Search Console showed a small sample with one indexed page. Existing links were checked across the project sites. | Do not rewrite copy or add pages without distinct content and stronger demand evidence. |
+| Improve Desktop and Mobile PageSpeed | The autoplay, poster, marquee, and immediate hero-renderer issues were fixed and verified. | Do not reopen those fixes in this release. |
+| madebyjoe: research 25 improvements | The ten repository hardening PRs completed staging, cache, generation, validation, and deployment work. | Reuse existing source and Apache checks. |
 
-## Work packets
+## Completed release verification work from PR #38
 
-Each owner is a separate GPT-6.2-Sol agent with high reasoning effort. Each
-packet can be implemented from the same base. Integration owns shared files.
+PR #38 merged a staged-artifact validator, recovery-page checks, Chromium smoke
+checks, and a release runbook. This work remains part of the release baseline.
 
-| Owner | Task and exclusive write scope | Dependencies | Acceptance criteria |
-| --- | --- | --- | --- |
-| Agent 1 | Add staged artifact input to the existing validator. Own `scripts/validate-site.py` only. | Existing stager layout. | Default command still validates the checkout. `--root DIR` validates the staged tree, rejects missing local sources and references that resolve outside it, and returns a nonzero status with a useful path. |
-| Agent 2 | Add recovery-page reference validation in `scripts/validate-recovery.py` and focused fixtures in `scripts/test-recovery.py`. | Staged artifact root passed as `--root DIR`. The Apache checker retains status verification. | Current recovery page passes. Missing assets, references that only work relative to the error document at the root, and a missing home link fail. Preserve the page itself. |
-| Agent 3 | Add browser navigation and contact assertions in `scripts/browser/interactions.mjs` (export `checkInteractions(browser, baseURL)`). | Parent smoke runner supplies Playwright browser and URL. | Verify keyboard access to the index and contact, with navigation reaching the intended target, plus email link behavior when clipboard access fails. Match existing behavior and surface regressions. |
-| Agent 4 | Add browser media assertions in `scripts/browser/media.mjs` (export `checkMedia(browser, baseURL)`). | Same runner interface as Agent 3. | Check desktop and mobile hero playback and canvas readiness before interaction, plus all five chapter media on scroll and a reduced motion run. Use bounded waits and report failures with the mode and element. |
-| Agent 5 | Write `docs/release-verification.md`, a release and recovery runbook. | Existing README and check scripts. Parent links the final commands from README. | Explain validation, FTP, direct Apache and CDN checks, safe retry criteria, missing page status, range requests, and when to call a failure unresolved. Use no account data. |
-| Integration owner | Own this plan, `README.md`, browser runner and package metadata, staged-root regression fixture, and both workflow files. | Agents 1–5. | Review each patch and repeat focused checks on the combined branch. Validate the exact staged directory before Apache tests and FTP upload. Document and run browser checks locally. Open one PR with evidence and gaps. |
+| Owner | Delivered task | Acceptance evidence |
+| --- | --- | --- |
+| Agent 1 | Added staged artifact input to `scripts/validate-site.py`. | Default validation still checks the checkout. `--root DIR` checks the staged tree and rejects missing or out-of-root local references. |
+| Agent 2 | Added `scripts/validate-recovery.py` and `scripts/test-recovery.py`. | The recovery page checks required links and assets. Tests cover missing assets and incorrect links. Apache checks verify the actual HTTP 404 status. |
+| Agent 3 | Added browser keyboard and contact assertions in `scripts/browser/interactions.mjs`. | Chromium checks index navigation, keyboard access, and the email-link fallback when clipboard access fails. |
+| Agent 4 | Added browser media assertions in `scripts/browser/media.mjs`. | Chromium checks desktop/mobile hero playback, canvas readiness, five chapter videos, and reduced-motion behavior. |
+| Agent 5 | Added `docs/release-verification.md`. | The runbook explains validation, FTP, origin/CDN checks, safe retries, missing-page status, range requests, and failure reporting. |
 
-## Integration checks
+## Current maintenance work from PR #39
 
-- Run inline source sync, static validation, regression scripts, and JS
-  syntax checks. Run workflow lint and diff whitespace checks.
-- Stage a fresh artifact and run its validators. Remove a referenced asset
-  from a temporary copy and confirm rejection.
-- Run the Apache checker against the staged artifact if Apache is available
-  locally. PR CI repeats it with the repo's Apache configuration.
-- Run the browser smoke checks with Chromium. Capture useful failure evidence.
-  Real iOS and Android autoplay remain outside the emulator proof.
-- Confirm the PR base, head and check state. A branch push or PR check does not
-  establish a production deployment.
+| ID | Owner | Task and acceptance criteria | Depends on | Status and risk |
+| --- | --- | --- | --- | --- |
+| P1 | Agent 1 | Verify the existing Dependabot configuration checks GitHub Actions from the repository root (`directory: /`) once per week with a bounded open-PR limit. Confirm workflow Actions use full commit SHAs. | None | Complete. Existing config meets the criteria. A maintainer must review and merge proposed updates. |
+| P2 | Agent 2 | Add `docs/vendor-maintenance.md` with checked-in version and notice evidence for GSAP, Lenis, and Partytown. Mark unsupported facts as unknown. | None | Complete. Lenis terms and the exact GSAP terms remain unverified; no vendor code changed. |
+| P3 | Agent 3 | Add `scripts/test-progressive-enhancement.py` using Python's standard library. Check the page title, primary navigation, five index and project links, chapter posters, and a recipient-bearing `mailto:` link. Include a failing fixture. | None | Complete. The real page passes; a missing chapter poster fails clearly. This source check does not prove rendered behavior. |
+| P4 | Agent 4 | Run the P3 check and `scripts/test-recovery.py` in `.github/workflows/validate.yml`. Preserve staged-root validation, Apache checks, and pinned Actions. | P3 and PR #38 validation baseline | Complete. Both test commands pass locally and remain in the same validation step. Hosted Apache validation is pending. |
+| P5 | Agent 5 | Add `docs/analytics-acceptance.md` and link it from `README.md`. Separate collector transport, GA4 event visibility, staff filtering, and dashboard attribution. Preserve tracking IDs and account privacy. | None | Complete. Live GA4 requests and dashboard attribution were not checked. |
 
-## Risks and open questions
+## Release checks
 
-- Browser playback depends on codecs, autoplay policy and WebGL. Use a known
-  browser build and report the environment. Keep the smoke suite local unless
-  there is evidence it is stable enough for hosted CI.
-- A recovery document can render at a nested missing URL. Use root-relative
-  assets and verify the real HTTP status separately. Hosting behavior can vary
-  between Apache and the CDN.
-- The October rebuild checklist described an earlier launch. Git history
-  retains it. This plan tracks the present release checks.
-- Defer new routes, search campaigns, visible motion changes, arbitrary
-  private-file filtering policy, and production changes to separate decisions.
+- Run generated HTML sync, site validation, all Python regression scripts, and
+  JavaScript syntax checks.
+- Stage a fresh public artifact. Run site and recovery validators against that
+  exact directory. Use temporary fixtures to confirm invalid references fail.
+- Run the Chromium smoke suite against the local development server. It blocks
+  external DNS to prevent local analytics traffic. Real-device autoplay still
+  needs physical device evidence.
+- Run `actionlint` and `git diff --check`.
+- PR CI runs source and failure-path checks, staged-artifact checks, and the
+  Apache integration check. After merge, inspect both validation and FTP deploy
+  Actions, then check the affected public paths and behavior.
+
+## Deferred work and risks
+
+- **Production 404 recovery:** `/404.html` and the repository's Apache test work,
+  but a T3 investigation found production returned a bare 404. A repository-only
+  investigation found no supported fix. Further work needs read-only access to
+  the effective HTTPS virtual host, applicable overrides, and matching logs.
+  Do not add a blanket redirect or soft 404.
+- **Old share-image cache:** T3 verified the exact `/OG.jpg` redirect at origin
+  and both hosts with a query string. A cached public request without a query
+  string still returned an old 404 at that time. Recheck after cache expiry.
+- **Search landing pages:** the reviewed Search Console sample was eight
+  impressions, zero clicks, and one indexed page. It does not support copy
+  changes. Revisit pages only with distinct project material and stronger demand.
+- **Lighthouse CI:** browser smoke coverage now exists, but performance scores
+  vary by run. Add automated Lighthouse thresholds only after a stable,
+  low-noise approach is selected.
+- **Browser limits:** codecs, autoplay policy, and WebGL can vary by browser.
+  The local Chromium smoke suite does not prove iOS or Android autoplay.
+
+## Completion record
+
+- [x] PR #38 release checks and runbook are retained in this plan.
+- [x] P1–P5 documentation, source check, and workflow change are implemented.
+- [x] Initial local source suite and focused negative fixtures passed.
+- [x] Rerun the complete combined suite after merging current `main`: 34 Python tests, staged-root checks, JavaScript syntax, `actionlint`, diff checks, and Chromium keyboard/contact/media smoke tests passed.
+- [ ] Confirm the updated PR validation passes, then merge.
+- [ ] Verify post-merge validation and FTP deployment Actions and public behavior.

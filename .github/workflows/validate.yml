@@ -27,6 +27,7 @@ jobs:
           python3 scripts/test-validation.py
           python3 scripts/test-generation.py
           python3 scripts/test-server.py
+          python3 scripts/test-progressive-enhancement.py
           python3 scripts/test-recovery.py
           for file in js/*.js scripts/*.mjs; do node --check "$file"; done
       - name: Verify Apache behavior using the public artifact
