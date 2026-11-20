@@ -55,7 +55,8 @@ export async function checkInteractions(browser, baseURL) {
       timeout: 10_000,
     });
     assert(response?.ok(), 'The homepage must load for the interaction checks');
-    await page.locator('.loader').waitFor({ state: 'detached', timeout: TIMEOUT });
+    // The CSS failsafe hides the loader when it cannot remove itself.
+    await page.locator('.loader').waitFor({ state: 'hidden', timeout: TIMEOUT });
 
     const nav = page.getByRole('navigation', { name: 'Main', exact: true });
     await openSection(page, nav.getByRole('link', { name: 'Index', exact: true }), '#index');
