@@ -27,10 +27,13 @@ jobs:
           python3 scripts/test-validation.py
           python3 scripts/test-generation.py
           python3 scripts/test-server.py
+          python3 scripts/test-recovery.py
           for file in js/*.js scripts/*.mjs; do node --check "$file"; done
       - name: Verify Apache behavior using the public artifact
         run: |
           sudo python3 scripts/stage-public.py /var/www/madebyjoe-public
+          python3 scripts/validate-site.py --root /var/www/madebyjoe-public
+          python3 scripts/validate-recovery.py --root /var/www/madebyjoe-public
           sudo a2enmod rewrite headers expires
           sudo tee /etc/apache2/sites-available/000-default.conf >/dev/null <<'APACHE'
           <VirtualHost *:80>

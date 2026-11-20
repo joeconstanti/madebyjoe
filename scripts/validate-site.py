@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Validate homepage references, fragments, IDs and JSON-LD without dependencies."""
+import argparse
 from html.parser import HTMLParser
 import json
 from pathlib import Path
@@ -55,7 +56,23 @@ class Page(HTMLParser):
             self.json_parts = None
 
 
-def validate_share_metadata(page):
+def check_local_path(root, path, errors, missing, *, require_file=True):
+    try:
+        path = path.resolve()
+        if not path.is_relative_to(root):
+            errors.append(f'{missing} (resolves outside site root {root})')
+            return None
+        exists = path.is_file() if require_file else path.exists()
+    except (OSError, RuntimeError, ValueError) as error:
+        errors.append(f'{missing} ({error})')
+        return None
+    if not exists:
+        errors.append(missing)
+        return None
+    return path
+
+
+def validate_share_metadata(page, root):
     if page.share_metadata['og:url'] != [CANONICAL]:
         page.errors.append('Expected one og:url in the head matching the homepage canonical')
     images = page.share_metadata['og:image']
@@ -63,42 +80,54 @@ def validate_share_metadata(page):
         page.errors.append('Expected one absolute og:image in the head on the canonical HTTPS origin')
         return
     url = urlsplit(images[0])
-    public_images = ROOT / 'img'
-    path = (ROOT / unquote(url.path).lstrip('/')).resolve()
-    if not path.is_relative_to(public_images) or not path.is_file():
-        page.errors.append(f'Missing public og:image asset: {images[0]}')
+    missing = f'Missing public og:image asset: {images[0]}'
+    path = check_local_path(root, root / unquote(url.path).lstrip('/'), page.errors, missing)
+    if path is not None and not path.is_relative_to(root / 'img'):
+        page.errors.append(missing)
 
 
-def validate():
+def validate(root=ROOT):
+    root = root.resolve()
+    if not root.is_dir():
+        raise SystemExit(f'Site root is not a directory: {root}')
     page = Page()
-    page.feed((ROOT / 'index.html').read_text())
+    sources = {}
+    for name in ('index.html', 'css/main.css', 'sitemap.xml', 'robots.txt'):
+        sources[name] = check_local_path(
+            root, root / name, page.errors, f'Missing site source: {name} in {root}'
+        )
+    if page.errors:
+        raise SystemExit('\n'.join(page.errors))
+
+    homepage = sources['index.html']
+    page.feed(homepage.read_text(encoding='utf-8'))
     for reference, resource in page.references:
         url = urlsplit(reference)
         if url.scheme or url.netloc:
             continue
-        path = (ROOT / unquote(url.path).lstrip('/')).resolve() if url.path else ROOT / 'index.html'
-        is_home = path == ROOT or path == ROOT / 'index.html'
+        target = root / unquote(url.path).lstrip('/') if url.path else homepage
+        path = check_local_path(
+            root, target, page.errors, f'Missing local asset: {reference}', require_file=resource
+        )
+        is_home = path == root or path == homepage
         if url.fragment and is_home and unquote(url.fragment) not in page.ids:
             page.errors.append(f'Missing fragment: {reference}')
-        if not path.is_relative_to(ROOT) or not path.exists() or (resource and not path.is_file()):
-            page.errors.append(f'Missing local asset: {reference}')
-    css = ROOT / 'css/main.css'
-    for reference in re.findall(r'url\([\'"]?([^\)\'"\s]+)', css.read_text()):
+    css = sources['css/main.css']
+    for reference in re.findall(r'url\([\'"]?([^\)\'"\s]+)', css.read_text(encoding='utf-8')):
         url = urlsplit(reference)
         if url.scheme or url.netloc or not url.path:
             continue
         decoded = unquote(url.path)
-        path = (ROOT / decoded.lstrip('/') if decoded.startswith('/') else css.parent / decoded).resolve()
-        if not path.is_relative_to(ROOT) or not path.is_file():
-            page.errors.append(f'Missing CSS asset: {reference}')
-    tree = ET.parse(ROOT / 'sitemap.xml')
+        target = root / decoded.lstrip('/') if decoded.startswith('/') else root / 'css' / decoded
+        check_local_path(root, target, page.errors, f'Missing CSS asset: {reference}')
+    tree = ET.parse(sources['sitemap.xml'])
     locations = [node.text for node in tree.iter('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
     if locations != [CANONICAL]:
         page.errors.append('Unexpected canonical sitemap URLs')
     if len(page.canonicals) != 1 or page.canonicals != locations:
         page.errors.append('Expected exactly one homepage canonical matching the sitemap URL in the head')
-    validate_share_metadata(page)
-    if 'Sitemap: https://madebyjoe.co/sitemap.xml' not in (ROOT / 'robots.txt').read_text():
+    validate_share_metadata(page, root)
+    if 'Sitemap: https://madebyjoe.co/sitemap.xml' not in sources['robots.txt'].read_text(encoding='utf-8'):
         page.errors.append('Missing sitemap discovery')
     if page.errors:
         raise SystemExit('\n'.join(page.errors))
@@ -106,4 +135,7 @@ def validate():
 
 
 if __name__ == '__main__':
-    validate()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--root', type=Path, default=ROOT, metavar='DIR',
+                        help='site directory to validate (default: this checkout)')
+    validate(parser.parse_args().root)

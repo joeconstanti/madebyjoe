@@ -1,82 +1,56 @@
-# PLAN 14th October 2026 (rewritten 18 October 2026)
+# Portfolio release verification
 
-Branch: `madebyjoe-2.0`. One page that promotes the 5 entities.
+## Scope and evidence
 
-## Our Content
-joe.graphics:https://joe.graphics
-fromtheroot.studio:https://fromtheroot.studio
-syntheticlabs.xyz:https://syntheticlabs.xyz
-cerebral.studio:https://cerebral.studio
-automatedigital.ai:https://automatedigital.ai
+Keep madebyjoe.co a static portfolio for Joe and his five projects. Preserve the
+current design, copy, routes, tracking, and FTP deployment model. Start from
+GitHub main at `92c8da8425f0324ff3961c2ad885357fd8d1c5d9`. Keep the root
+checkout's unpublished tooling and About edits outside this branch.
 
-## Direction change (17 Oct 2026)
-The cipher.tv 3D ring was scrapped. The ring prototype is kept for reference in `archive/ring_prototype.html`.
-New reference = trends from Awwwards Sites of the Day, Sep–Oct 2026.
+| Conversation reviewed | Evidence used | Decision |
+| --- | --- | --- |
+| Evolve madebyjoe, CI/CD | [PR #28](https://github.com/joeconstanti/madebyjoe/pull/28), [PR #29](https://github.com/joeconstanti/madebyjoe/pull/29), and [PR #30](https://github.com/joeconstanti/madebyjoe/pull/30) already cover canceled runs, social metadata, and partial video delivery. The handback identifies staged references, recovery assets, and browser smoke tests as gaps. | Cover those gaps without repeating merged work. |
+| Evolve madebyjoe, five PRs | [Repository backlog](docs/evolve-2026-11-17.md) ranks browser automation, focus behavior, and media lifecycle. | Test current browser behavior. Escalate failures that need product decisions. |
+| Evolve traffic and site outage | [PR #27](https://github.com/joeconstanti/madebyjoe/pull/27) restores the former share image. The thread distinguishes direct origin, CDN cache, and browser evidence. | Preserve the redirect and document how to distinguish these failure modes. |
+| About portrait and PageSpeed | The portrait layout and hero-only dither were deliberate product choices. | Test the current site without revising the layout or motion. |
+| Figma brand kit and social work | These threads produced Figma design assets and prototypes. | Keep Figma work and new journal routes out of this release. |
 
-## Awwwards research (12 Sites of the Day, 19 Sep – 16 Oct 2026)
-| Site | Date | What it shows |
-|---|---|---|
-| huyml.co | 14 Oct | Giant name type, `01 / 19` project index, red #FF4949 on #181818 |
-| heronaiapp.com | 12 Oct | Preloader, storytelling scroll, orange #F15534 on #282828 |
-| nickho-motorsports.nl | 11 Oct | Scroll-driven 3D, GSAP |
-| mariavasilyeva.com | 9 Oct | Preloader, hover effects, annotations |
-| odysseeclinic.com.au | 8 Oct | Minimal, 2 colours, transitions |
-| twks.ch | 7 Oct | Mono, loader, accordion, 404 |
-| jesperlandberg.com | 29 Sep | Infinite scroll, WebGL, black/white |
-| meermohsin.me | 26 Sep | Cinematic hero scroll + footer |
-| gilhuybrecht.com | 21 Sep | Info-dense header columns (availability, services, recognition), image grid |
-| boc.studio | 19 Sep | Marquee band with logo + meta, orange #FF4421 on #0D0E0E |
-| lxlcreative.co.uk | 17 Sep | Orange #FF5121 on #27201D, transitions |
-| offforum.com | 16 Oct | Video hero, clean gallery |
+## Work packets
 
-Trends we use:
-1. **Two-colour palette, signal orange on near-black** (4 of 12). Our old orange `#f74f14` fits, so we keep it.
-2. **Oversized type**: full-width wordmark, big section titles, giant footer mark.
-3. **Small mono meta labels**: `(01)`, `01 / 05`, local clock, info columns in the header.
-4. **Video inside type**: a video pill inside the hero wordmark.
-5. **Index list + cursor-follow hover preview**.
-6. **Sticky stacked panels**: each entity is a full-screen chapter that slides over the last one.
-7. **Marquee band**, **word-by-word scroll reveal**, **custom cursor with labels**, **magnetic buttons**, **preloader with %**, **Lenis smooth scroll**.
+Each owner is a separate GPT-6.2-Sol agent with high reasoning effort. Each
+packet can be implemented from the same base. Integration owns shared files.
 
-## Built (18 Oct 2026)
-- `index.html`: one page: preloader → hero → index list → marquee → 5 chapters → How it fits → Selected brands → About → Contact → footer.
-- `css/main.css`: tokens, layout, responsive (stack below 1000 px), reduced motion.
-- `js/main.js`: Lenis, GSAP ScrollTrigger + SplitText, loader tied to real loading, hover preview, pill cycler, sticky stack, lazy video (plays only while visible), copy-email toast, London clock.
-- `js/hero-gl.js`: raw WebGL. The hero background plays the same video as the hero pill as a one-colour 4 px Bayer dither, dimmed behind the heading, and cross-fades when the pill changes. Near the mouse the cells get finer and turn signal orange. Pauses off-screen.
-- Motion language: text types in (chars fade up from a soft blur), elements focus in (blur 10px to 0), media and the preloader dissolve with the same Bayer dither.
-- `js/vendor/`: GSAP 3.13 (+ ScrollTrigger, SplitText), Lenis 1.3.4. No CDN.
-- `fonts/`: Inter Tight (variable), Instrument Serif (+ italic), Geist Mono. Self-hosted, latin only.
-- `media/v2/`: 5 videos + posters, 4.8 MB total, lazy-loaded. Source: each entity's own site media (no screen recordings, no site UI).
-- Old site moved to `archive/index_v1.html`.
+| Owner | Task and exclusive write scope | Dependencies | Acceptance criteria |
+| --- | --- | --- | --- |
+| Agent 1 | Add staged artifact input to the existing validator. Own `scripts/validate-site.py` only. | Existing stager layout. | Default command still validates the checkout. `--root DIR` validates the staged tree, rejects missing local sources and references that resolve outside it, and returns a nonzero status with a useful path. |
+| Agent 2 | Add recovery-page reference validation in `scripts/validate-recovery.py` and focused fixtures in `scripts/test-recovery.py`. | Staged artifact root passed as `--root DIR`. The Apache checker retains status verification. | Current recovery page passes. Missing assets, references that only work relative to the error document at the root, and a missing home link fail. Preserve the page itself. |
+| Agent 3 | Add browser navigation and contact assertions in `scripts/browser/interactions.mjs` (export `checkInteractions(browser, baseURL)`). | Parent smoke runner supplies Playwright browser and URL. | Verify keyboard access to the index and contact, with navigation reaching the intended target, plus email link behavior when clipboard access fails. Match existing behavior and surface regressions. |
+| Agent 4 | Add browser media assertions in `scripts/browser/media.mjs` (export `checkMedia(browser, baseURL)`). | Same runner interface as Agent 3. | Check desktop and mobile hero playback and canvas readiness before interaction, plus all five chapter media on scroll and a reduced motion run. Use bounded waits and report failures with the mode and element. |
+| Agent 5 | Write `docs/release-verification.md`, a release and recovery runbook. | Existing README and check scripts. Parent links the final commands from README. | Explain validation, FTP, direct Apache and CDN checks, safe retry criteria, missing page status, range requests, and when to call a failure unresolved. Use no account data. |
+| Integration owner | Own this plan, `README.md`, browser runner and package metadata, staged-root regression fixture, and both workflow files. | Agents 1–5. | Review each patch and repeat focused checks on the combined branch. Validate the exact staged directory before Apache tests and FTP upload. Document and run browser checks locally. Open one PR with evidence and gaps. |
 
-Each entity chapter uses its own brand colours:
-| Site | Role | Background | Accent | Main media |
-|---|---|---|---|---|
-| From the Root Studio | Studio (design & 3D) | #0b0b0b | #9db4ff | Netflix anamorphic billboard |
-| Synthetic Labs | Lab | #f0efeb (light) | #1f4fd1 | Generative coral study |
-| Cerebral | Hosting | #0f1309 | #c6f135 | Brand film |
-| Automate Digital | Agency | #141933 | #ff6a2b | 3D workflow pipes + stats |
-| joe.graphics | Personal design work | #05070c | #7fd6ff | The J logo film (from joe.graphics) |
+## Integration checks
 
-Run: `python3 -m http.server 5173`, open `localhost:5173`.
+- Run inline source sync, static validation, regression scripts, and JS
+  syntax checks. Run workflow lint and diff whitespace checks.
+- Stage a fresh artifact and run its validators. Remove a referenced asset
+  from a temporary copy and confirm rejection.
+- Run the Apache checker against the staged artifact if Apache is available
+  locally. PR CI repeats it with the repo's Apache configuration.
+- Run the browser smoke checks with Chromium. Capture useful failure evidence.
+  Real iOS and Android autoplay remain outside the emulator proof.
+- Confirm the PR base, head and check state. A branch push or PR check does not
+  establish a production deployment.
 
-## TASKS
+## Risks and open questions
 
-### Must do before launch
-- [ ] Joe checks all copy (About text, Cerebral text, brand list, each quote)
-- [ ] New OG image (`img/OG.jpg`) from the new hero
-- [ ] `.htaccess`: long cache for `.mp4`, `.jpg`, `.woff2`, `.js`, `.css` (CSS/JS use `?v=` strings)
-- [ ] Test on real iOS Safari and Android Chrome (autoplay, sticky, `svh`)
-- [ ] Lighthouse: 90+ performance on mobile
-
-### Nice to have
-- [ ] Cerebral: cleaner footage without site UI text, when available
-- [ ] Per-entity favicon/logo marks in the index rows
-- [ ] Sound toggle for the films
-- [ ] Update README for 2.0
-- [ ] Open PR `madebyjoe-2.0` → `main`; merge deploys via cPanel
-
-## Copy rules (18 Oct 2026)
-- Never say "entities" on the site. Just list the five by name.
-- Chapters stay lean: name, one quote, 3 tags (or stats), one button, one video.
-- No em-dashes anywhere.
+- Browser playback depends on codecs, autoplay policy and WebGL. Use a known
+  browser build and report the environment. Keep the smoke suite local unless
+  there is evidence it is stable enough for hosted CI.
+- A recovery document can render at a nested missing URL. Use root-relative
+  assets and verify the real HTTP status separately. Hosting behavior can vary
+  between Apache and the CDN.
+- The October rebuild checklist described an earlier launch. Git history
+  retains it. This plan tracks the present release checks.
+- Defer new routes, search campaigns, visible motion changes, arbitrary
+  private-file filtering policy, and production changes to separate decisions.

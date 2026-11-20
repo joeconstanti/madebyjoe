@@ -1,0 +1,10 @@
+{
+  "name": "madebyjoe-browser-smoke",
+  "private": true,
+  "scripts": {
+    "check": "node smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.60.0"
+  }
+}

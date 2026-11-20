@@ -36,6 +36,7 @@ python3 scripts/validate-site.py
 python3 scripts/test-validation.py
 python3 scripts/test-generation.py
 python3 scripts/test-server.py
+python3 scripts/test-recovery.py
 for file in js/*.js scripts/*.mjs; do node --check "$file"; done
 ```
 
@@ -61,6 +62,18 @@ The Apache check also fetches the recovery page as a real GET to assert the
 404 status and homepage link. Run `python3 scripts/test-server.py` locally
 when changing HTTP checks or their fixtures.
 
+Run the local browser smoke checks against the development server above:
+
+```sh
+npm --prefix scripts/browser ci
+npm --prefix scripts/browser exec -- playwright install chromium
+npm --prefix scripts/browser run check -- http://127.0.0.1:8000
+```
+
+The smoke suite uses Chromium and blocks external DNS so the local run does
+not send analytics traffic. Use real mobile devices and an authorized analytics
+session when those behaviors are in scope.
+
 Browser acceptance after runtime or media changes:
 
 - Test desktop and mobile with no prior click, touch or scroll. Hero video should
@@ -80,6 +93,8 @@ conditions and dates. Historical local scores do not establish current live scor
 
 ## Deploy and recover
 
+See the [release and recovery runbook](docs/release-verification.md).
+
 Merging to `main` triggers `.github/workflows/deploy.yml`. It validates sources,
 stages an explicit public-only directory and uploads that directory with FTP.
 Production uploads are serialized and are not canceled mid-transfer. The workflow
@@ -97,6 +112,8 @@ To inspect an upload artifact without deploying:
 
 ```sh
 python3 scripts/stage-public.py /tmp/madebyjoe-public-review
+python3 scripts/validate-site.py --root /tmp/madebyjoe-public-review
+python3 scripts/validate-recovery.py --root /tmp/madebyjoe-public-review
 ```
 
 Choose a new path outside the checkout. Public inputs must be regular files and
