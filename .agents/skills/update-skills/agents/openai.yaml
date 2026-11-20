@@ -1,0 +1,5 @@
+interface:
+  display_name: "update-skills"
+  short_description: "Review and apply a jstack release to this project"
+policy:
+  allow_implicit_invocation: false

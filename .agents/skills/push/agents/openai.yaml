@@ -1,0 +1,5 @@
+interface:
+  display_name: "push"
+  short_description: "Commit scoped work and push it to main"
+policy:
+  allow_implicit_invocation: false

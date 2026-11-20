@@ -1,0 +1,679 @@
+{
+  "files": {
+    ".agents/jstack/.gitignore": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "042a6297dec254e9ca75dd958a5221d5856222647c157a60aa20e92fbeef26a8"
+    },
+    ".agents/jstack/LICENSE": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "576111a23df92c8ca70ebb616d3f5ab8df51369dba53d47bc0dbdcc8d98cecd5"
+    },
+    ".agents/jstack/rules.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "b1bcecdf0eaf3b5a273086cceb86c6fb0011032c0cc8f35445185275a8e72655"
+    },
+    ".agents/skills/audit/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "43dea618e32e810a30414edd48e5d41a0103ec10696c96f2b2453e177932471a"
+    },
+    ".agents/skills/check/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "f4ec4630a640b4dc9fc9f059ced9cda581367bc57fbc88c6178892a336fbfa83"
+    },
+    ".agents/skills/design/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "f4967411095f4b096f369d01884520020061ff3884f107f19dc6fb0dab8c380d"
+    },
+    ".agents/skills/design/references/quality.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "0a87bcb26f6edea61ebc1f23515271b1f40a28deddff0c86391c77373980ab2e"
+    },
+    ".agents/skills/doctor/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "6686f1a51871628082f2e57169e9bf8d044528a0af78030eacaf394d01269bfa"
+    },
+    ".agents/skills/doctor/scripts/doctor.py": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "8319dbce40845ee9e370a0358d4bf395050b0727b79b3f1eb56b3498a34901a2"
+    },
+    ".agents/skills/edit/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "2bddc48d118e78dd45c12b04fbb79e5fcceb6dae83187fbd7190719bcbdf3431"
+    },
+    ".agents/skills/grill-with-docs/LICENSE": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "76a245e05c0a0095013255ce936c756222faf20b92b29d22288284d6e24863ab"
+    },
+    ".agents/skills/grill-with-docs/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "35d73500f18b58ecd4564826cc9b191985c34ab620df21301c7bbd0cbea92950"
+    },
+    ".agents/skills/grill/LICENSE": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "76a245e05c0a0095013255ce936c756222faf20b92b29d22288284d6e24863ab"
+    },
+    ".agents/skills/grill/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "feb728d19d3edf602bc7a387e82d56be7afdd25efc1fcaeb99af9439e4572eba"
+    },
+    ".agents/skills/pr/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "dd6350e64790e960c82b32ebf8b5cfed7f3922ee3d2490ec1207e99d621e1aea"
+    },
+    ".agents/skills/preview/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "bbd6a18e3ec8acac2debaabf98673eeced9855800b99f31c850449f59e49babd"
+    },
+    ".agents/skills/pull/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "07254cd825d6b80d4874815ce902491c145ad34876ede1650ddf5cb6c48510bb"
+    },
+    ".agents/skills/push/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "f3d20cc06603e4c7b20a4f377b6ccb37b267164175c20ccfdcd2d648c246af08"
+    },
+    ".agents/skills/push/agents/openai.yaml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "c4314bde1be40662671473ee21087843c6ac751344c2f16cb52dfef5f0b30f56"
+    },
+    ".agents/skills/research/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "4d8e1db38b017340102d376c679dc3eb970977063ebcfe0fe061d4fdea4016d1"
+    },
+    ".agents/skills/research/references/evidence.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "2e5dbd55a373c8ac6a5f66c9b3e6ec40b9d051d5c030a8400cff119c33c3adc5"
+    },
+    ".agents/skills/review/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "749bb967e5caab81b1d090c41947b56bbf51b1829f36a471fa8af6d61c0b9b56"
+    },
+    ".agents/skills/start/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "5c6ce132217f8e48ffd0939a6cdb5a15ce1d962514b8a418bcf6cae153268211"
+    },
+    ".agents/skills/start/references/recipes.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "377c9ad93ab447fe480bf8a5d873c457278da13c277883f91a617727ca1d6036"
+    },
+    ".agents/skills/update-skills/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "23a6ab9a44a5616aa5dea2570436610510bf2790002f4b67515f847fb0a201bf"
+    },
+    ".agents/skills/update-skills/agents/openai.yaml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "a36214a07be51a4fee7894e10d97912d97c13f2f52f9612ce602f3ee26cce264"
+    },
+    ".agents/skills/verify/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "bb5b48bbcc185b9eb215b5fe91ff73c56c1375e6247a4f813c5cf7ded607863f"
+    },
+    ".agents/skills/write/SKILL.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "034a227aa2cfab199f0fc8a8e8c78b560b816ab58bfd65f98938c802ba651bc3"
+    },
+    ".agents/skills/write/references/editorial.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "cfa82bdc7a34837c80b362fdcebfe68b46fad7f8c595a95bea661f403a1dd29c"
+    },
+    ".claude/skills/audit": {
+      "kind": "link",
+      "target": "../../.agents/skills/audit"
+    },
+    ".claude/skills/check": {
+      "kind": "link",
+      "target": "../../.agents/skills/check"
+    },
+    ".claude/skills/design": {
+      "kind": "link",
+      "target": "../../.agents/skills/design"
+    },
+    ".claude/skills/doctor": {
+      "kind": "link",
+      "target": "../../.agents/skills/doctor"
+    },
+    ".claude/skills/edit": {
+      "kind": "link",
+      "target": "../../.agents/skills/edit"
+    },
+    ".claude/skills/grill": {
+      "kind": "link",
+      "target": "../../.agents/skills/grill"
+    },
+    ".claude/skills/grill-with-docs": {
+      "kind": "link",
+      "target": "../../.agents/skills/grill-with-docs"
+    },
+    ".claude/skills/pr": {
+      "kind": "link",
+      "target": "../../.agents/skills/pr"
+    },
+    ".claude/skills/preview": {
+      "kind": "link",
+      "target": "../../.agents/skills/preview"
+    },
+    ".claude/skills/pull": {
+      "kind": "link",
+      "target": "../../.agents/skills/pull"
+    },
+    ".claude/skills/push": {
+      "kind": "link",
+      "target": "../../.agents/skills/push"
+    },
+    ".claude/skills/research": {
+      "kind": "link",
+      "target": "../../.agents/skills/research"
+    },
+    ".claude/skills/review": {
+      "kind": "link",
+      "target": "../../.agents/skills/review"
+    },
+    ".claude/skills/start": {
+      "kind": "link",
+      "target": "../../.agents/skills/start"
+    },
+    ".claude/skills/update-skills": {
+      "kind": "link",
+      "target": "../../.agents/skills/update-skills"
+    },
+    ".claude/skills/verify": {
+      "kind": "link",
+      "target": "../../.agents/skills/verify"
+    },
+    ".claude/skills/write": {
+      "kind": "link",
+      "target": "../../.agents/skills/write"
+    },
+    ".cursor/commands/audit.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "5963e6d91d252832fdf8756403f4b218135c9d23bebf6491a4a3f9e9e833cb44"
+    },
+    ".cursor/commands/check.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "6f475a821e6485349b50aff7ec89616b3b439d4f9ddda2402370b1b85acb865f"
+    },
+    ".cursor/commands/design.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "00414571239b49b609b227cfad7a4c865671fd58bf2bc4679947d2eb0bcab998"
+    },
+    ".cursor/commands/doctor.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "fd22a46e3b91586f8f41d1033ad883f65bd0800b5aa2a372b7b41689701641ea"
+    },
+    ".cursor/commands/edit.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "3c4fdd83cdc9e3033eb6142844de620abc133bfc0b4b841eb8bd4e323115df3e"
+    },
+    ".cursor/commands/grill-with-docs.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "8cb57a21afff577c81a6c260c6dd2d4b3dac451b292cd07a13d97da84ac63362"
+    },
+    ".cursor/commands/grill.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "0907804ea309089d5ecadad608dc7b445cefcc8219eaab98076a117472771a1f"
+    },
+    ".cursor/commands/pr.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "87637f1ff551cb02c7af8495d92cdf54e1a240938a36765f7791bd1d79b5cf17"
+    },
+    ".cursor/commands/preview.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "2211d31d7432531724cb43d658f23df5f6b9eb4c21eb3dbd64413facb2c8c2d9"
+    },
+    ".cursor/commands/pull.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "df9c00e3e06d913b11f8f927b74e621ba5d9bf70799f6c2b0c923a1bf80107ca"
+    },
+    ".cursor/commands/push.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "d809d2bc7f74fb56895fc21c6399554ebb7de5453b1cddf534a16e1709b21ede"
+    },
+    ".cursor/commands/research.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "d9fabd0597877555b9e4a0d220edbfcbdd96e45be7c04eb7aaedcc9295b84f20"
+    },
+    ".cursor/commands/review.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "05a02d1ca17f4f1f4c306b971a06bd44b923f97b57abbf5c72bdaf3702b3e3cc"
+    },
+    ".cursor/commands/start.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "32691a2e2ca62eb3a86ad5fb0da74e456bead0455f2dbfdc5a5ee73acce843bb"
+    },
+    ".cursor/commands/update-skills.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "8ac18c7f6509c8b7bca1a341128f51949f7fdd3e9439dcd46c25c01313e58111"
+    },
+    ".cursor/commands/verify.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "d22ae9af4be94841358e6ff0c11eaa7e39df2ff1912a9e916dbac4d09703d497"
+    },
+    ".cursor/commands/write.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "10bd94bf5deb647df8f35b7c9d3d0587808032fb1640a8344f84449d3dd1f3bb"
+    },
+    ".cursor/skills/audit": {
+      "kind": "link",
+      "target": "../../.agents/skills/audit"
+    },
+    ".cursor/skills/check": {
+      "kind": "link",
+      "target": "../../.agents/skills/check"
+    },
+    ".cursor/skills/design": {
+      "kind": "link",
+      "target": "../../.agents/skills/design"
+    },
+    ".cursor/skills/doctor": {
+      "kind": "link",
+      "target": "../../.agents/skills/doctor"
+    },
+    ".cursor/skills/edit": {
+      "kind": "link",
+      "target": "../../.agents/skills/edit"
+    },
+    ".cursor/skills/grill": {
+      "kind": "link",
+      "target": "../../.agents/skills/grill"
+    },
+    ".cursor/skills/grill-with-docs": {
+      "kind": "link",
+      "target": "../../.agents/skills/grill-with-docs"
+    },
+    ".cursor/skills/pr": {
+      "kind": "link",
+      "target": "../../.agents/skills/pr"
+    },
+    ".cursor/skills/preview": {
+      "kind": "link",
+      "target": "../../.agents/skills/preview"
+    },
+    ".cursor/skills/pull": {
+      "kind": "link",
+      "target": "../../.agents/skills/pull"
+    },
+    ".cursor/skills/push": {
+      "kind": "link",
+      "target": "../../.agents/skills/push"
+    },
+    ".cursor/skills/research": {
+      "kind": "link",
+      "target": "../../.agents/skills/research"
+    },
+    ".cursor/skills/review": {
+      "kind": "link",
+      "target": "../../.agents/skills/review"
+    },
+    ".cursor/skills/start": {
+      "kind": "link",
+      "target": "../../.agents/skills/start"
+    },
+    ".cursor/skills/update-skills": {
+      "kind": "link",
+      "target": "../../.agents/skills/update-skills"
+    },
+    ".cursor/skills/verify": {
+      "kind": "link",
+      "target": "../../.agents/skills/verify"
+    },
+    ".cursor/skills/write": {
+      "kind": "link",
+      "target": "../../.agents/skills/write"
+    },
+    ".gemini/commands/audit.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "1990d8a56708ba3b313518189807c7394b67f213b760f15a664c628afbc47d4f"
+    },
+    ".gemini/commands/check.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "e5f96b0b0416e551d0d2ff402bfb367cbd33e8969f998b3048ad88d0b7c2f939"
+    },
+    ".gemini/commands/design.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "534c9724186e942fadacd3407c2cbcd032926cb5c83b20dc7ae5e48f864d01d6"
+    },
+    ".gemini/commands/doctor.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "f9e46870762d3f932d88fce210329d5c2c68eca65aad837ab59390ce4b7a2068"
+    },
+    ".gemini/commands/edit.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "c5eb943f126934461e76a360b5d0ffa53472f98106a9d75f5a4a8a03748aefdd"
+    },
+    ".gemini/commands/grill-with-docs.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "e68490b0dddf0ee8009156c7cc5db7ec40e584dbf6f7b6eaba7e24a6cf3f1551"
+    },
+    ".gemini/commands/grill.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "89634fe11c9a82e7d5aea95cbb39238f4edec1803f3980afa98d1b40c034986e"
+    },
+    ".gemini/commands/pr.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "8779f8edeb27fc91261f82651fd95baf48ad7d74fa7e2a1faa6a14ab83a4cd12"
+    },
+    ".gemini/commands/preview.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "6be17321d3747d9df7becfc27f62d18d0646b17d8564b0f84f32020448a8fb0c"
+    },
+    ".gemini/commands/pull.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "62a709d6ca5535c5241109a06a1ff0eb2227c670a1320f5c63983b0022810186"
+    },
+    ".gemini/commands/push.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "f54bae0b7afea792761d8bc136873cc75361977717aac9bec37137aff2cf454c"
+    },
+    ".gemini/commands/research.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "9b8848cf6156844638a76ebb6547c484d1c2b06a50b433ce80ad65ec92aad21d"
+    },
+    ".gemini/commands/review.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "aff951649e158c43becfa703a47f9398cabca00d39b9eb6d0ca6d6ca7d426e18"
+    },
+    ".gemini/commands/start.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "c64e90621d1026f2088ce92c807d04dc3b6178fda164f4cb93f4a3d7e3dd348e"
+    },
+    ".gemini/commands/update-skills.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "1d76b9b378e48731d45ff32d5de13d3e82251bb6c5cb00a137229b6550748d02"
+    },
+    ".gemini/commands/verify.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "3c66a683093dc1ae164fc3549b8b4cc0b3b0597211281d81eabb07fe10626f0e"
+    },
+    ".gemini/commands/write.toml": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "756576c722ba2f2d6ca9b91601f719f69eaa85c2494bf13d119114dc45e2329c"
+    },
+    ".gemini/skills/audit": {
+      "kind": "link",
+      "target": "../../.agents/skills/audit"
+    },
+    ".gemini/skills/check": {
+      "kind": "link",
+      "target": "../../.agents/skills/check"
+    },
+    ".gemini/skills/design": {
+      "kind": "link",
+      "target": "../../.agents/skills/design"
+    },
+    ".gemini/skills/doctor": {
+      "kind": "link",
+      "target": "../../.agents/skills/doctor"
+    },
+    ".gemini/skills/edit": {
+      "kind": "link",
+      "target": "../../.agents/skills/edit"
+    },
+    ".gemini/skills/grill": {
+      "kind": "link",
+      "target": "../../.agents/skills/grill"
+    },
+    ".gemini/skills/grill-with-docs": {
+      "kind": "link",
+      "target": "../../.agents/skills/grill-with-docs"
+    },
+    ".gemini/skills/pr": {
+      "kind": "link",
+      "target": "../../.agents/skills/pr"
+    },
+    ".gemini/skills/preview": {
+      "kind": "link",
+      "target": "../../.agents/skills/preview"
+    },
+    ".gemini/skills/pull": {
+      "kind": "link",
+      "target": "../../.agents/skills/pull"
+    },
+    ".gemini/skills/push": {
+      "kind": "link",
+      "target": "../../.agents/skills/push"
+    },
+    ".gemini/skills/research": {
+      "kind": "link",
+      "target": "../../.agents/skills/research"
+    },
+    ".gemini/skills/review": {
+      "kind": "link",
+      "target": "../../.agents/skills/review"
+    },
+    ".gemini/skills/start": {
+      "kind": "link",
+      "target": "../../.agents/skills/start"
+    },
+    ".gemini/skills/update-skills": {
+      "kind": "link",
+      "target": "../../.agents/skills/update-skills"
+    },
+    ".gemini/skills/verify": {
+      "kind": "link",
+      "target": "../../.agents/skills/verify"
+    },
+    ".gemini/skills/write": {
+      "kind": "link",
+      "target": "../../.agents/skills/write"
+    },
+    ".opencode/commands/audit.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "5963e6d91d252832fdf8756403f4b218135c9d23bebf6491a4a3f9e9e833cb44"
+    },
+    ".opencode/commands/check.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "6f475a821e6485349b50aff7ec89616b3b439d4f9ddda2402370b1b85acb865f"
+    },
+    ".opencode/commands/design.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "00414571239b49b609b227cfad7a4c865671fd58bf2bc4679947d2eb0bcab998"
+    },
+    ".opencode/commands/doctor.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "fd22a46e3b91586f8f41d1033ad883f65bd0800b5aa2a372b7b41689701641ea"
+    },
+    ".opencode/commands/edit.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "3c4fdd83cdc9e3033eb6142844de620abc133bfc0b4b841eb8bd4e323115df3e"
+    },
+    ".opencode/commands/grill-with-docs.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "8cb57a21afff577c81a6c260c6dd2d4b3dac451b292cd07a13d97da84ac63362"
+    },
+    ".opencode/commands/grill.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "0907804ea309089d5ecadad608dc7b445cefcc8219eaab98076a117472771a1f"
+    },
+    ".opencode/commands/pr.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "87637f1ff551cb02c7af8495d92cdf54e1a240938a36765f7791bd1d79b5cf17"
+    },
+    ".opencode/commands/preview.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "2211d31d7432531724cb43d658f23df5f6b9eb4c21eb3dbd64413facb2c8c2d9"
+    },
+    ".opencode/commands/pull.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "df9c00e3e06d913b11f8f927b74e621ba5d9bf70799f6c2b0c923a1bf80107ca"
+    },
+    ".opencode/commands/push.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "d809d2bc7f74fb56895fc21c6399554ebb7de5453b1cddf534a16e1709b21ede"
+    },
+    ".opencode/commands/research.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "d9fabd0597877555b9e4a0d220edbfcbdd96e45be7c04eb7aaedcc9295b84f20"
+    },
+    ".opencode/commands/review.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "05a02d1ca17f4f1f4c306b971a06bd44b923f97b57abbf5c72bdaf3702b3e3cc"
+    },
+    ".opencode/commands/start.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "32691a2e2ca62eb3a86ad5fb0da74e456bead0455f2dbfdc5a5ee73acce843bb"
+    },
+    ".opencode/commands/update-skills.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "8ac18c7f6509c8b7bca1a341128f51949f7fdd3e9439dcd46c25c01313e58111"
+    },
+    ".opencode/commands/verify.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "d22ae9af4be94841358e6ff0c11eaa7e39df2ff1912a9e916dbac4d09703d497"
+    },
+    ".opencode/commands/write.md": {
+      "executable": false,
+      "kind": "file",
+      "sha256": "10bd94bf5deb647df8f35b7c9d3d0587808032fb1640a8344f84449d3dd1f3bb"
+    },
+    ".opencode/skills/audit": {
+      "kind": "link",
+      "target": "../../.agents/skills/audit"
+    },
+    ".opencode/skills/check": {
+      "kind": "link",
+      "target": "../../.agents/skills/check"
+    },
+    ".opencode/skills/design": {
+      "kind": "link",
+      "target": "../../.agents/skills/design"
+    },
+    ".opencode/skills/doctor": {
+      "kind": "link",
+      "target": "../../.agents/skills/doctor"
+    },
+    ".opencode/skills/edit": {
+      "kind": "link",
+      "target": "../../.agents/skills/edit"
+    },
+    ".opencode/skills/grill": {
+      "kind": "link",
+      "target": "../../.agents/skills/grill"
+    },
+    ".opencode/skills/grill-with-docs": {
+      "kind": "link",
+      "target": "../../.agents/skills/grill-with-docs"
+    },
+    ".opencode/skills/pr": {
+      "kind": "link",
+      "target": "../../.agents/skills/pr"
+    },
+    ".opencode/skills/preview": {
+      "kind": "link",
+      "target": "../../.agents/skills/preview"
+    },
+    ".opencode/skills/pull": {
+      "kind": "link",
+      "target": "../../.agents/skills/pull"
+    },
+    ".opencode/skills/push": {
+      "kind": "link",
+      "target": "../../.agents/skills/push"
+    },
+    ".opencode/skills/research": {
+      "kind": "link",
+      "target": "../../.agents/skills/research"
+    },
+    ".opencode/skills/review": {
+      "kind": "link",
+      "target": "../../.agents/skills/review"
+    },
+    ".opencode/skills/start": {
+      "kind": "link",
+      "target": "../../.agents/skills/start"
+    },
+    ".opencode/skills/update-skills": {
+      "kind": "link",
+      "target": "../../.agents/skills/update-skills"
+    },
+    ".opencode/skills/verify": {
+      "kind": "link",
+      "target": "../../.agents/skills/verify"
+    },
+    ".opencode/skills/write": {
+      "kind": "link",
+      "target": "../../.agents/skills/write"
+    }
+  },
+  "schema": 1,
+  "source": "https://github.com/joeconstanti/jstack",
+  "version": "0.5.0"
+}

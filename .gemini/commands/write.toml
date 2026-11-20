@@ -1,0 +1,2 @@
+description = "jstack write"
+prompt = "Read `.agents/skills/write/SKILL.md` and follow it for this request.\nResolve its relative references from that skill folder.\nApply `.agents/jstack/rules.md`.\n\nArguments: {{args}}\n"
