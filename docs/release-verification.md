@@ -17,6 +17,8 @@
    ```sh
    stage_parent=$(mktemp -d)
    python3 scripts/stage-public.py "$stage_parent/public"
+   python3 scripts/validate-site.py --root "$stage_parent/public"
+   python3 scripts/validate-recovery.py --root "$stage_parent/public"
    # After starting Apache with that document root on port 8088:
    python3 scripts/check-server.py http://127.0.0.1:8088
    ```
@@ -30,7 +32,8 @@
 
 1. Record the SHA pushed to `main`. The push starts both **Validate static site**
    and [**Deploy to GoDaddy via FTP**](../.github/workflows/deploy.yml). The deploy
-   workflow runs its own source checks, stages the public files and uploads them.
+   workflow runs its own source checks, stages and validates the public files,
+   then uploads them.
    Check both workflow conclusions for the same SHA. Record the deploy run URL,
    attempt number and result of the FTP step. The production concurrency group
    allows only one active upload and does not cancel an upload when a new push arrives.
