@@ -19,7 +19,8 @@ class ValidationTests(unittest.TestCase):
         for name in ('index.html', '404.html', '.htaccess', 'robots.txt', 'sitemap.xml'):
             shutil.copy2(ROOT / name, self.root / name)
         for name in ('css', 'fonts', 'img', 'js', 'media', 'scripts'):
-            shutil.copytree(ROOT / name, self.root / name)
+            shutil.copytree(ROOT / name, self.root / name,
+                            ignore=shutil.ignore_patterns('node_modules', '__pycache__'))
         shutil.copytree(ROOT / 'clients/audits', self.root / 'clients/audits')
         self.page = self.root / 'index.html'
 
@@ -31,6 +32,26 @@ class ValidationTests(unittest.TestCase):
                      ('python3', 'scripts/validate-site.py')]:
             result = self.run_script(*args)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_validator_reads_staged_files_instead_of_checkout(self):
+        destination = Path(self.temp.name) / 'public'
+        result = self.run_script('python3', 'scripts/stage-public.py', str(destination))
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+        validate = ('python3', 'scripts/validate-site.py', '--root', str(destination))
+        result = self.run_script(*validate)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+        asset = destination / 'img/OG.jpg'
+        asset.unlink()
+        result = self.run_script(*validate)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Missing public og:image asset:', result.stderr)
+
+        asset.symlink_to(self.root / 'img/OG.jpg')
+        result = self.run_script(*validate)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('resolves outside site root', result.stderr)
 
     def test_rendering_resources_are_crawlable(self):
         robots = RobotFileParser()

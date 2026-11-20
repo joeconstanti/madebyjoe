@@ -1,49 +1,89 @@
-# Portfolio Improvement Plan
+# Portfolio improvement and release verification plan
 
 Updated: 20 November 2026
 
-## Product scope
+## Scope
 
-Made by Joe is a static, single-page portfolio at `madebyjoe.co`. Keep its current
-visual design, copy, project links, analytics IDs, and motion behavior. Do not add
-new project pages until Joe supplies distinct source material and Search Console
-shows enough demand to guide the work. Keep deployment public-only and verify the
-live result after a release.
+Made by Joe is a static, single-page portfolio at `madebyjoe.co`. Keep the
+current design, copy, project links, routes, analytics IDs, motion behavior, and
+FTP deployment model. Do not add new project pages until Joe supplies distinct
+source material and Search Console provides enough evidence to guide the work.
+Keep deployment public-only. A green upload does not prove the live site.
 
-The plan selects five small repository improvements from the project improvement
-backlog. It does not reopen work that has already merged, including source and
-Apache validation, public-only FTP staging, canonical checks, metadata and social
-preview fixes, renderer access, media autoplay, and the verified `/OG.jpg`
-redirect.
+## Conversation evidence
 
-## Tasks
+| Conversation | Evidence | Decision |
+| --- | --- | --- |
+| Evolve madebyjoe, CI/CD | PRs [#28](https://github.com/joeconstanti/madebyjoe/pull/28)–[#30](https://github.com/joeconstanti/madebyjoe/pull/30) cover canceled runs, social metadata, and partial video delivery. Later release work identified staged references, recovery assets, and browser smoke checks as gaps. | Add validation and browser coverage without repeating merged work. |
+| Evolve madebyjoe, five PRs | `docs/evolve-2026-11-17.md` ranks browser automation, keyboard focus, and media lifecycle. | Test existing browser behavior. Keep product changes out of these checks. |
+| Evolve traffic and site outage | [PR #27](https://github.com/joeconstanti/madebyjoe/pull/27) restores the old share image. The T3 thread separates direct-origin, CDN cache, and browser evidence. | Preserve the redirect and report each proof level separately. |
+| About portrait and PageSpeed | The portrait layout and hero-only dither were deliberate choices. | Check the current page without changing layout or motion. |
+| Figma brand kit and social work | The threads produced brand assets and prototypes. | Keep Figma work and new routes out of this release. |
+| Grow Website Traffic | Search Console showed a small sample with one indexed page. Existing links were checked across the project sites. | Do not rewrite copy or add pages without distinct content and stronger demand evidence. |
+| Improve Desktop and Mobile PageSpeed | The autoplay, poster, marquee, and immediate hero-renderer issues were fixed and verified. | Do not reopen those fixes in this release. |
+| madebyjoe: research 25 improvements | The ten repository hardening PRs completed staging, cache, generation, validation, and deployment work. | Reuse existing source and Apache checks. |
 
-| ID | Owner | Task and acceptance criteria | Depends on | Risk or open question |
+## Completed release verification work from PR #38
+
+PR #38 merged a staged-artifact validator, recovery-page checks, Chromium smoke
+checks, and a release runbook. This work remains part of the release baseline.
+
+| Owner | Delivered task | Acceptance evidence |
+| --- | --- | --- |
+| Agent 1 | Added staged artifact input to `scripts/validate-site.py`. | Default validation still checks the checkout. `--root DIR` checks the staged tree and rejects missing or out-of-root local references. |
+| Agent 2 | Added `scripts/validate-recovery.py` and `scripts/test-recovery.py`. | The recovery page checks required links and assets. Tests cover missing assets and incorrect links. Apache checks verify the actual HTTP 404 status. |
+| Agent 3 | Added browser keyboard and contact assertions in `scripts/browser/interactions.mjs`. | Chromium checks index navigation, keyboard access, and the email-link fallback when clipboard access fails. |
+| Agent 4 | Added browser media assertions in `scripts/browser/media.mjs`. | Chromium checks desktop/mobile hero playback, canvas readiness, five chapter videos, and reduced-motion behavior. |
+| Agent 5 | Added `docs/release-verification.md`. | The runbook explains validation, FTP, origin/CDN checks, safe retries, missing-page status, range requests, and failure reporting. |
+
+## Current maintenance work from PR #39
+
+| ID | Owner | Task and acceptance criteria | Depends on | Status and risk |
 | --- | --- | --- | --- | --- |
-| P1 | Agent 1 | Verify the existing Dependabot configuration checks GitHub Actions from the repository root (`directory: /`) once per week with a bounded open-PR limit. Confirm every current workflow Action remains pinned to a reviewed commit SHA. No configuration change is needed. **Complete:** config and all five Action refs were checked; `actionlint` and focused YAML validation passed. | None | Dependabot can propose routine updates. A maintainer must review and merge them. GitHub-side execution remains unverified. |
-| P2 | Agent 2 | Add `docs/vendor-maintenance.md`. Inventory the locally used GSAP modules, Lenis, and Partytown. Record versions and license evidence only when the checked-in files support it. Explain how to review upstream updates and preserve required notices. **Complete:** version and notice claims cite checked-in evidence; unknown license terms are identified. | None | Some vendor files do not expose a version or license. These remain marked unknown; vendor code was not changed. |
-| P3 | Agent 3 | Add `scripts/test-progressive-enhancement.py` using Python's standard library. It must check that the unexecuted HTML contains the page title, primary navigation links, five project links, five chapter video posters, and a working `mailto:` link. It must fail with a clear message when one required element is removed. **Complete:** the homepage passes and a temporary missing-poster fixture fails with a clear error. | None | This is a source-level check. It does not prove visual or browser behavior without JavaScript. |
-| P4 | Agent 4 | Run the P3 check in `.github/workflows/validate.yml` on pull requests and pushes to `main`. Keep it in the existing validation job and preserve the Apache checks. Confirm the workflow fails when P3's required markup is missing. **Complete:** one command was added to the existing validation step; a temporary missing-title fixture failed as expected. | P3 | No network browser package or new frontend dependency was added. Hosted Actions remains to be confirmed. |
-| P5 | Agent 5 | Add `docs/analytics-acceptance.md` and link it from `README.md`. Describe how to check GA4 request transport, the page-view event, and dashboard attribution as separate observations. Preserve existing tracking IDs and avoid recording account secrets. **Complete:** source and guide are linked; the procedure separates transport, GA4 event visibility, staff filtering, and attribution. | None | Live GA4 requests and property reports were not checked. Analytics dashboards can delay or filter events. |
+| P1 | Agent 1 | Verify the existing Dependabot configuration checks GitHub Actions from the repository root (`directory: /`) once per week with a bounded open-PR limit. Confirm workflow Actions use full commit SHAs. | None | Complete. Existing config meets the criteria. A maintainer must review and merge proposed updates. |
+| P2 | Agent 2 | Add `docs/vendor-maintenance.md` with checked-in version and notice evidence for GSAP, Lenis, and Partytown. Mark unsupported facts as unknown. | None | Complete. Lenis terms and the exact GSAP terms remain unverified; no vendor code changed. |
+| P3 | Agent 3 | Add `scripts/test-progressive-enhancement.py` using Python's standard library. Check the page title, primary navigation, five index and project links, chapter posters, and a recipient-bearing `mailto:` link. Include a failing fixture. | None | Complete. The real page passes; a missing chapter poster fails clearly. This source check does not prove rendered behavior. |
+| P4 | Agent 4 | Run the P3 check and `scripts/test-recovery.py` in `.github/workflows/validate.yml`. Preserve staged-root validation, Apache checks, and pinned Actions. | P3 and PR #38 validation baseline | Complete. Both test commands pass locally and remain in the same validation step. Hosted Apache validation is pending. |
+| P5 | Agent 5 | Add `docs/analytics-acceptance.md` and link it from `README.md`. Separate collector transport, GA4 event visibility, staff filtering, and dashboard attribution. Preserve tracking IDs and account privacy. | None | Complete. Live GA4 requests and dashboard attribution were not checked. |
 
-## Deferred work
+## Release checks
 
-- **Production 404 recovery:** `/404.html` is present and works in hosted Apache validation, but production requests still returned a bare 404 in the reviewed T3 thread. A repository-only review found no supported fix. Continue only after read-only access to the effective HTTPS virtual host, applicable overrides, and matching access/error logs. Do not add a blanket redirect or soft 404.
-- **Old share-image cache:** T3 verified the exact `/OG.jpg` redirect at the origin and on both hosts with a query string. A cached public request without a query string still returned an old 404 at that time. Recheck after cache expiry before closing this follow-up.
-- **More search landing pages:** the reviewed Search Console sample was eight impressions, zero clicks, and one indexed page. It does not support query-driven copy changes. Revisit only with distinct project material and a stronger demand signal.
-- **Browser and Lighthouse automation:** the site has documented browser acceptance steps and a previously measured mobile Lighthouse score of 95. Scores vary by run. Keep a browser or Lighthouse CI setup out of this change until a stable, low-noise approach is selected.
+- Run generated HTML sync, site validation, all Python regression scripts, and
+  JavaScript syntax checks.
+- Stage a fresh public artifact. Run site and recovery validators against that
+  exact directory. Use temporary fixtures to confirm invalid references fail.
+- Run the Chromium smoke suite against the local development server. It blocks
+  external DNS to prevent local analytics traffic. Real-device autoplay still
+  needs physical device evidence.
+- Run `actionlint` and `git diff --check`.
+- PR CI runs source and failure-path checks, staged-artifact checks, and the
+  Apache integration check. After merge, inspect both validation and FTP deploy
+  Actions, then check the affected public paths and behavior.
 
-## Evidence reviewed
+## Deferred work and risks
 
-- T3 Code thread [“madebyjoe: research 25 improvements, ship top 10 PRs”](t3-thread://v2/7be29275-49a0-47f8-b6cd-0ddb476aa5c7/mcp:launch:9012909971ef741bc670fc53beb1c21d55df07c120e13594d15f1a8c297f8ce2) records the completed deployment, cache, generation, validation, and documentation work.
-- T3 Code thread [“Evolve traffic: madebyjoe — 5 PRs”](t3-thread://v2/7be29275-49a0-47f8-b6cd-0ddb476aa5c7/mcp:launch:1752174c75b3eb68fed061210d9fa3284517abddbee8c78a8962bb3587a68539) records the completed rendering-library access, profile schema, social preview, canonical validation, and recovery-page work. It also records the production 404 limitation and the `/OG.jpg` redirect follow-up.
-- T3 Code thread [“Grow Website Traffic”](t3-thread://v2/7be29275-49a0-47f8-b6cd-0ddb476aa5c7/cd3c10a9-61d6-402b-b7e0-bb252507121c) records the Search Console sample, crawler exclusions, profile links, and the need for distinct project content before adding pages.
-- T3 Code thread [“Improve Desktop and Mobile PageSpeed”](t3-thread://v2/7be29275-49a0-47f8-b6cd-0ddb476aa5c7/3919774c-dbe7-4882-a6ad-7665dde8c49f) records the autoplay, poster, marquee, and immediate hero-renderer fixes.
-- `docs/improvements.md` records the ranked follow-up candidates used for P1–P5.
+- **Production 404 recovery:** `/404.html` and the repository's Apache test work,
+  but a T3 investigation found production returned a bare 404. A repository-only
+  investigation found no supported fix. Further work needs read-only access to
+  the effective HTTPS virtual host, applicable overrides, and matching logs.
+  Do not add a blanket redirect or soft 404.
+- **Old share-image cache:** T3 verified the exact `/OG.jpg` redirect at origin
+  and both hosts with a query string. A cached public request without a query
+  string still returned an old 404 at that time. Recheck after cache expiry.
+- **Search landing pages:** the reviewed Search Console sample was eight
+  impressions, zero clicks, and one indexed page. It does not support copy
+  changes. Revisit pages only with distinct project material and stronger demand.
+- **Lighthouse CI:** browser smoke coverage now exists, but performance scores
+  vary by run. Add automated Lighthouse thresholds only after a stable,
+  low-noise approach is selected.
+- **Browser limits:** codecs, autoplay policy, and WebGL can vary by browser.
+  The local Chromium smoke suite does not prove iOS or Android autoplay.
 
-## Completion evidence
+## Completion record
 
-- [x] P1–P5 are complete locally and their focused acceptance checks pass.
-- [x] Run the source generation check, site validator, Python regression scripts, and JavaScript syntax checks from `README.md`.
-- [ ] Confirm the pull request validation job passes. Do not deploy from this branch.
-- [x] Report deferred items and their required evidence in the pull request.
+- [x] PR #38 release checks and runbook are retained in this plan.
+- [x] P1–P5 documentation, source check, and workflow change are implemented.
+- [x] Initial local source suite and focused negative fixtures passed.
+- [x] Rerun the complete combined suite after merging current `main`: 34 Python tests, staged-root checks, JavaScript syntax, `actionlint`, diff checks, and Chromium keyboard/contact/media smoke tests passed.
+- [ ] Confirm the updated PR validation passes, then merge.
+- [ ] Verify post-merge validation and FTP deployment Actions and public behavior.
