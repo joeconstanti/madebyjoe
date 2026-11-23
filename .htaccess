@@ -110,10 +110,18 @@
     Header set Content-Security-Policy "default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://*.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; worker-src 'self' blob:; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.clarity.ms;"
 </IfModule>
 
+# Allow the public route to share a name with the local prototype directory.
+<IfModule mod_dir.c>
+    <If "%{REQUEST_URI} == '/archive'">
+        DirectorySlash Off
+    </If>
+</IfModule>
+
 # Keep repo internals off the public web: agent config, docs, archive and tooling.
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteRule ^(?:\.(?!well-known/)[^/]+|archive|scripts|docs)(?:/|$) - [R=404,L]
+    RewriteRule ^(?:\.(?!well-known/)[^/]+|scripts|docs)(?:/|$) - [R=404,L]
+    RewriteRule ^archive/.+ - [R=404,L]
     RewriteRule ^(?:AGENTS|DESIGN|PLAN|PRODUCT|README|CLAUDE|GEMINI)\.md$ - [R=404,L,NC]
 </IfModule>
 
@@ -149,6 +157,11 @@ ErrorDocument 404 /404.html
     # Preserve paths and query parameters when removing www.
     RewriteCond %{HTTP_HOST} ^www\.madebyjoe\.co(?::[0-9]+)?$ [NC]
     RewriteRule ^ https://madebyjoe.co%{REQUEST_URI} [R=301,L,NE]
+
+    RewriteOptions AllowNoSlash
+    RewriteCond %{THE_REQUEST} \s/+archive(?:\.html|/)[?\s]
+    RewriteRule ^archive(?:\.html|/)$ /archive [R=301,L]
+    RewriteRule ^archive$ archive.html [END]
 
     RewriteRule ^makersclub$ makersclub.html [END]
 

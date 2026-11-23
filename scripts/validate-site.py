@@ -93,7 +93,7 @@ def validate(root=ROOT):
         raise SystemExit(f'Site root is not a directory: {root}')
     page = Page()
     sources = {}
-    for name in ('index.html', 'makersclub.html', 'css/main.css', 'sitemap.xml', 'robots.txt'):
+    for name in ('index.html', 'archive.html', 'makersclub.html', 'css/main.css', 'css/archive.css', 'sitemap.xml', 'robots.txt'):
         sources[name] = check_local_path(
             root, root / name, page.errors, f'Missing site source: {name} in {root}'
         )
@@ -107,23 +107,25 @@ def validate(root=ROOT):
         if url.scheme or url.netloc:
             continue
         target = root / unquote(url.path).lstrip('/') if url.path else homepage
+        if url.path == '/archive':
+            target = sources['archive.html']
         path = check_local_path(
             root, target, page.errors, f'Missing local asset: {reference}', require_file=resource
         )
         is_home = path == root or path == homepage
         if url.fragment and is_home and unquote(url.fragment) not in page.ids:
             page.errors.append(f'Missing fragment: {reference}')
-    css = sources['css/main.css']
-    for reference in re.findall(r'url\([\'"]?([^\)\'"\s]+)', css.read_text(encoding='utf-8')):
-        url = urlsplit(reference)
-        if url.scheme or url.netloc or not url.path:
-            continue
-        decoded = unquote(url.path)
-        target = root / decoded.lstrip('/') if decoded.startswith('/') else root / 'css' / decoded
-        check_local_path(root, target, page.errors, f'Missing CSS asset: {reference}')
+    for css in (sources['css/main.css'], sources['css/archive.css']):
+        for reference in re.findall(r'url\([\'"]?([^\)\'"\s]+)', css.read_text(encoding='utf-8')):
+            url = urlsplit(reference)
+            if url.scheme or url.netloc or not url.path:
+                continue
+            decoded = unquote(url.path)
+            target = root / decoded.lstrip('/') if decoded.startswith('/') else root / 'css' / decoded
+            check_local_path(root, target, page.errors, f'Missing CSS asset: {reference}')
     tree = ET.parse(sources['sitemap.xml'])
     locations = [node.text for node in tree.iter('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
-    if locations != [CANONICAL, MAKERSCLUB_CANONICAL]:
+    if locations != [CANONICAL, MAKERSCLUB_CANONICAL, CANONICAL + 'archive']:
         page.errors.append('Unexpected canonical sitemap URLs')
     if page.canonicals != [CANONICAL]:
         page.errors.append('Expected exactly one homepage canonical matching the sitemap URL in the head')
@@ -132,6 +134,20 @@ def validate(root=ROOT):
     if makersclub.canonicals != [MAKERSCLUB_CANONICAL]:
         makersclub.errors.append('Expected exactly one Makersclub canonical matching the sitemap URL in the head')
     page.errors.extend(makersclub.errors)
+    archive = Page()
+    archive.feed(sources['archive.html'].read_text(encoding='utf-8'))
+    if archive.canonicals != [CANONICAL + 'archive']:
+        archive.errors.append('Expected one archive canonical matching the sitemap URL in the head')
+    for reference, resource in archive.references:
+        url = urlsplit(reference)
+        if url.scheme or url.netloc:
+            continue
+        if url.path:
+            check_local_path(root, root / unquote(url.path).lstrip('/'), archive.errors,
+                             f'Missing local asset: {reference}', require_file=resource)
+        elif url.fragment and unquote(url.fragment) not in archive.ids:
+            archive.errors.append(f'Missing archive fragment: {reference}')
+    page.errors.extend(archive.errors)
     validate_share_metadata(page, root)
     if 'Sitemap: https://madebyjoe.co/sitemap.xml' not in sources['robots.txt'].read_text(encoding='utf-8'):
         page.errors.append('Missing sitemap discovery')

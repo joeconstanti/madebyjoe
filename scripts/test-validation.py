@@ -16,7 +16,7 @@ class ValidationTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name) / 'checkout'
         self.root.mkdir()
-        for name in ('index.html', 'makersclub.html', '404.html', '.htaccess', 'robots.txt', 'sitemap.xml'):
+        for name in ('index.html', 'archive.html', 'makersclub.html', '404.html', '.htaccess', 'robots.txt', 'sitemap.xml'):
             shutil.copy2(ROOT / name, self.root / name)
         for name in ('css', 'fonts', 'img', 'js', 'media', 'scripts'):
             shutil.copytree(ROOT / name, self.root / name,
@@ -204,7 +204,7 @@ class ValidationTests(unittest.TestCase):
         result = self.run_script('python3', 'scripts/stage-public.py', str(destination))
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual({p.name for p in destination.iterdir()},
-                         {'.htaccess', 'index.html', 'makersclub.html', '404.html', 'robots.txt', 'sitemap.xml',
+                         {'.htaccess', 'index.html', 'archive.html', 'makersclub.html', '404.html', 'robots.txt', 'sitemap.xml',
                           'css', 'fonts', 'img', 'js', 'media', 'clients'})
         expected = {'audits/sported.html', 'audits/sported-assets/sported-live-homepage-hero.png',
                     'audits/sported-assets/sported-logo.png'}

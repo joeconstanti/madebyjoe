@@ -28,6 +28,20 @@ and enhancement script in `index.html`. Edit other page markup directly. After
 copy changes, run `python3 scripts/subset-fonts.py` (requires fonttools and brotli),
 then sync again. Keep original fonts as subset sources.
 
+## Work archive
+
+`archive.html` contains the public work index. Entries include a stable fragment ID,
+a work type, a source, and a link to the original page. The public route is
+`/archive` on Apache. For the Python development server, open `/archive.html`.
+
+The archive covers projects, apps, case studies, and creative work from From the
+Root Studio, joe.graphics, Synthetic Labs, and Automate Digital, plus the
+ventures shown on the Made by Joe homepage. Keep entries without a confirmed
+date in the Undated section. Label dated entries with the recorded event, such as
+a portfolio publication, media upload, or software release. Use a year or month
+when that is the precision the evidence supports. Add or update preview images in
+`img/archive/` and preserve the source links when an entry appears on two sites.
+
 ## Validate
 
 ```sh

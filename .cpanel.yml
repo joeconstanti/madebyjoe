@@ -3,5 +3,5 @@ deployment:
   tasks:
     # Match the public-only FTP deployment; never copy agent tooling or Git data.
     - export DEPLOYPATH=/home/joeconstanti/public_html/madebyjoe.co/
-    - /bin/cp .htaccess index.html makersclub.html 404.html robots.txt sitemap.xml "$DEPLOYPATH"
+    - /bin/cp .htaccess index.html archive.html makersclub.html 404.html robots.txt sitemap.xml "$DEPLOYPATH"
     - /bin/cp -R css fonts img js media "$DEPLOYPATH"
