@@ -7,12 +7,39 @@
   <meta name="description" content="Eight practical workshops on using AI agents for real work.">
   <link rel="canonical" href="https://madebyjoe.co/makersclub">
   <link rel="icon" href="/img/j.jpg">
+  <link rel="stylesheet" href="/css/main.css">
   <style>
-    html, body { margin: 0; height: 100%; background: #0e0d0c; }
+    body {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      height: 100vh;
+      height: 100dvh;
+    }
+    .hdr { position: relative; mix-blend-mode: normal; border-bottom: 1px solid var(--line); }
     iframe { display: block; width: 100%; height: 100%; border: 0; }
   </style>
 </head>
 <body>
-  <iframe title="Makersclub AI agent workshops" src="https://embed.figma.com/proto/f0EdnJHZ3Tnr2YaweKWMzD/madebyjoe.co?node-id=61-88&amp;p=f&amp;viewport=-1816%2C703%2C0.09&amp;scaling=contain&amp;content-scaling=fixed&amp;page-id=35%3A87&amp;embed-host=share&amp;hide-ui=1&amp;footer=false&amp;hotspot-hints=false" allowfullscreen></iframe>
+  <header class="hdr">
+    <a class="hdr__logo" href="/#top" aria-label="madebyjoe, home">madebyjoe<sup>®</sup></a>
+    <p class="hdr__role">Designer &amp; technologist</p>
+    <p class="hdr__clock">LDN <time class="js-clock">--:--:--</time></p>
+    <nav class="hdr__nav" aria-label="Main">
+      <a href="/#index">Index</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </header>
+  <iframe title="Makersclub AI agent workshops" src="https://embed.figma.com/proto/f0EdnJHZ3Tnr2YaweKWMzD/madebyjoe.co?node-id=61-88&amp;p=f&amp;viewport=-1816%2C703%2C0.09&amp;scaling=contain&amp;content-scaling=fixed&amp;page-id=35%3A87&amp;embed-host=share&amp;footer=false&amp;hotspot-hints=false" allowfullscreen></iframe>
+  <script>
+    const clock = document.querySelector('.js-clock');
+    const londonTime = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit',
+      second: '2-digit', hour12: false
+    });
+    const tick = () => { clock.textContent = londonTime.format(new Date()); };
+    tick();
+    setInterval(tick, 1000);
+  </script>
 </body>
 </html>
