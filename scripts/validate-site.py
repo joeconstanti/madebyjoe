@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parent.parent
 CANONICAL = 'https://madebyjoe.co/'
+MAKERSCLUB_CANONICAL = CANONICAL + 'makersclub'
 
 
 class Page(HTMLParser):
@@ -92,7 +93,7 @@ def validate(root=ROOT):
         raise SystemExit(f'Site root is not a directory: {root}')
     page = Page()
     sources = {}
-    for name in ('index.html', 'css/main.css', 'sitemap.xml', 'robots.txt'):
+    for name in ('index.html', 'makersclub.html', 'css/main.css', 'sitemap.xml', 'robots.txt'):
         sources[name] = check_local_path(
             root, root / name, page.errors, f'Missing site source: {name} in {root}'
         )
@@ -122,10 +123,15 @@ def validate(root=ROOT):
         check_local_path(root, target, page.errors, f'Missing CSS asset: {reference}')
     tree = ET.parse(sources['sitemap.xml'])
     locations = [node.text for node in tree.iter('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
-    if locations != [CANONICAL]:
+    if locations != [CANONICAL, MAKERSCLUB_CANONICAL]:
         page.errors.append('Unexpected canonical sitemap URLs')
-    if len(page.canonicals) != 1 or page.canonicals != locations:
+    if page.canonicals != [CANONICAL]:
         page.errors.append('Expected exactly one homepage canonical matching the sitemap URL in the head')
+    makersclub = Page()
+    makersclub.feed(sources['makersclub.html'].read_text(encoding='utf-8'))
+    if makersclub.canonicals != [MAKERSCLUB_CANONICAL]:
+        makersclub.errors.append('Expected exactly one Makersclub canonical matching the sitemap URL in the head')
+    page.errors.extend(makersclub.errors)
     validate_share_metadata(page, root)
     if 'Sitemap: https://madebyjoe.co/sitemap.xml' not in sources['robots.txt'].read_text(encoding='utf-8'):
         page.errors.append('Missing sitemap discovery')

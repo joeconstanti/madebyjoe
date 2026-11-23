@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parent.parent
 AUDIT = 'clients/audits'
 SPORTED_ASSETS = f'{AUDIT}/sported-assets'
 FILES = (
-    '.htaccess', 'index.html', '404.html', 'robots.txt', 'sitemap.xml',
+    '.htaccess', 'index.html', 'makersclub.html', '404.html', 'robots.txt', 'sitemap.xml',
     f'{AUDIT}/sported.html',
     f'{SPORTED_ASSETS}/sported-live-homepage-hero.png',
     f'{SPORTED_ASSETS}/sported-logo.png',

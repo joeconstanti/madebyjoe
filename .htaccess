@@ -142,9 +142,15 @@ ErrorDocument 404 /404.html
     RewriteCond %{THE_REQUEST} \s/+clients/audits/sported(?:\.html|/)[?\s]
     RewriteRule ^clients/audits/sported(?:\.html|/)$ https://madebyjoe.co/clients/audits/sported [R=301,L]
 
+    # Keep the workshop deck at one public URL.
+    RewriteCond %{THE_REQUEST} \s/+makersclub(?:\.html|/)[?\s]
+    RewriteRule ^makersclub(?:\.html|/)$ https://madebyjoe.co/makersclub [R=301,L]
+
     # Preserve paths and query parameters when removing www.
     RewriteCond %{HTTP_HOST} ^www\.madebyjoe\.co(?::[0-9]+)?$ [NC]
     RewriteRule ^ https://madebyjoe.co%{REQUEST_URI} [R=301,L,NE]
+
+    RewriteRule ^makersclub$ makersclub.html [END]
 
     # Serve the staged HTML at its extensionless public URL.
     RewriteRule ^clients/audits/sported$ clients/audits/sported.html [END]
@@ -187,5 +193,12 @@ RewriteRule ^ %1 [R=301,L]
 <IfModule mod_headers.c>
     <Files "partytown-sandbox-sw.html">
         Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googletagmanager.com; worker-src 'self' blob:; connect-src 'self' https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com; img-src 'self' data: https:;"
+    </Files>
+</IfModule>
+
+# Permit the workshop embed on this page only.
+<IfModule mod_headers.c>
+    <Files "makersclub.html">
+        Header edit Content-Security-Policy "$" " frame-src https://embed.figma.com https://www.figma.com;"
     </Files>
 </IfModule>
