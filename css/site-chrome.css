@@ -1,3 +1,6 @@
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+
 /* ---------- Header ---------- */
 .hdr {
   position: fixed; inset: 0 0 auto; z-index: 50; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr));

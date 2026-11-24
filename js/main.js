@@ -10,11 +10,10 @@
   const ENTITIES = ['From the Root', 'Synthetic Labs', 'Cerebral', 'Automate', 'joe.graphics'];
 
   /* ---------- Smooth scroll ---------- */
-  let lenis = null;
-  if (!reduce) {
-    lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1 });
+  const siteScroll = window.siteScroll;
+  const lenis = siteScroll?.lenis;
+  if (lenis) {
     lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((t) => lenis.raf(t * 1000));
     gsap.ticker.lagSmoothing(0);
   }
 
@@ -30,10 +29,11 @@
   }
   function scrollToEl(el) {
     const y = el ? targetY(el) : 0;
-    if (lenis) lenis.scrollTo(y, { duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 4) });
+    if (siteScroll) siteScroll.scrollTo(y);
     else window.scrollTo({ top: y });
   }
   $$('a[href^="#"]').forEach((a) => a.addEventListener('click', (e) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     const id = a.getAttribute('href');
     const el = id === '#top' ? null : $(id);
     if (id !== '#top' && !el) return;

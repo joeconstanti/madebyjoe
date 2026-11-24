@@ -91,7 +91,8 @@
   async function enhance() {
     if (started) return;
     started = true;
-    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'vendor/lenis.min.js', 'main.js?v=20261028-seo']) {
+    await new Promise((resolve) => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
+    for (const src of ['vendor/gsap.min.js', 'vendor/ScrollTrigger.min.js', 'vendor/SplitText.min.js', 'main.js?v=20261124-scroll']) {
       const loaded = await new Promise((resolve) => {
         const script = document.createElement('script');
         script.src = 'js/' + src;

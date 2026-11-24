@@ -29,8 +29,6 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-html.lenis, html.lenis body { height: auto; }
-.lenis.lenis-smooth { scroll-behavior: auto !important; }
 body {
   margin: 0; background: var(--ink); color: var(--paper);
   font: 400 var(--fs-body)/1.45 var(--sans); letter-spacing: -.005em;
