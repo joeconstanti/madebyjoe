@@ -36,7 +36,7 @@ class Page(HTMLParser):
             if attrs['id'] in self.ids:
                 self.errors.append(f"Duplicate id: {attrs['id']}")
             self.ids.add(attrs['id'])
-        for name in ('src', 'href', 'poster', 'data-src', 'data-poster'):
+        for name in ('src', 'href', 'poster', 'data-src', 'data-poster', 'data-motion-src'):
             if attrs.get(name):
                 self.references.append((attrs[name], name != 'href'))
         if tag == 'script' and attrs.get('type') == 'application/ld+json':
