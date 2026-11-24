@@ -42,6 +42,12 @@ a portfolio publication, media upload, or software release. Use a year or month
 when that is the precision the evidence supports. Add or update preview images in
 `img/archive/` and preserve the source links when an entry appears on two sites.
 
+Set the discipline, work type, format, source and client fields on each project
+article. Add verified roles and credits in the project detail template. When
+grouping copies or variants, keep their old fragment IDs as aliases and put
+captioned clips in the parent project. Serve video previews from `media/archive/`
+with a poster and `preload="none"` so browsing the timeline does not load video.
+
 ## Validate
 
 ```sh
