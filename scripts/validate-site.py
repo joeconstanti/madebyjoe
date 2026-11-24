@@ -143,7 +143,8 @@ def validate(root=ROOT):
         if url.scheme or url.netloc:
             continue
         if url.path:
-            check_local_path(root, root / unquote(url.path).lstrip('/'), archive.errors,
+            target = sources['archive.html'] if url.path == '/archive' else root / unquote(url.path).lstrip('/')
+            check_local_path(root, target, archive.errors,
                              f'Missing local asset: {reference}', require_file=resource)
         elif url.fragment and unquote(url.fragment) not in archive.ids:
             archive.errors.append(f'Missing archive fragment: {reference}')

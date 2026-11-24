@@ -1,4 +1,12 @@
 (() => {
+  const clock = document.querySelector('.js-clock');
+  const londonTime = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+  });
+  function tick() { clock.textContent = londonTime.format(new Date()); }
+  tick();
+  setInterval(tick, 1000);
+
   const timeline = document.querySelector('.timeline');
   const byId = (id) => document.getElementById(id);
   const query = byId('query');
@@ -203,7 +211,7 @@
   function currentYear() {
     if (rail.hidden) return;
     const available = groups.filter(({ section }) => !section.hidden);
-    const offset = matchMedia('(max-width: 650px)').matches ? rail.offsetHeight + 16 : 100;
+    const offset = matchMedia('(max-width: 650px)').matches ? rail.offsetHeight + 68 : 100;
     const current = available.findLast(({ section }) => section.getBoundingClientRect().top <= offset) || available[0];
     const last = rail.querySelector('[aria-current]');
     if (last === current?.link) return;
