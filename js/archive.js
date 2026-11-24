@@ -380,4 +380,56 @@
   picks.hidden = false;
   timeline.querySelector('.controls').hidden = false;
   readFilters();
+
+  if ('IntersectionObserver' in window && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter() : null;
+    function prepareTitle(title) {
+      const text = title.textContent;
+      const accessible = document.createElement('span');
+      accessible.className = 'sr-only';
+      accessible.textContent = text;
+      const visual = document.createElement('span');
+      visual.className = 'typing-title';
+      visual.setAttribute('aria-hidden', 'true');
+      const characters = segmenter
+        ? Array.from(segmenter.segment(text), ({ segment }) => segment)
+        : Array.from(text);
+      const interval = Math.min(48, 850 / characters.length);
+      characters.forEach((character, index) => {
+        const letter = document.createElement('span');
+        letter.textContent = character;
+        letter.style.setProperty('--letter-delay', `${index * interval}ms`);
+        visual.append(letter);
+      });
+      title.replaceChildren(accessible, visual);
+      return () => { title.textContent = text; };
+    }
+
+    const reveal = new IntersectionObserver((entries, observer) => {
+      const entering = entries.filter((entry) => entry.isIntersecting);
+      if (!entering.length) return;
+
+      const restoreTitles = [];
+      entering.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top
+        || a.boundingClientRect.left - b.boundingClientRect.left);
+      entering.forEach(({ target }, index) => {
+        observer.unobserve(target);
+        const title = target.querySelector('.entry-info strong');
+        if (title) restoreTitles.push(prepareTitle(title));
+        target.style.setProperty('--reveal-delay', `${Math.min(index, 4) * 95}ms`);
+        target.classList.add('is-entering');
+      });
+      window.setTimeout(() => {
+        for (const restore of restoreTitles) restore();
+        for (const { target } of entering) {
+          target.classList.remove('is-entering');
+          target.style.removeProperty('--reveal-delay');
+        }
+      }, 1450);
+    }, { rootMargin: '0px 0px -16px' });
+
+    for (const target of timeline.querySelectorAll('.timeline-heading, .year-heading, .entry, .years a')) {
+      reveal.observe(target);
+    }
+  }
 })();

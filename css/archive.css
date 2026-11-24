@@ -200,3 +200,69 @@ h1,h2,p{margin:0}
 }
 .is-previewing .thumbnail-preview{opacity:1}
 @media(max-width:360px){.hdr__nav{gap:7px;font-size:10px}}
+
+@media (prefers-reduced-motion: no-preference) {
+  .intro h1 > :is(span, em) {
+    display: inline-block;
+    animation: archive-type 300ms steps(4, end) backwards;
+  }
+
+  .intro h1 > em {
+    animation: archive-type 600ms steps(8, end) 300ms backwards;
+  }
+
+  .intro p {
+    animation: archive-fade 550ms ease-out 450ms backwards;
+  }
+
+  .intro .jump:not(:focus) {
+    animation: archive-fade 500ms ease-out 600ms backwards;
+  }
+
+  .is-entering:is(.timeline-heading, .year-heading) {
+    animation: archive-reveal 650ms cubic-bezier(.16, 1, .3, 1) var(--reveal-delay) backwards;
+  }
+
+  .entry.is-entering:not(:focus-within) .typing-title > span {
+    animation: archive-fade 1ms step-end calc(var(--reveal-delay) + 120ms + var(--letter-delay)) backwards;
+  }
+
+  .entry.is-entering:not(:focus-within) .entry-art {
+    animation: archive-fade 760ms ease-out var(--reveal-delay) backwards;
+  }
+
+  .entry.is-entering:not(:focus-within) :is(.entry-meta, .entry-date, .entry-match, .entry-arrow) {
+    animation: archive-fade 620ms ease-out calc(var(--reveal-delay) + 240ms) backwards;
+  }
+
+  .thumbnail-preview {
+    transition: opacity 480ms ease-out;
+  }
+
+  .years a.is-entering progress::-webkit-progress-value {
+    transform-origin: left;
+    animation: archive-grow 900ms cubic-bezier(.16, 1, .3, 1) var(--reveal-delay) backwards;
+  }
+
+  .years a.is-entering progress::-moz-progress-bar {
+    transform-origin: left;
+    animation: archive-grow 900ms cubic-bezier(.16, 1, .3, 1) var(--reveal-delay) backwards;
+  }
+
+  @keyframes archive-type {
+    from { clip-path: inset(-.25em 100% -.25em -.08em); }
+    to { clip-path: inset(-.25em -.08em -.25em -.08em); }
+  }
+
+  @keyframes archive-fade {
+    from { opacity: 0; }
+  }
+
+  @keyframes archive-reveal {
+    from { opacity: 0; transform: translateY(12px); }
+  }
+
+  @keyframes archive-grow {
+    from { transform: scaleX(0); }
+  }
+}
