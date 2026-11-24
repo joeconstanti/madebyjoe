@@ -82,6 +82,7 @@ h1,h2,p{margin:0}
 .entry-art{display:block;grid-column:1/-1;align-self:start;overflow:hidden;background:#191715}
 .entry-art:empty{display:none}
 .entry-art img{aspect-ratio:1.63;object-fit:cover;transition:transform .55s cubic-bezier(.16,1,.3,1)}
+#mbj-makers-club .entry-art img{aspect-ratio:16/9}
 .entry-link:hover img{transform:scale(1.045)}
 .entry-info{display:grid;align-self:center;gap:.32rem;padding:.7rem .1rem .85rem}
 .entry-info strong{font-size:clamp(1rem,1.6vw,1.3rem);font-weight:560;line-height:1.13;overflow-wrap:anywhere}
