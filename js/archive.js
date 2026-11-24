@@ -17,10 +17,6 @@
   const chips = byId('filter-chips');
   const ranked = timeline.querySelector('.ranked-results');
   const rail = timeline.querySelector('.years');
-  const detail = byId('work-detail');
-  const content = detail.querySelector('.detail-content');
-  const previous = byId('previous-project');
-  const next = byId('next-project');
   const feature = document.querySelector('.feature');
   const picks = document.querySelector('.picks');
   const entries = new Map();
@@ -41,8 +37,6 @@
     [/\b(?:hpto|homepage takeover)\b/g, 'hpto'],
     [/\b(?:xr|extended reality)\b/g, 'xr'],
   ];
-  let visible = [];
-  let previousFocus;
   let scrollFrame;
 
   function normalize(value) {
@@ -57,7 +51,7 @@
     const link = rail.querySelector(`[data-year="${year}"]`);
     const group = { section, grid, link, count: section.querySelector('.year-count') };
     group.records = Array.from(grid.querySelectorAll('.entry'), (entry) => {
-      const { kind, alternateKind, sources, disciplines, format, subject = '', aliases = '', redirects = '' } = entry.dataset;
+      const { kind, alternateKind, sources, disciplines, format, subject = '', aliases = '' } = entry.dataset;
       const title = entry.querySelector('strong').textContent;
       const record = {
         entry, title, year, group, match: entry.querySelector('.entry-match'),
@@ -75,7 +69,7 @@
           )],
         ],
       };
-      for (const id of [entry.id, ...redirects.split(' ').filter(Boolean)]) entries.set(id, record);
+      entries.set(entry.id, record);
       return record;
     });
     return group;
@@ -115,7 +109,7 @@
   }
   rangeTo.value = years.at(-1);
 
-  // Short, silent previews play once per visit to the viewport.
+  // Short, silent previews loop while visible.
   const allowMotion = matchMedia('(prefers-reduced-motion: no-preference)');
   const previewSources = new Map([[feature, () => entries.get(feature.dataset.featureLink).entry.dataset.motionSrc]]);
   for (const { entry } of records) {
@@ -138,7 +132,7 @@
   }
 
   function syncPreviews() {
-    const enabled = allowMotion.matches && !detail.open && !document.hidden;
+    const enabled = allowMotion.matches && !document.hidden;
     for (const [art, source] of previewSources) {
       if (!enabled || !visiblePreviews.has(art) || !art.getClientRects().length) {
         stopPreview(art);
@@ -149,13 +143,13 @@
       const video = document.createElement('video');
       video.className = 'thumbnail-preview';
       video.defaultMuted = video.muted = video.playsInline = true;
+      video.loop = true;
       video.setAttribute('aria-hidden', 'true');
       video.src = src;
       previews.set(art, video);
       art.append(video);
-      video.addEventListener('ended', () => art.classList.remove('is-previewing'));
       video.play().then(() => {
-        if (previews.get(art) === video && !video.ended) art.classList.add('is-previewing');
+        if (previews.get(art) === video) art.classList.add('is-previewing');
       }).catch(() => {});
     }
   }
@@ -258,8 +252,7 @@
       }
     }
     if (bestMatch) matches.sort((a, b) => b.score - a.score);
-    visible = matches.map(({ record }) => record);
-    if (bestMatch) ranked.replaceChildren(...visible.map(({ entry }) => entry));
+    if (bestMatch) ranked.replaceChildren(...matches.map(({ record }) => record.entry));
     for (const group of groups) {
       const count = yearCounts.get(group.section.dataset.year) || 0;
       group.section.hidden = bestMatch || count === 0;
@@ -280,7 +273,7 @@
         option.input.disabled = !option.input.checked && count === 0;
       }
     }
-    const total = visible.length;
+    const total = matches.length;
     timeline.querySelector('.empty').hidden = total > 0;
     rail.hidden = bestMatch || total === 0;
     ranked.hidden = !bestMatch;
@@ -328,56 +321,6 @@
     storeFilters();
   }
 
-  function renderDetail(record) {
-    const title = document.createElement('h2');
-    title.id = 'detail-title';
-    title.tabIndex = -1;
-    title.textContent = record.title;
-    const body = record.entry.querySelector('template').content.cloneNode(true);
-    const image = record.entry.querySelector('img')?.cloneNode();
-    if (image) {
-      image.loading = 'eager';
-      body.querySelector('.detail-date').after(image);
-    }
-    content.replaceChildren(title, body);
-    const index = visible.indexOf(record);
-    previous.disabled = index <= 0;
-    next.disabled = index < 0 || index === visible.length - 1;
-    byId('detail-position').textContent = index < 0 ? 'Outside current results' : `${index + 1} of ${visible.length}`;
-    detail.scrollTop = 0;
-  }
-
-  function syncDetail() {
-    const record = entries.get(location.hash.slice(1));
-    if (!record) {
-      if (detail.open) detail.close();
-      return;
-    }
-    renderDetail(record);
-    if (!detail.open) detail.showModal();
-    syncPreviews();
-  }
-
-  function openEntry(event) {
-    const link = event.target.closest('.entry-link, .feature');
-    if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey
-      || event.altKey || event.shiftKey || typeof detail.showModal !== 'function') return;
-    const id = link.dataset.featureLink || link.closest('.entry').id;
-    event.preventDefault();
-    previousFocus = link;
-    history.pushState({ archiveDetail: true }, '', `#${id}`);
-    syncDetail();
-  }
-
-  function stepDetail(offset) {
-    const index = visible.indexOf(entries.get(location.hash.slice(1)));
-    const record = index >= 0 && visible[index + offset];
-    if (!record) return;
-    history.replaceState(history.state, '', `#${record.entry.id}`);
-    renderDetail(record);
-    byId('detail-title').focus({ preventScroll: true });
-  }
-
   picks.addEventListener('click', (event) => {
     const button = event.target.closest('[data-feature]');
     if (!button || button.getAttribute('aria-pressed') === 'true') return;
@@ -393,19 +336,6 @@
     picks.querySelector('[aria-pressed="true"]').setAttribute('aria-pressed', 'false');
     button.setAttribute('aria-pressed', 'true');
   });
-
-  detail.addEventListener('close', () => {
-    syncPreviews();
-    content.querySelectorAll('video').forEach((video) => video.pause());
-    if (entries.has(location.hash.slice(1))) {
-      if (previousFocus && history.state?.archiveDetail) history.back();
-      else history.replaceState(null, '', location.pathname + location.search);
-    }
-    previousFocus?.focus({ preventScroll: true });
-    previousFocus = null;
-  });
-  previous.addEventListener('click', () => stepDetail(-1));
-  next.addEventListener('click', () => stepDetail(1));
 
   function clearFilters() {
     query.value = '';
@@ -439,13 +369,7 @@
   });
   byId('reset').addEventListener('click', clearFilters);
   byId('clear-empty').addEventListener('click', clearFilters);
-  feature.addEventListener('click', openEntry);
-  timeline.addEventListener('click', openEntry);
-  window.addEventListener('hashchange', syncDetail);
-  window.addEventListener('popstate', () => {
-    readFilters();
-    syncDetail();
-  });
+  window.addEventListener('popstate', readFilters);
   window.addEventListener('scroll', () => {
     if (scrollFrame) return;
     scrollFrame = requestAnimationFrame(() => {
@@ -456,5 +380,4 @@
   picks.hidden = false;
   timeline.querySelector('.controls').hidden = false;
   readFilters();
-  if (typeof detail.showModal === 'function') syncDetail();
 })();
