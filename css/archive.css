@@ -231,30 +231,4 @@ dialog button{padding:.55rem 1rem}
   pointer-events:none;
 }
 .is-previewing .thumbnail-preview{opacity:1}
-.preview-button{
-  position:absolute;
-  z-index:2;
-  top:.6rem;
-  right:.6rem;
-  display:inline-flex;
-  align-items:center;
-  gap:.4rem;
-  min-height:44px;
-  padding:.25rem .65rem;
-  border:1px solid #fff6;
-  background:#141312;
-  color:var(--paper);
-  font-size:.78rem;
-  line-height:1;
-}
-.preview-button::before{
-  content:"";
-  width:.6rem;
-  height:.68rem;
-  background:currentColor;
-  clip-path:polygon(0 0,100% 50%,0 100%);
-}
-.preview-button[aria-label^="Stop"]::before{height:.6rem;clip-path:none}
-.preview-button:is(:hover,:focus-visible){border-color:var(--signal)}
-.compact .preview-button{display:none}
 @media(max-width:360px){.hdr__nav{gap:7px;font-size:10px}}

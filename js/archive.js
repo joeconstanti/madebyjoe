@@ -115,98 +115,61 @@
   }
   rangeTo.value = years.at(-1);
 
-  // Keep a single silent player. Cards retain their still images until it is playing.
-  const hoverMotion = matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
-  const previewVideo = document.createElement('video');
-  previewVideo.className = 'thumbnail-preview';
-  previewVideo.muted = previewVideo.loop = previewVideo.playsInline = true;
-  previewVideo.preload = 'none';
-  previewVideo.setAttribute('aria-hidden', 'true');
-  let activePreview;
-  let hoverTimer;
-  const previewVisibility = new IntersectionObserver(([entry]) => {
-    if (!entry.isIntersecting && activePreview?.art === entry.target) stopPreview();
-  });
+  // Short, silent previews play once per visit to the viewport.
+  const allowMotion = matchMedia('(prefers-reduced-motion: no-preference)');
+  const previewSources = new Map([[feature, () => entries.get(feature.dataset.featureLink).entry.dataset.motionSrc]]);
+  for (const { entry } of records) {
+    if (entry.dataset.motionSrc) {
+      previewSources.set(entry.querySelector('.entry-art'), () => entry.dataset.motionSrc);
+    }
+  }
+  const visiblePreviews = new Set();
+  const previews = new Map();
 
-  function stopPreview() {
-    clearTimeout(hoverTimer);
-    if (!activePreview) return;
-    const { art, button, title } = activePreview;
-    activePreview = undefined;
-    previewVisibility.unobserve(art);
+  function stopPreview(art) {
+    const video = previews.get(art);
+    if (!video) return;
     art.classList.remove('is-previewing');
-    button.textContent = 'Preview';
-    button.setAttribute('aria-label', `Play motion preview for ${title()}`);
-    previewVideo.pause();
-    previewVideo.removeAttribute('src');
-    previewVideo.load();
-    previewVideo.remove();
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    video.remove();
+    previews.delete(art);
   }
 
-  function playPreview(preview, manual) {
-    stopPreview();
-    if (detail.open || document.hidden || !preview.art.getClientRects().length) return;
-    const src = preview.source();
-    if (!src) return;
-    const playback = { ...preview, manual };
-    activePreview = playback;
-    preview.art.append(previewVideo);
-    previewVisibility.observe(preview.art);
-    previewVideo.src = src;
-    preview.button.textContent = 'Stop preview';
-    preview.button.setAttribute('aria-label', `Stop motion preview for ${preview.title()}`);
-    previewVideo.play().then(() => {
-      if (activePreview === playback) preview.art.classList.add('is-previewing');
-    }).catch(() => {
-      if (activePreview === playback) stopPreview();
-    });
+  function syncPreviews() {
+    const enabled = allowMotion.matches && !detail.open && !document.hidden;
+    for (const [art, source] of previewSources) {
+      if (!enabled || !visiblePreviews.has(art) || !art.getClientRects().length) {
+        stopPreview(art);
+        continue;
+      }
+      const src = source();
+      if (!src || previews.has(art)) continue;
+      const video = document.createElement('video');
+      video.className = 'thumbnail-preview';
+      video.defaultMuted = video.muted = video.playsInline = true;
+      video.setAttribute('aria-hidden', 'true');
+      video.src = src;
+      previews.set(art, video);
+      art.append(video);
+      video.addEventListener('ended', () => art.classList.remove('is-previewing'));
+      video.play().then(() => {
+        if (previews.get(art) === video && !video.ended) art.classList.add('is-previewing');
+      }).catch(() => {});
+    }
   }
 
-  function addPreview(host, art, source, title) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'preview-button';
-    button.textContent = 'Preview';
-    button.setAttribute('aria-label', `Play motion preview for ${title()}`);
-    host.append(button);
-    const preview = { art, button, source, title };
-    art.addEventListener('pointerenter', (event) => {
-      if (event.pointerType !== 'mouse' || !hoverMotion.matches) return;
-      clearTimeout(hoverTimer);
-      hoverTimer = setTimeout(() => {
-        if (!activePreview?.manual) playPreview(preview, false);
-      }, 180);
-    });
-    host.addEventListener('pointerleave', () => {
-      clearTimeout(hoverTimer);
-      if (activePreview?.art === art && !activePreview.manual) stopPreview();
-    });
-    button.addEventListener('click', () => {
-      if (activePreview?.art === art) stopPreview();
-      else playPreview(preview, true);
-    });
-    return button;
-  }
-
-  for (const { entry, title } of records) {
-    if (entry.dataset.motionSrc) addPreview(entry, entry.querySelector('.entry-art'), () => entry.dataset.motionSrc, () => title);
-  }
-  const featuredRecord = () => entries.get(feature.dataset.featureLink);
-  const featuredPreview = addPreview(
-    feature.closest('.spotlight'), feature,
-    () => featuredRecord().entry.dataset.motionSrc,
-    () => featuredRecord().title,
-  );
-  featuredPreview.hidden = !featuredRecord().entry.dataset.motionSrc;
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopPreview();
-  });
-  hoverMotion.addEventListener('change', () => {
-    if (activePreview && !activePreview.manual) stopPreview();
-  });
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') stopPreview();
-  });
+  const previewObserver = new IntersectionObserver((changes) => {
+    for (const { target, intersectionRatio } of changes) {
+      if (intersectionRatio >= .35) visiblePreviews.add(target);
+      else visiblePreviews.delete(target);
+    }
+    syncPreviews();
+  }, { threshold: .35 });
+  for (const art of previewSources.keys()) previewObserver.observe(art);
+  allowMotion.addEventListener('change', syncPreviews);
+  document.addEventListener('visibilitychange', syncPreviews);
 
   function currentYear() {
     if (rail.hidden) return;
@@ -270,7 +233,6 @@
   }
 
   function applyFilters() {
-    stopPreview();
     const terms = normalize(query.value).split(' ').filter(Boolean);
     const bestMatch = terms.length > 0 && sort.value === 'relevance';
     const selected = selectedFilters();
@@ -326,12 +288,13 @@
     byId('results').textContent = `${total} ${total === 1 ? 'project' : 'projects'}`;
     updateChips(selected);
     currentYear();
+    syncPreviews();
   }
 
   function setView(compact) {
-    stopPreview();
     timeline.classList.toggle('compact', compact);
     view.setAttribute('aria-pressed', String(compact));
+    syncPreviews();
   }
 
   function storeFilters() {
@@ -390,9 +353,9 @@
       if (detail.open) detail.close();
       return;
     }
-    stopPreview();
     renderDetail(record);
     if (!detail.open) detail.showModal();
+    syncPreviews();
   }
 
   function openEntry(event) {
@@ -418,13 +381,12 @@
   picks.addEventListener('click', (event) => {
     const button = event.target.closest('[data-feature]');
     if (!button || button.getAttribute('aria-pressed') === 'true') return;
-    stopPreview();
+    stopPreview(feature);
     const record = entries.get(button.dataset.feature);
     feature.querySelector('img').src = record.entry.querySelector('img').src;
     feature.href = record.entry.querySelector('.entry-link').href;
     feature.dataset.featureLink = record.entry.id;
-    featuredPreview.hidden = !record.entry.dataset.motionSrc;
-    featuredPreview.setAttribute('aria-label', `Play motion preview for ${record.title}`);
+    syncPreviews();
     feature.querySelector('strong').textContent = record.title;
     const year = record.year === 'undated' ? 'Undated' : record.year;
     feature.querySelector('.feature-meta').textContent = `${record.entry.querySelector('.entry-meta').textContent} · ${year}`;
@@ -433,6 +395,7 @@
   });
 
   detail.addEventListener('close', () => {
+    syncPreviews();
     content.querySelectorAll('video').forEach((video) => video.pause());
     if (entries.has(location.hash.slice(1))) {
       if (previousFocus && history.state?.archiveDetail) history.back();
