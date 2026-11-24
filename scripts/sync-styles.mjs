@@ -63,15 +63,16 @@ const pages = [['index.html', file, original, html]];
 for (const name of ['archive.html', 'makersclub.html', '404.html']) {
   const path = new URL(name, root);
   const current = readFileSync(path, 'utf8');
-  if (!headerPattern.test(current) || !footerPattern.test(current)) {
-    throw new Error(`Missing shared header or footer in ${name}`);
+  const hasSharedFooter = name !== 'makersclub.html';
+  if (!headerPattern.test(current)) throw new Error(`Missing shared header in ${name}`);
+  if (footerPattern.test(current) !== hasSharedFooter) {
+    throw new Error(`Unexpected shared footer state in ${name}`);
   }
   const pageHeader = name === 'archive.html'
     ? secondaryHeader.replace('href="/archive"', 'href="/archive" aria-current="page"')
     : secondaryHeader;
-  const generated = current
-    .replace(headerPattern, () => pageHeader)
-    .replace(footerPattern, () => footer);
+  const withHeader = current.replace(headerPattern, () => pageHeader);
+  const generated = hasSharedFooter ? withHeader.replace(footerPattern, () => footer) : withHeader;
   pages.push([name, path, current, generated]);
 }
 

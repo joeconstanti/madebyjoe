@@ -60,7 +60,7 @@ h1,h2,p{margin:0}
 .timeline-heading{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:1rem}
 .timeline-heading h2{font-weight:530;font-size:clamp(1.65rem,3vw,2.65rem);letter-spacing:-.035em}
 #results,.year-count,.entry-meta{color:var(--muted)}
-.controls{display:flex;flex-wrap:wrap;gap:.5rem;padding:.7rem 0;background:var(--ink);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.controls{display:flex;flex-wrap:wrap;gap:.5rem;padding:.7rem 0;background:var(--ink)}
 .controls label:not(.search){display:flex}
 .controls :is(input,select,button){min-height:44px;border:1px solid var(--line);border-radius:0;background:#191715;padding:.5rem .75rem}
 .controls :is(button,select):hover{border-color:var(--muted)}
