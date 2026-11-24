@@ -1,0 +1,58 @@
+/* ---------- Header ---------- */
+.hdr {
+  position: fixed; inset: 0 0 auto; z-index: 50; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap); align-items: baseline; padding: 16px var(--pad);
+  font: 400 var(--fs-mono)/1.3 var(--mono); text-transform: uppercase; letter-spacing: .04em;
+  color: #fff; mix-blend-mode: difference;
+}
+.hdr__logo { grid-column: 1 / 4; font: 600 18px/1 var(--sans); text-transform: none; letter-spacing: -.03em; }
+.hdr__logo sup { font-size: .5em; margin-left: 1px; }
+.hdr__role { grid-column: 4 / 7; }
+.hdr__clock { grid-column: 7 / 9; font-variant-numeric: tabular-nums; }
+.hdr__nav { grid-column: 9 / 13; display: flex; justify-content: flex-end; gap: 22px; }
+.hdr__nav sup { font-size: .8em; margin-left: 2px; }
+.hdr a { position: relative; }
+.hdr__nav a::after, .ftr a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 1px; background: currentColor;
+  transform: scaleX(0); transform-origin: right; transition: transform .5s var(--ease);
+}
+.hdr__nav a:is(:hover, :focus-visible, [aria-current="page"])::after, .ftr a:hover::after { transform: scaleX(1); transform-origin: left; }
+
+/* ---------- Footer ---------- */
+.ftr { background: var(--signal); color: var(--ink); overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr); }
+.ftr__grid {
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap);
+  padding: 28px var(--pad) 0; font-size: 14px; line-height: 1.5;
+}
+.ftr__grid .lbl {
+  display: block; font: 400 var(--fs-mono)/1.3 var(--mono); text-transform: uppercase;
+  letter-spacing: .04em; opacity: .9; margin-bottom: .6em;
+}
+.ftr__grid p:nth-child(1) { grid-column: 1 / 4; }
+.ftr__grid p:nth-child(2) { grid-column: 5 / 7; font-variant-numeric: tabular-nums; }
+.ftr__grid p:nth-child(3) { grid-column: 7 / 9; }
+.ftr__top { grid-column: 10 / 13; justify-self: end; align-self: end; }
+.ftr a { position: relative; }
+.ftr__mark {
+  padding: 4vh var(--pad) .2em; white-space: nowrap;
+  font: 700 calc((100vw - 2 * var(--pad)) * .22322)/.78 var(--sans); letter-spacing: -.07em;
+}
+.ftr__grid p:first-child a { display: inline-block; min-height: 24px; line-height: 24px; }
+
+@media (max-width: 999px) {
+  .hdr__role, .hdr__clock { display: none; }
+  .hdr__logo { grid-column: 1 / 7; }
+  .hdr__nav { grid-column: 7 / 13; gap: 14px; }
+  .ftr__grid p:nth-child(1) { grid-column: 1 / 7; }
+  .ftr__grid p:nth-child(2) { grid-column: 7 / 13; }
+  .ftr__grid p:nth-child(3) { grid-column: 1 / 7; margin-top: 20px; }
+  .ftr__top { grid-column: 7 / 13; }
+}
+
+@media (max-width: 360px) {
+  .hdr__nav { gap: 7px; font-size: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hdr__nav a::after, .ftr a::after { transition-duration: .01ms; }
+}

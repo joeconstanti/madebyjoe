@@ -24,7 +24,10 @@ node scripts/sync-styles.mjs
 ```
 
 This embeds first-view CSS, font subsets, the hero renderer, analytics bootstrap
-and enhancement script in `index.html`. Edit other page markup directly. After
+and enhancement script in `index.html`. Edit the shared header and footer in
+`index.html` and their styles in `css/site-chrome.css`. The same command copies
+the shared markup to the archive, Makersclub and 404 pages. Edit other page
+content directly. After
 copy changes, run `python3 scripts/subset-fonts.py` (requires fonttools and brotli),
 then sync again. Keep original fonts as subset sources.
 

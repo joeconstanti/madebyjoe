@@ -9,21 +9,6 @@
   gsap.registerPlugin(ScrollTrigger, SplitText);
   const ENTITIES = ['From the Root', 'Synthetic Labs', 'Cerebral', 'Automate', 'joe.graphics'];
 
-  /* ---------- Fit text to its container width ---------- */
-  const range = document.createRange();
-  function fit(el) {
-    el.style.fontSize = '';
-    const cs = getComputedStyle(el);
-    const avail = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    for (let i = 0; i < 2; i++) {
-      range.selectNodeContents(el);
-      const w = range.getBoundingClientRect().width;
-      const fs = parseFloat(getComputedStyle(el).fontSize);
-      if (w > 0) el.style.fontSize = (fs * avail / w) + 'px';
-    }
-  }
-  const fitAll = () => $$('.js-fit').forEach(fit);
-
   /* ---------- Smooth scroll ---------- */
   let lenis = null;
   if (!reduce) {
@@ -334,7 +319,6 @@
 
   // Content is visible immediately; decoration never gates first paint.
   document.fonts.ready.then(() => {
-    fitAll();
     scrollAnimations();
     ScrollTrigger.refresh();
   });
@@ -343,5 +327,5 @@
 
   /* ---------- Resize ---------- */
   let rz;
-  addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { fitAll(); ScrollTrigger.refresh(); }, 150); });
+  addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => ScrollTrigger.refresh(), 150); });
 })();

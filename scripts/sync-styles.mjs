@@ -2,6 +2,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 const root = new URL('../', import.meta.url);
 let css = readFileSync(new URL('css/main.css', root), 'utf8');
+const chromeCss = readFileSync(new URL('css/site-chrome.css', root), 'utf8');
+css = css.replace('@import "./site-chrome.css";', () => chromeCss.trimEnd());
 css = css.replace(/url\(\.\.\/fonts\/([^)]*\.woff2)\)/g, (_, name) => {
   const subset = name.replace('.woff2', '-site.woff2');
   return `url(data:font/woff2;base64,${readFileSync(new URL('fonts/' + subset, root)).toString('base64')})`;
@@ -48,9 +50,35 @@ for (let i = 1; i < edits.length; i++) {
 for (const edit of edits.reverse()) {
   html = html.slice(0, edit.start) + edit.text + html.slice(edit.end);
 }
-if (process.argv.includes('--check')) {
-  if (html !== original) {
-    console.error('Generated index.html is stale. Run node scripts/sync-styles.mjs');
+// Keep the homepage as the source for the public site's header and footer.
+const headerPattern = /<header class="hdr">[\s\S]*?<\/header>/;
+const footerPattern = /<footer class="ftr">[\s\S]*?<\/footer>/;
+const header = html.match(headerPattern)?.[0];
+const footer = html.match(footerPattern)?.[0];
+if (!header || !footer) throw new Error('Missing shared header or footer in index.html');
+const secondaryHeader = header
+  .replace('href="#top" aria-label="madebyjoe, back to top"', 'href="/" aria-label="madebyjoe, home"')
+  .replaceAll('href="#', 'href="/#');
+const pages = [['index.html', file, original, html]];
+for (const name of ['archive.html', 'makersclub.html', '404.html']) {
+  const path = new URL(name, root);
+  const current = readFileSync(path, 'utf8');
+  if (!headerPattern.test(current) || !footerPattern.test(current)) {
+    throw new Error(`Missing shared header or footer in ${name}`);
+  }
+  const pageHeader = name === 'archive.html'
+    ? secondaryHeader.replace('href="/archive"', 'href="/archive" aria-current="page"')
+    : secondaryHeader;
+  const generated = current
+    .replace(headerPattern, () => pageHeader)
+    .replace(footerPattern, () => footer);
+  pages.push([name, path, current, generated]);
+}
+
+for (const [name, path, current, generated] of pages) {
+  if (current === generated) continue;
+  if (process.argv.includes('--check')) {
+    console.error(`Generated ${name} is stale. Run node scripts/sync-styles.mjs`);
     process.exitCode = 1;
-  } else console.log('Generated HTML is in sync');
-} else writeFileSync(file, html);
+  } else writeFileSync(path, generated);
+}

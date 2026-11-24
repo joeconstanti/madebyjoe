@@ -1,12 +1,4 @@
 (() => {
-  const clock = document.querySelector('.js-clock');
-  const londonTime = new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
-  });
-  function tick() { clock.textContent = londonTime.format(new Date()); }
-  tick();
-  setInterval(tick, 1000);
-
   const timeline = document.querySelector('.timeline');
   const byId = (id) => document.getElementById(id);
   const query = byId('query');

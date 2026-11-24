@@ -5,10 +5,6 @@
   firstVideo.muted = true; firstVideo.defaultMuted = true; firstVideo.playsInline = true;
   firstVideo.autoplay = true;
   firstVideo.play().catch(() => {});
-  const format = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  const tick = () => document.querySelectorAll('.js-clock').forEach((el) => { el.textContent = format.format(new Date()); });
-  tick(); setInterval(tick, 1000);
-  document.querySelectorAll('.js-year').forEach((el) => { el.textContent = new Date().getFullYear(); });
   // Keep the branded intro independent of video and the optional animation bundle.
   const loader = document.querySelector('.loader');
   if (loader) {

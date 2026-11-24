@@ -14,7 +14,8 @@ class GenerationTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
-        shutil.copy2(ROOT / 'index.html', self.root / 'index.html')
+        for name in ('index.html', 'archive.html', 'makersclub.html', '404.html'):
+            shutil.copy2(ROOT / name, self.root / name)
         for name in ('css', 'fonts', 'js', 'media', 'scripts'):
             shutil.copytree(ROOT / name, self.root / name)
         self.page = self.root / 'index.html'

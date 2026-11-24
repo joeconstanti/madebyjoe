@@ -11,35 +11,42 @@
   <style>
     body {
       display: grid;
-      grid-template-rows: auto minmax(0, 1fr);
-      height: 100vh;
-      height: 100dvh;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      min-height: 100vh;
+      min-height: 100dvh;
     }
     .hdr { position: relative; mix-blend-mode: normal; border-bottom: 1px solid var(--line); }
-    iframe { display: block; width: 100%; height: 100%; border: 0; }
+    iframe { display: block; width: 100%; min-height: calc(100dvh - 3.25rem); border: 0; }
   </style>
+  <script src="/js/site-chrome.js" defer></script>
 </head>
-<body>
+<body id="top">
   <header class="hdr">
-    <a class="hdr__logo" href="/#top" aria-label="madebyjoe, home">madebyjoe<sup>®</sup></a>
+    <a class="hdr__logo" href="/" aria-label="madebyjoe, home">madebyjoe<sup>®</sup></a>
     <p class="hdr__role">Designer &amp; technologist</p>
     <p class="hdr__clock">LDN <time class="js-clock">--:--:--</time></p>
     <nav class="hdr__nav" aria-label="Main">
       <a href="/#index">Index</a>
       <a href="/#about">About</a>
+      <a href="/archive">Archive</a>
       <a href="/#contact">Contact</a>
     </nav>
   </header>
   <iframe title="Makersclub AI agent workshops" src="https://embed.figma.com/proto/f0EdnJHZ3Tnr2YaweKWMzD/madebyjoe.co?node-id=61-88&amp;p=f&amp;viewport=-1816%2C703%2C0.09&amp;scaling=contain&amp;content-scaling=fixed&amp;page-id=35%3A87&amp;embed-host=share&amp;footer=false&amp;hotspot-hints=false" allowfullscreen></iframe>
-  <script>
-    const clock = document.querySelector('.js-clock');
-    const londonTime = new Intl.DateTimeFormat('en-GB', {
-      timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit',
-      second: '2-digit', hour12: false
-    });
-    const tick = () => { clock.textContent = londonTime.format(new Date()); };
-    tick();
-    setInterval(tick, 1000);
-  </script>
+  <footer class="ftr">
+    <div class="ftr__grid grid">
+      <p><span class="lbl">(Visit)</span>
+        <a href="https://fromtheroot.studio" target="_blank" rel="noopener">fromtheroot.studio</a><br>
+        <a href="https://syntheticlabs.xyz" target="_blank" rel="noopener">syntheticlabs.xyz</a><br>
+        <a href="https://cerebral.studio" target="_blank" rel="noopener">cerebral.studio</a><br>
+        <a href="https://automatedigital.ai" target="_blank" rel="noopener">automatedigital.ai</a><br>
+        <a href="https://joe.graphics" target="_blank" rel="noopener">joe.graphics</a>
+      </p>
+      <p><span class="lbl">(Local time)</span>London <time class="js-clock">--:--:--</time></p>
+      <p><span class="lbl">(©)</span>madebyjoe <span class="js-year">2026</span></p>
+      <p class="ftr__top"><a href="#top">Back to top ↑</a></p>
+    </div>
+    <div class="ftr__mark js-fit" aria-hidden="true">madebyjoe</div>
+  </footer>
 </body>
 </html>
