@@ -1,36 +1,183 @@
-:root {
-  color-scheme: light dark;
-  font-family: system-ui, sans-serif;
-  line-height: 1.6;
+.resource-layout {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-content: start;
+  column-gap: var(--gap);
+  min-height: 68svh;
+  padding: clamp(2.5rem, 7vw, 7rem) var(--gutter) clamp(4rem, 9vw, 9rem);
+  scroll-margin-top: 4rem;
 }
 
-body {
+.resource-layout > .resource-title,
+.resource-intro {
+  grid-column: 1 / 6;
+}
+
+.resource-title {
+  max-width: 11ch;
+  font-size: clamp(3rem, 6.2vw, 6rem);
+  font-weight: 530;
+  line-height: .91;
+  letter-spacing: -.04em;
+  text-wrap: balance;
+}
+
+.resource-title em {
+  color: var(--signal);
+  font: italic 1.08em/.91 "Instrument Serif", Georgia, serif;
+}
+
+.resource-nav {
+  grid-column: 1 / -1;
+  margin-bottom: clamp(1.75rem, 4vw, 3.5rem);
+}
+
+.resource-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  min-height: 44px;
+  font: var(--fs-mono)/1.3 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.resource-nav a:hover {
+  color: var(--signal);
+}
+
+.resource-nav svg {
+  width: 1rem;
+  transform: rotate(180deg);
+}
+
+.resource-intro p,
+.resource-notes {
+  max-width: 65ch;
+  color: var(--muted);
+}
+
+.resource-intro p {
+  max-width: 37ch;
+  margin-top: 1.5rem;
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+}
+
+.resource-content,
+.resource-list--index {
+  grid-column: 7 / -1;
+}
+
+.resource-content h2 {
+  margin-bottom: .85rem;
+  font: var(--fs-mono)/1.3 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.resource-list {
+  list-style: none;
+  padding: 0;
   margin: 0;
+  border-top: 1px solid var(--line);
 }
 
-main {
-  box-sizing: border-box;
-  max-width: 44rem;
-  margin-inline: auto;
-  padding: 2rem clamp(1rem, 5vw, 3rem) 4rem;
+.resource-list li {
+  border-bottom: 1px solid var(--line);
 }
 
-h1 {
-  line-height: 1.15;
+.resource-list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem .15rem;
+  min-height: 56px;
+  font-size: clamp(1.05rem, 1.55vw, 1.4rem);
+  line-height: 1.2;
+  transition: color .2s var(--ease);
 }
 
-li + li {
-  margin-block-start: 0.5rem;
+.resource-list--index a {
+  padding-block: 1.2rem;
 }
 
-a {
-  text-underline-offset: 0.18em;
+.resource-list strong {
+  display: block;
+  font-size: clamp(1.45rem, 2.7vw, 2.65rem);
+  font-weight: 530;
+  letter-spacing: -.035em;
 }
 
-pre {
-  padding: 0.8rem;
-  border: 1px solid;
-  border-radius: 0.25rem;
-  white-space: pre-wrap;
+.resource-list small {
+  display: block;
+  margin-top: .25rem;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.resource-list a:is(:hover, :focus-visible) {
+  color: var(--signal);
+}
+
+.resource-list svg,
+.resource-nav svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  flex: none;
+}
+
+.resource-list svg {
+  width: 1.5rem;
+}
+
+.resource-notes {
+  display: grid;
+  gap: 1rem;
+  margin-top: clamp(1.6rem, 3vw, 2.6rem);
   overflow-wrap: anywhere;
+}
+
+.resource-notes a {
+  color: var(--paper);
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+
+.resource-notes a:hover {
+  color: var(--signal);
+}
+
+.resource-notes pre {
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  color: var(--paper);
+  white-space: pre-wrap;
+}
+
+.resource-notes code {
+  font-family: var(--mono);
+  font-size: .85em;
+}
+
+@media (max-width: 760px) {
+  .resource-layout > .resource-title,
+  .resource-intro,
+  .resource-content,
+  .resource-list--index {
+    grid-column: 1 / -1;
+  }
+
+  .resource-content,
+  .resource-list--index {
+    margin-top: 2.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resource-list a {
+    transition: none;
+  }
 }

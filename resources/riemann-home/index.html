@@ -4,19 +4,57 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Riemann waves | Made by Joe</title>
-  <link rel="stylesheet" href="../resources.css">
+  <link rel="icon" href="/img/j.jpg">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/site-chrome.css">
+  <link rel="stylesheet" href="/resources/resources.css">
+  <script src="/js/site-chrome.js" defer></script>
 </head>
-<body>
-  <main>
-    <nav aria-label="Resources"><a href="../">Viewer resources</a></nav>
-    <h1>Riemann waves</h1>
-    <p>Select Build and move the wave slider from zero to 200. The orange curve shows a finite sum. The white staircase counts primes and prime powers with weights.</p>
-    <ul>
-      <li><a href="explainer/index.html">Open the interactive explainer</a></li>
-      <li><a href="explainer/index.html" download>Download the offline explainer</a></li>
-      <li><a href="prompt.txt" download>Download the build prompt</a></li>
-    </ul>
-    <p>Select Break it and move the slider away from 0.50 to see a hypothetical change to a zero and its reflection. Return it to 0.50 to restore the curve. The explainer shows a finite approximation of the formula and a hypothetical calculation.</p>
+<body id="top">
+  <a class="skip" href="#content">Skip to content</a>
+  <header class="hdr">
+    <a class="hdr__logo" href="/" aria-label="madebyjoe, home">madebyjoe<sup>®</sup></a>
+    <p class="hdr__role">Designer &amp; technologist</p>
+    <p class="hdr__clock">LDN <time class="js-clock">--:--:--</time></p>
+    <nav class="hdr__nav" aria-label="Main">
+      <a href="/#index">Index</a>
+      <a href="/#about">About</a>
+      <a href="/archive">Archive</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </header>
+  <main id="content" class="resource-layout">
+    <nav class="resource-nav" aria-label="Resources"><a href="../"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg> Viewer resources</a></nav>
+    <div class="resource-intro">
+      <h1 class="resource-title">Riemann <em>waves</em></h1>
+      <p>Select Build and move the wave slider from zero to 200. The orange curve shows a finite sum. The white staircase counts primes and prime powers with weights.</p>
+    </div>
+    <div class="resource-content">
+      <h2>Files and demos</h2>
+      <ul class="resource-list">
+          <li><a href="explainer/index.html"><span>Open the interactive explainer</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></a></li>
+          <li><a href="explainer/index.html" download><span>Download the offline explainer</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 20h14"/></svg></a></li>
+          <li><a href="prompt.txt" download><span>Download the build prompt</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 20h14"/></svg></a></li>
+      </ul>
+      <div class="resource-notes">
+        <p>Select Break it and move the slider away from 0.50 to see a hypothetical change to a zero and its reflection. Return it to 0.50 to restore the curve. The explainer shows a finite approximation of the formula and a hypothetical calculation.</p>
+      </div>
+    </div>
   </main>
+  <footer class="ftr">
+    <div class="ftr__grid grid">
+      <p><span class="lbl">(Visit)</span>
+        <a href="https://fromtheroot.studio" target="_blank" rel="noopener">fromtheroot.studio</a><br>
+        <a href="https://syntheticlabs.xyz" target="_blank" rel="noopener">syntheticlabs.xyz</a><br>
+        <a href="https://cerebral.studio" target="_blank" rel="noopener">cerebral.studio</a><br>
+        <a href="https://automatedigital.ai" target="_blank" rel="noopener">automatedigital.ai</a><br>
+        <a href="https://joe.graphics" target="_blank" rel="noopener">joe.graphics</a>
+      </p>
+      <p><span class="lbl">(Local time)</span>London <time class="js-clock">--:--:--</time></p>
+      <p><span class="lbl">(©)</span>madebyjoe <span class="js-year">2026</span></p>
+      <p class="ftr__top"><a href="#top">Back to top ↑</a></p>
+    </div>
+    <div class="ftr__mark js-fit" aria-hidden="true">madebyjoe</div>
+  </footer>
 </body>
 </html>

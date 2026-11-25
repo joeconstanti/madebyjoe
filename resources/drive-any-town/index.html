@@ -4,18 +4,58 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Drive any town | Made by Joe</title>
-  <link rel="stylesheet" href="../resources.css">
+  <link rel="icon" href="/img/j.jpg">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/site-chrome.css">
+  <link rel="stylesheet" href="/resources/resources.css">
+  <script src="/js/site-chrome.js" defer></script>
 </head>
-<body>
-  <main>
-    <nav aria-label="Resources"><a href="../">Viewer resources</a></nav>
-    <h1>Drive any town</h1>
-    <p>Use Chrome on a computer with an internet connection. Enter a public place such as Lombard Street, San Francisco. Map loading can take a few minutes.</p>
-    <ul>
-      <li><a href="anyroad.html">Play the driving game</a></li>
-      <li><a href="prompt.txt" download>Driving game prompt</a></li>
-    </ul>
-    <p>Drive with WASD or the arrow keys. Use Space for the handbrake, C for the camera, N for night and R to reset.</p><p>The game sends your search to OpenStreetMap’s public geocoding service. Use public places and keep requests infrequent. <a href="https://operations.osmfoundation.org/policies/nominatim/">Geocoding usage policy</a></p><p>Streets and building outlines come from map data. The game estimates walls, windows and trees. Inspired by <a href="https://cherwellvalleymotorclub.app">Cherwell Valley Motor Club</a>.</p>
+<body id="top">
+  <a class="skip" href="#content">Skip to content</a>
+  <header class="hdr">
+    <a class="hdr__logo" href="/" aria-label="madebyjoe, home">madebyjoe<sup>®</sup></a>
+    <p class="hdr__role">Designer &amp; technologist</p>
+    <p class="hdr__clock">LDN <time class="js-clock">--:--:--</time></p>
+    <nav class="hdr__nav" aria-label="Main">
+      <a href="/#index">Index</a>
+      <a href="/#about">About</a>
+      <a href="/archive">Archive</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </header>
+  <main id="content" class="resource-layout">
+    <nav class="resource-nav" aria-label="Resources"><a href="../"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg> Viewer resources</a></nav>
+    <div class="resource-intro">
+      <h1 class="resource-title">Drive <em>any town</em></h1>
+      <p>Use Chrome on a computer with an internet connection. Enter a public place such as Lombard Street, San Francisco. Map loading can take a few minutes.</p>
+    </div>
+    <div class="resource-content">
+      <h2>Files and demos</h2>
+      <ul class="resource-list">
+          <li><a href="anyroad.html"><span>Play the driving game</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></a></li>
+          <li><a href="prompt.txt" download><span>Driving game prompt</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 20h14"/></svg></a></li>
+      </ul>
+      <div class="resource-notes">
+        <p>Drive with WASD or the arrow keys. Use Space for the handbrake, C for the camera, N for night and R to reset.</p>
+        <p>The game sends your search to OpenStreetMap’s public geocoding service. Use public places and keep requests infrequent. <a href="https://operations.osmfoundation.org/policies/nominatim/">Geocoding usage policy</a></p>
+        <p>Streets and building outlines come from map data. The game estimates walls, windows and trees. Inspired by <a href="https://cherwellvalleymotorclub.app">Cherwell Valley Motor Club</a>.</p>
+      </div>
+    </div>
   </main>
+  <footer class="ftr">
+    <div class="ftr__grid grid">
+      <p><span class="lbl">(Visit)</span>
+        <a href="https://fromtheroot.studio" target="_blank" rel="noopener">fromtheroot.studio</a><br>
+        <a href="https://syntheticlabs.xyz" target="_blank" rel="noopener">syntheticlabs.xyz</a><br>
+        <a href="https://cerebral.studio" target="_blank" rel="noopener">cerebral.studio</a><br>
+        <a href="https://automatedigital.ai" target="_blank" rel="noopener">automatedigital.ai</a><br>
+        <a href="https://joe.graphics" target="_blank" rel="noopener">joe.graphics</a>
+      </p>
+      <p><span class="lbl">(Local time)</span>London <time class="js-clock">--:--:--</time></p>
+      <p><span class="lbl">(©)</span>madebyjoe <span class="js-year">2026</span></p>
+      <p class="ftr__top"><a href="#top">Back to top ↑</a></p>
+    </div>
+    <div class="ftr__mark js-fit" aria-hidden="true">madebyjoe</div>
+  </footer>
 </body>
 </html>

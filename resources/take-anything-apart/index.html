@@ -4,21 +4,60 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Take anything apart | Made by Joe</title>
-  <link rel="stylesheet" href="../resources.css">
+  <link rel="icon" href="/img/j.jpg">
+  <link rel="stylesheet" href="/css/archive.css">
+  <link rel="stylesheet" href="/css/site-chrome.css">
+  <link rel="stylesheet" href="/resources/resources.css">
+  <script src="/js/site-chrome.js" defer></script>
 </head>
-<body>
-  <main>
-    <nav aria-label="Resources"><a href="../">Viewer resources</a></nav>
-    <h1>Take anything apart</h1>
-    <p>Explore a mechanical watch and a 35 mm film camera in 3D. The demos need an internet connection to load Three.js. The models are for learning.</p>
-    <ul>
-      <li><a href="watch.html">Explore the watch</a></li>
-      <li><a href="camera.html">Explore the camera</a></li>
-      <li><a href="prompt-watch.txt" download>Watch prompt</a></li>
-      <li><a href="prompt-camera.txt" download>Camera prompt</a></li>
-      <li><a href="prompt-template.txt" download>Template for your own object</a></li>
-    </ul>
-    <p>Replace [OBJECT] and [THE SMALLEST INTERESTING PART] in the template. Paste it into Claude Code in an empty folder, then open the HTML it creates.</p><p>Inspired by <a href="https://rshekhar.com/voyager/">Raj Shekhar’s Voyager</a>.</p>
+<body id="top">
+  <a class="skip" href="#content">Skip to content</a>
+  <header class="hdr">
+    <a class="hdr__logo" href="/" aria-label="madebyjoe, home">madebyjoe<sup>®</sup></a>
+    <p class="hdr__role">Designer &amp; technologist</p>
+    <p class="hdr__clock">LDN <time class="js-clock">--:--:--</time></p>
+    <nav class="hdr__nav" aria-label="Main">
+      <a href="/#index">Index</a>
+      <a href="/#about">About</a>
+      <a href="/archive">Archive</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </header>
+  <main id="content" class="resource-layout">
+    <nav class="resource-nav" aria-label="Resources"><a href="../"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg> Viewer resources</a></nav>
+    <div class="resource-intro">
+      <h1 class="resource-title">Take anything <em>apart</em></h1>
+      <p>Explore a mechanical watch and a 35 mm film camera in 3D. The demos need an internet connection to load Three.js. The models are for learning.</p>
+    </div>
+    <div class="resource-content">
+      <h2>Files and demos</h2>
+      <ul class="resource-list">
+          <li><a href="watch.html"><span>Explore the watch</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></a></li>
+          <li><a href="camera.html"><span>Explore the camera</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></a></li>
+          <li><a href="prompt-watch.txt" download><span>Watch prompt</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 20h14"/></svg></a></li>
+          <li><a href="prompt-camera.txt" download><span>Camera prompt</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 20h14"/></svg></a></li>
+          <li><a href="prompt-template.txt" download><span>Template for your own object</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 20h14"/></svg></a></li>
+      </ul>
+      <div class="resource-notes">
+        <p>Replace [OBJECT] and [THE SMALLEST INTERESTING PART] in the template. Paste it into Claude Code in an empty folder, then open the HTML it creates.</p>
+        <p>Inspired by <a href="https://rshekhar.com/voyager/">Raj Shekhar’s Voyager</a>.</p>
+      </div>
+    </div>
   </main>
+  <footer class="ftr">
+    <div class="ftr__grid grid">
+      <p><span class="lbl">(Visit)</span>
+        <a href="https://fromtheroot.studio" target="_blank" rel="noopener">fromtheroot.studio</a><br>
+        <a href="https://syntheticlabs.xyz" target="_blank" rel="noopener">syntheticlabs.xyz</a><br>
+        <a href="https://cerebral.studio" target="_blank" rel="noopener">cerebral.studio</a><br>
+        <a href="https://automatedigital.ai" target="_blank" rel="noopener">automatedigital.ai</a><br>
+        <a href="https://joe.graphics" target="_blank" rel="noopener">joe.graphics</a>
+      </p>
+      <p><span class="lbl">(Local time)</span>London <time class="js-clock">--:--:--</time></p>
+      <p><span class="lbl">(©)</span>madebyjoe <span class="js-year">2026</span></p>
+      <p class="ftr__top"><a href="#top">Back to top ↑</a></p>
+    </div>
+    <div class="ftr__mark js-fit" aria-hidden="true">madebyjoe</div>
+  </footer>
 </body>
 </html>

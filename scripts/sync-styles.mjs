@@ -60,7 +60,10 @@ const secondaryHeader = header
   .replace('href="#top" aria-label="madebyjoe, back to top"', 'href="/" aria-label="madebyjoe, home"')
   .replaceAll('href="#', 'href="/#');
 const pages = [['index.html', file, original, html]];
-for (const name of ['archive.html', 'makersclub.html', '404.html']) {
+const resourceGuides = [
+  'take-anything-apart', 'drive-any-town', 'muse-uk', 'edit-first', 'riemann-home', 'hydrogen-3d',
+].map(slug => `resources/${slug}/index.html`);
+for (const name of ['archive.html', 'makersclub.html', '404.html', 'resources/index.html', ...resourceGuides]) {
   const path = new URL(name, root);
   const current = readFileSync(path, 'utf8');
   const hasSharedFooter = name !== 'makersclub.html';
