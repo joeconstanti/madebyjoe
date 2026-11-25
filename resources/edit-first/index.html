@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Edit first, film later | Made by Joe</title>
+  <link rel="stylesheet" href="../resources.css">
+</head>
+<body>
+  <main>
+    <nav aria-label="Resources"><a href="../">Viewer resources</a></nav>
+    <h1>Edit first, film later</h1>
+    <p>Build the edit with a stand-in voice. Record the same words, then use the Python program to move cuts, callouts, sounds and captions to the new recording.</p>
+    <ul>
+      <li><a href="edit-first.zip" download>Download the Python program and example files</a></li>
+      <li><a href="prompt.txt" download>Download the editing prompt</a></li>
+    </ul>
+    <p>Extract the ZIP and open a terminal inside the extracted folder. Run this command with Python 3.9 or later.</p><pre><code>python3 swap.py example/draft_edit.json example/draft_words.json example/new_words.json -o new_edit.json --words-out new_captions.json</code></pre><p>Use <code>example/new_words_line_missing.json</code> in place of <code>example/new_words.json</code> to see how the program reports a missing line. For your own video, put <code>swap.py</code>, <code>script.txt</code> and a <code>clips</code> folder together, then use the prompt in Claude Code.</p><p>Inspired by <a href="https://www.youtube.com/shorts/yg6KRjokjaE">Riley Brown’s editing workflow</a>.</p>
+  </main>
+</body>
+</html>

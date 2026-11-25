@@ -215,3 +215,9 @@ RewriteRule ^ %1 [R=301,L]
         Header edit Content-Security-Policy "$" " frame-src https://embed.figma.com https://www.figma.com;"
     </Files>
 </IfModule>
+
+# Permit Three.js and the public map services only on the demos that use them.
+<IfModule mod_headers.c>
+    Header edit Content-Security-Policy "(script-src [^;]+)" "$1 https://cdn.jsdelivr.net" "expr=%{REQUEST_URI} =~ m#^/resources/(?:take-anything-apart/(?:watch|camera)|drive-any-town/anyroad)\.html$#"
+    Header edit Content-Security-Policy "(connect-src [^;]+)" "$1 https://nominatim.openstreetmap.org https://overpass-api.de https://maps.mail.ru https://overpass.kumi.systems https://overpass.private.coffee https://s3.amazonaws.com" "expr=%{REQUEST_URI} == '/resources/drive-any-town/anyroad.html'"
+</IfModule>

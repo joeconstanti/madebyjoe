@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Riemann's waves</title>
+<link rel="icon" href="data:,">
+<style>
+:root{--bg:#070707;--o:#FF6E1B;--ink:#fff;--mut:#b3aca6;--line:#2c2825;--u:clamp(13px,min(2.96vw,1.67vh),19px)}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);overscroll-behavior:none}
+body{font:500 var(--u)/1.25 "Avenir Next","Segoe UI",Roboto,system-ui,sans-serif;-webkit-user-select:none;user-select:none}
+#app{position:fixed;inset:0;display:grid;gap:calc(var(--u)*.5);
+ padding:max(calc(var(--u)*.8),env(safe-area-inset-top)) calc(var(--u)*1.1) max(calc(var(--u)*.9),env(safe-area-inset-bottom));
+ grid-template:"h" auto "s" auto "c" minmax(0,1fr) "p" auto "k" auto "z" auto / minmax(0,1fr)}
+header{grid-area:h;display:flex;justify-content:space-between;align-items:center;gap:1em}
+h1{font-size:1.5em;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+h1 u{text-decoration:none;color:var(--o)}
+.tabs{display:flex;border:1px solid var(--line);border-radius:99px;padding:3px;flex:none}
+button{font:inherit;color:var(--ink);background:none;border:0;cursor:pointer;touch-action:manipulation}
+.tabs button{padding:.5em 1em;border-radius:99px;font-weight:600;color:var(--mut);white-space:nowrap;min-height:44px}
+.tabs button[aria-selected=true]{background:#fff;color:#070707}
+.stats{grid-area:s;display:grid;grid-template-columns:1fr 1fr;gap:1em;align-items:end}
+.stats b{display:block;font-size:2.9em;line-height:1;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stats span{color:var(--mut);display:block;white-space:nowrap}
+.stats div:last-child{text-align:right}
+#stage{grid-area:c;position:relative;min-height:0;margin:0 calc(var(--u)*-.5)}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#chips{grid-area:p;display:grid;grid-template-columns:repeat(12,1fr);gap:4px}
+#chips i{font-style:normal;text-align:center;font-weight:700;font-size:1.12em;line-height:1.75;border-radius:8px;color:#8b847e;background:#141210;font-variant-numeric:tabular-nums;transition:color .3s,background .3s,box-shadow .3s}
+#chips i.on{background:var(--o);color:#070707;box-shadow:0 0 18px #ff6e1b99}
+#chips i.pow.on{background:#141210;color:#fff;box-shadow:inset 0 0 0 1.5px #fff,0 0 10px #ffffff44}
+#chips i.bad,#chips i.pow.bad{background:#141210;color:#8b847e;box-shadow:none;text-decoration:line-through}
+#chips i.pop{animation:pop .7s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35)}100%{transform:scale(1)}}
+.ctl{grid-area:k;display:flex;align-items:center;gap:1em}
+#play{flex:none;min-width:6.2em;min-height:52px;border-radius:99px;background:var(--o);color:#070707;font-weight:700;font-size:1.2em;box-shadow:0 0 26px #ff6e1b66}
+button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:99px}
+input[type=range]{--f:0%;flex:1;min-width:0;height:52px;-webkit-appearance:none;appearance:none;background:none;cursor:pointer;touch-action:none;margin:0}
+input::-webkit-slider-runnable-track{height:12px;border-radius:9px;background:linear-gradient(90deg,var(--o) var(--f),#2a2623 var(--f))}
+input::-moz-range-track{height:12px;border-radius:9px;background:linear-gradient(90deg,var(--o) var(--f),#2a2623 var(--f))}
+input::-webkit-slider-thumb{-webkit-appearance:none;width:38px;height:38px;margin-top:-13px;border-radius:50%;background:#fff;box-shadow:0 0 24px var(--o)}
+input::-moz-range-thumb{width:38px;height:38px;border:0;border-radius:50%;background:#fff;box-shadow:0 0 24px var(--o)}
+[hidden]{display:none!important}
+#foot{grid-area:z;color:var(--mut);text-align:center;min-height:2.5em;display:grid;align-content:center;font-variant-numeric:tabular-nums}
+#foot em{font-style:normal;color:#fff;font-weight:600}
+@media (min-aspect-ratio:1/1){
+ :root{--u:clamp(11.5px,min(1.5vw,2.25vh),20px)}
+ #app{grid-template:"c ." 1fr "c h" auto "c s" auto "c p" auto "c k" auto "c z" 1fr / minmax(0,1fr) calc(var(--u)*23);column-gap:calc(var(--u)*1.6);row-gap:calc(var(--u)*1.2)}
+ header{flex-direction:column;align-items:stretch}
+ h1{font-size:1.9em}.tabs button{flex:1}
+ #chips{grid-template-columns:repeat(8,1fr)}
+ #foot{align-content:start}
+}
+@media (min-aspect-ratio:1/1) and (max-height:480px){
+ #app{row-gap:6px}h1{display:none}#chips{grid-template-columns:repeat(12,1fr)}#chips i{font-size:.95em;line-height:1.5}
+ .stats b{font-size:2em}#play,input[type=range]{min-height:44px;height:44px}
+}
+</style></head><body>
+<main id="app">
+<header><h1 id="ttl"></h1>
+<div class="tabs" role="tablist"><button role="tab" id="tB" aria-selected="true">Build</button><button role="tab" id="tX" aria-selected="false">Break it</button></div></header>
+<section class="stats"><div><b id="n">0</b><span id="nl">waves added</span></div><div><b id="e">–</b><span id="el">average miss, in step height</span></div></section>
+<div id="stage"><canvas id="cv" role="img" aria-label="Chart: an orange sum of waves approaches the white prime staircase, from 2 to 50"></canvas></div>
+<div id="chips" aria-label="Primes and prime powers that have a visible step"></div>
+<div class="ctl"><button id="play">Play</button>
+<input id="sw" type="range" min="0" max="200" step="1" value="0" aria-label="Number of waves">
+<input id="sb" type="range" min="0.5" max="0.95" step="0.005" value="0.5" aria-label="Real part of the moved zero" hidden></div>
+<div id="foot"></div>
+</main>
+<script>
+'use strict';
+/* ============ MATH ============ */
+const PI=Math.PI, TAU=2*PI, NW=200, X0=1.5, X1=50, NS=3200;
+// Bernoulli numbers B2..B26, from their recurrence
+const BERN=(()=>{const B=[1];for(let m=1;m<=26;m++){let s=0,c=1;for(let j=0;j<m;j++){s+=c*B[j];c=c*(m+1-j)/(j+1);}B[m]=-s/(m+1);if(m>1&&m%2)B[m]=0;}return B;})();
+// Riemann-Siegel theta: Im log Gamma(1/4+it/2) - (t/2) log pi. Shift the argument by 12, then Stirling.
+function theta(t){
+  let a=.25,b=t/2,arg=0;
+  for(let j=0;j<12;j++)arg+=Math.atan2(b,a+j);
+  a+=12;
+  const lr=.5*Math.log(a*a+b*b),ph=Math.atan2(b,a);
+  let im=(a-.5)*ph+b*lr-b;
+  const r=Math.exp(lr);
+  for(let m=1;m<=8;m++)im+=BERN[2*m]/(2*m*(2*m-1))*Math.pow(r,1-2*m)*Math.sin((1-2*m)*ph);
+  return im-arg-t/2*Math.log(PI);
+}
+// Psi(p)=cos(2pi(p^2-p-1/16))/cos(2pi p) as a power series in z=p-1/2, for the Riemann-Siegel remainder
+const PSI=(()=>{const M=27,num=Array(M).fill(0),den=Array(M).fill(0),q=[];
+  const c=Math.cos(5*PI/8),s=Math.sin(5*PI/8);
+  let f=1;for(let j=0;2*j<M;j++){if(j)f*=TAU/j;num[2*j]=f*[c,s,-c,-s][j%4];}
+  f=1;for(let j=0;j<M;j++){if(j)f*=TAU/j;if(j%2===0)den[j]=-f*(j%4?-1:1);}
+  for(let j=0;j<M;j++){let v=num[j];for(let i=1;i<=j;i++)v-=den[i]*q[j-i];q[j]=v/den[0];}
+  return q;})();
+function dPsi(z,d){let s=0;for(let j=PSI.length-1;j>=d;j--){let c=PSI[j];for(let i=0;i<d;i++)c*=j-i;s=s*z+c;}return s;}
+// Riemann-Siegel Z(t): main sum and three remainder terms. Used to find every sign change.
+function Zrs(t){
+  const a=Math.sqrt(t/TAU),N=Math.floor(a),z=a-N-.5,th=theta(t);let s=0;
+  for(let n=1;n<=N;n++)s+=Math.cos(th-t*Math.log(n))/Math.sqrt(n);
+  const C0=dPsi(z,0),C1=-dPsi(z,3)/(96*PI**2),C2=dPsi(z,2)/(64*PI**2)+dPsi(z,6)/(18432*PI**4);
+  return 2*s+(N%2?1:-1)/Math.sqrt(a)*(C0+C1/a+C2/(a*a));
+}
+// The same Z(t), near machine precision: e^{i theta} zeta(1/2+it) by Euler-Maclaurin. Used to refine.
+function Zem(t){
+  const N=Math.ceil(t/3)+24;let re=0,im=0;
+  for(let n=1;n<N;n++){const L=t*Math.log(n),r=1/Math.sqrt(n);re+=r*Math.cos(L);im-=r*Math.sin(L);}
+  const L=t*Math.log(N),r=1/Math.sqrt(N),cr=r*Math.cos(L),ci=-r*Math.sin(L); // N^-s
+  const d=.25+t*t; // N^{1-s}/(s-1)
+  re+=N*(cr*-.5+ci*t)/d+cr/2; im+=N*(ci*-.5-cr*t)/d+ci/2;
+  let pr=.5,pi=t,f=2,pw=1/N; // s(s+1)...(s+2k-2) N^{-s-2k+1} B2k/(2k)!
+  for(let k=1;k<=13;k++){
+    const b=BERN[2*k]/f*pw;
+    re+=b*(pr*cr-pi*ci); im+=b*(pr*ci+pi*cr);
+    for(const a of [2*k-1,2*k]){const u=.5+a,x=pr*u-pi*t;pi=pr*t+pi*u;pr=x;}
+    f*=(2*k+1)*(2*k+2);pw/=N*N;
+  }
+  const th=theta(t);return re*Math.cos(th)-im*Math.sin(th);
+}
+function refine(a,b){ // bisection with safe secant steps (Illinois)
+  let fa=Zem(a),fb=Zem(b);if(fa*fb>0)throw Error('lost bracket '+a);
+  for(let i=0;i<60&&b-a>1e-13*b;i++){
+    let m=b-fb*(b-a)/(fb-fa);if(i%3===2||!(m>a&&m<b))m=(a+b)/2;
+    const fm=Zem(m);if(fm===0)return m;
+    if(fa*fm<0){b=m;fb=fm;}else{a=m;fa=fm;}
+  }
+  return Math.abs(fa)<Math.abs(fb)?a:b;
+}
+const T0=performance.now();
+const allZeros=(()=>{const z=[];let t=7,f=Zrs(t);while(z.length<NW+1){const u=t+.02,g=Zrs(u);if(f*g<0)z.push(refine(t-.02,u+.02));t=u;f=g;}return z;})();
+const zeros=allZeros.slice(0,NW), zeroMs=performance.now()-T0;
+const predicted=t=>theta(t)/PI+1; // Riemann-von Mangoldt, smooth part
+const gaps=zeros.map((z,i)=>(z+allZeros[i+1])/2);
+const gapPred=gaps.map(predicted);
+const checkOK=gapPred.every((p,i)=>Math.abs(p-(i+1))<1);
+// A real sieve, and psi(x)
+const isP=Array(51).fill(true);isP[0]=isP[1]=false;for(let i=2;i*i<=50;i++)if(isP[i])for(let j=i*i;j<=50;j+=i)isP[j]=false;
+const jumps=[];for(let p=2;p<=50;p++)if(isP[p])for(let q=p;q<=50;q*=p)jumps.push({q,p,h:Math.log(p)});
+jumps.sort((a,b)=>a.q-b.q);
+function psiTrue(x){let s=0;for(const j of jumps)if(x>=j.q)s+=j.h;return s;}
+const smooth=x=>x-Math.log(TAU)-.5*Math.log(1-1/(x*x));
+function pair(x,b,g){const L=Math.log(x),r=Math.exp(b*L);return -2*r*(b*Math.cos(g*L)+g*Math.sin(g*L))/(b*b+g*g);} // -2 Re x^rho/rho
+function curveAt(x,n,beta){
+  let s=smooth(x);for(let k=0;k<n;k++)s+=pair(x,.5,zeros[k]);
+  if(beta>.5)s+=pair(x,beta,zeros[0])+pair(x,1-beta,zeros[0])-pair(x,.5,zeros[0]);
+  return s;
+}
+// Tables: log-spaced samples; P[n] is the sum with n waves
+const xs=new Float64Array(NS),wt=new Float64Array(NS),tr=new Float64Array(NS);
+for(let i=0;i<NS;i++){xs[i]=X0*Math.pow(X1/X0,i/(NS-1));tr[i]=psiTrue(xs[i]);}
+for(let i=0;i<NS;i++)if(xs[i]>=2)wt[i]=(xs[Math.min(NS-1,i+1)]-xs[Math.max(0,i-1)])/2;
+const W=zeros.map(g=>Float32Array.from(xs,x=>pair(x,.5,g)));
+const P=[Float64Array.from(xs,smooth)];
+for(let k=0;k<NW;k++){const a=P[k],w=W[k],b=new Float64Array(NS);for(let i=0;i<NS;i++)b[i]=a[i]+w[i];P.push(b);}
+function meanMiss(c){let s=0,t=0;for(let i=0;i<NS;i++){s+=wt[i]*Math.abs(c[i]-tr[i]);t+=wt[i];}return s/t;}
+const errs=P.map(meanMiss);
+// A step has appeared when the curve rises by 60% of the way from "smooth ramp" to "full jump", and stays so,
+// while its mean miss near the jump is at most 40% of the step height.
+function win(a,b){return [xs.findIndex(x=>x>=a),xs.findIndex(x=>x>=b)<0?NS:xs.findIndex(x=>x>=b)];}
+for(const j of jumps){j.L=win(j.q-.42,j.q);j.R=win(j.q,j.q+.42);}
+const avg=(c,[a,b])=>{let s=0;for(let i=a;i<b;i++)s+=c[i];return s/(b-a);};
+function miss(c,[a],[,b]){let s=0;for(let i=a;i<b;i++)s+=Math.abs(c[i]-tr[i]);return s/(b-a);}
+for(const j of jumps){
+  const need=.42+.6*(j.h-.42);j.on=NW+1;
+  for(let n=NW;n>0&&avg(P[n],j.R)-avg(P[n],j.L)>=need&&miss(P[n],j.L,j.R)<=.4*j.h;n--)j.on=n;
+}
+/* ============ STATE ============ */
+const $=id=>document.getElementById(id);
+let view='build',count=0,beta=.5,playing=false,wait=0,sweep=false,flyers=[],ripples=[],dirty=true;
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const cur=Float64Array.from(P[0]),goal=new Float64Array(NS),bw=new Float64Array(NS);
+const color=k=>`hsl(${(22+k*47)%360} 95% 64%)`;
+const chips=jumps.map(j=>{const i=document.createElement('i');i.textContent=j.q;if(j.p!==j.q)i.className='pow';$('chips').append(i);return i;});
+let lit=jumps.map(()=>false);
+function setLit(f,bad){jumps.forEach((j,i)=>{
+  const v=f(j);chips[i].classList.toggle('on',v);chips[i].classList.toggle('bad',!!bad&&!v);
+  if(v&&!lit[i]&&view==='build'){ripples.push({j,t:0});chips[i].classList.remove('pop');void chips[i].offsetWidth;chips[i].classList.add('pop');}
+  lit[i]=v;});}
+function setText(id,s){const el=$(id);if(el.innerHTML!==s)el.innerHTML=s;}
+function breakArr(){ for(let i=0;i<NS;i++){const x=xs[i];bw[i]=beta>.5?pair(x,beta,zeros[0])+pair(x,1-beta,zeros[0]):W[0][i];goal[i]=P[NW][i]-W[0][i]+bw[i];} }
+const fmt=v=>Math.round(v).toLocaleString('en-US');
+function ui(){
+  const B=view==='build';
+  setText('ttl',B?'Waves build<br>the primes':'<u>What if</u> a zero<br>left the line?');
+  $('tB').setAttribute('aria-selected',B);$('tX').setAttribute('aria-selected',!B);
+  $('sw').hidden=!B;$('sb').hidden=B;
+  setText('play',B?(playing?'Pause':count>=NW?'Replay':'Play'):sweep?'Pause':beta>=.95?'Reset':'Push');
+  if(B){
+    setText('n',String(count));setText('nl',count===1?'wave added':'waves added');
+    setText('e',errs[count].toFixed(2));setText('el','average miss, in height');
+    $('sw').value=count;$('sw').style.setProperty('--f',count/2+'%');
+    setText('foot',count?`<span>Zero check ${Math.abs(gapPred[count-1]-count)<1?'✓':'✗'} <em>${count}</em> found below height ${gaps[count-1].toFixed(1)}</span><span>Counting formula says <em>${gapPred[count-1].toFixed(2)}</em></span>`
+      :`<span>All 200 zeros computed here in <em>${fmt(zeroMs)} ms</em></span><span>Zero check ${checkOK?'✓ every count fits the formula':'✗ count does not fit'}</span>`);
+    setLit(j=>count>=j.on);
+  }else{
+    breakArr();
+    setText('n',beta.toFixed(3).replace(/0$/,''));setText('nl',beta>.5?`mirror at ${(1-beta).toFixed(3).replace(/0$/,'')}`:'on the center line');
+    setText('e',meanMiss(goal).toFixed(2));setText('el','average miss, in height');
+    $('sb').value=beta;$('sb').style.setProperty('--f',(beta-.5)/.45*100+'%');
+    const A=b=>2*Math.pow(1e6,b)/Math.hypot(b,zeros[0]),M=beta>.5?A(beta)+A(1-beta):A(.5);
+    setText('foot',`<span><em>What if — not real.</em> No such zero was ever found.</span><span>This wave at one million: <em>±${fmt(M)}</em>${beta>.5?`, not ±${fmt(A(.5))}`:''}</span>`);
+    setLit(j=>miss(goal,j.L,j.R)<Math.max(.6,.4*j.h),true);
+  }
+}
+function setCount(n,fly){
+  n=Math.max(0,Math.min(NW,Math.round(+n)||0));const old=count;count=n;flyers=[];
+  if(fly&&n>old&&!still){const m=Math.min(4,n-old);for(let i=0;i<m;i++)flyers.push({k:n-m+i,t:-i*.07,d:.65,decor:true});}
+  ui();
+}
+function setView(v){view=v;playing=sweep=false;flyers=[];ripples=[];if(v==='break')beta=.5;ui();}
+function setBeta(b){beta=Math.max(.5,Math.min(.95,+b||.5));ui();}
+$('tB').onclick=()=>setView('build');$('tX').onclick=()=>setView('break');
+$('sw').oninput=e=>{playing=false;setCount(e.target.value,true);};
+$('sb').oninput=e=>{sweep=false;setBeta(e.target.value);};
+$('play').onclick=()=>{
+  if(view==='build'){if(!playing){if(count>=NW)setCount(0);wait=.15;}playing=!playing;if(!playing)flyers=[];}
+  else if(sweep)sweep=false;else if(beta>=.95)beta=.5;else sweep=true;
+  ui();};
+window.setWaves=n=>{if(view!=='build')setView('build');playing=false;setCount(n);ripples=[];cur.set(P[count]);};
+window.setBreak=b=>{if(view!=='break')setView('break');setBeta(b);cur.set(goal);};
+window.getState=()=>{const n=view==='build'?count:NW,b=view==='build'?.5:beta;
+  return {zeros:zeros.slice(),count:n,view,beta:b,curve:x=>curveAt(x,n,b),staircase:psiTrue,averageError:b>.5?meanMiss(goal):errs[n],
+    lit:jumps.filter((j,i)=>lit[i]).map(j=>j.q),check:{ok:checkOK,counted:NW,predicted:gapPred[NW-1],height:gaps[NW-1]},playing,zeroMs};};
+/* ============ DRAW ============ */
+const cv=$('cv'),g=cv.getContext('2d');let w=0,h=0,dpr=1,back=null,C={},hover=null,F=16;
+const font=(s,b)=>`${b||500} ${s}px "Avenir Next","Segoe UI",Roboto,system-ui,sans-serif`;
+const Y0=-2,Y1=55;
+const px=x=>C.l+(x-X0)/(X1-X0)*C.w, py=y=>C.b-(y-Y0)/(Y1-Y0)*C.h;
+const sx=new Float64Array(NS),sy=new Float64Array(NS);
+function size(){
+  const r=cv.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(2,devicePixelRatio||1);
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+  F=Math.max(12,parseFloat(getComputedStyle(document.body).fontSize));
+  const rack=Math.max(54,h*.21);
+  C={l:F*2.1,t:rack+F*.6,rack};C.w=w-C.l-F*.9;C.b=h-F*1.7;C.h=C.b-C.t;
+  for(let i=0;i<NS;i++)sx[i]=px(xs[i]);
+  back=document.createElement('canvas');back.width=cv.width;back.height=cv.height;
+  const c=back.getContext('2d');c.scale(dpr,dpr);
+  c.fillStyle='#070707';c.fillRect(0,0,w,h);
+  const G=c.createRadialGradient(w*.62,C.t+C.h*.45,0,w*.62,C.t+C.h*.45,Math.max(w,C.h)*.7);
+  G.addColorStop(0,'#1a0f08');G.addColorStop(1,'#070707');c.fillStyle=G;c.fillRect(0,C.rack,w,h-C.rack);
+  const fade=c.createLinearGradient(0,C.rack,0,C.rack+F*5);fade.addColorStop(0,'#070707');fade.addColorStop(1,'#07070700');c.fillStyle=fade;c.fillRect(0,C.rack-1,w,F*5+1);
+  // axes
+  c.font=font(F);c.fillStyle='#b3aca6';c.strokeStyle='#241f1b';c.lineWidth=1;
+  for(const v of [0,10,20,30,40,50]){
+    c.textAlign='right';c.textBaseline='middle';c.fillText(v,C.l-F*.45,py(v));
+    c.beginPath();c.moveTo(C.l,py(v));c.lineTo(C.l+C.w,py(v));c.stroke();
+    if(v){c.textAlign='center';c.textBaseline='top';c.fillText(v,Math.min(px(v),w-F*.7),C.b+F*.35);}
+  }
+  c.textAlign='center';c.textBaseline='top';c.fillText('2',px(2),C.b+F*.35);
+  // staircase, extruded back for depth
+  const stair=(ox,oy)=>{c.beginPath();let y=0;c.moveTo(px(X0)+ox,py(0)+oy);for(const j of jumps){c.lineTo(px(j.q)+ox,py(y)+oy);y+=j.h;c.lineTo(px(j.q)+ox,py(y)+oy);}c.lineTo(px(X1)+ox,py(y)+oy);};
+  const D=Math.min(22,F*1.3);
+  for(let i=14;i>0;i--){const s=i/14;stair(-D*s*.55,-D*s);c.strokeStyle=`rgba(255,255,255,${.035+.06*(1-s)})`;c.lineWidth=1.6;c.stroke();}
+  stair(0,0);c.lineTo(px(X1),C.b);c.lineTo(px(X0),C.b);c.closePath();
+  const L=c.createLinearGradient(0,C.t,0,C.b);L.addColorStop(0,'rgba(255,255,255,.10)');L.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=L;c.fill();
+  stair(0,0);c.lineJoin='round';c.strokeStyle='rgba(255,255,255,.14)';c.lineWidth=7;c.stroke();c.strokeStyle='rgba(255,255,255,.88)';c.lineWidth=2;c.stroke();
+}
+new ResizeObserver(()=>{size();dirty=true;}).observe($('stage'));
+const dust=Array.from({length:70},(_,i)=>({x:(i*.6180339)%1,y:(i*.7548776)%1,z:.2+((i*.5698402)%1)*.8}));
+const ss=(a,b,t)=>{t=Math.max(0,Math.min(1,(t-a)/(b-a)));return t*t*(3-2*t);};
+function poly(Yf,step){g.beginPath();for(let i=0;i<NS;i+=step)i?g.lineTo(sx[i],Yf(i)):g.moveTo(sx[i],Yf(i));}
+function wavePath(k,yc,amp,sc,step){const a=W[k],m=zeros[k]/(2*Math.sqrt(X1)),cx=w/2;g.beginPath();for(let i=0;i<NS;i+=step){const X=cx+(sx[i]-cx)*sc,Y=yc+-a[i]*m*amp;i?g.lineTo(X,Y):g.moveTo(X,Y);}}
+let slide=0,lastNext=0;
+const laneY=d=>C.rack-F*.7-(C.rack-F*3.2)*(1-Math.pow(.72,d))/(1-Math.pow(.72,5));
+function drawRack(dt){
+  const next=count+flyers.filter(f=>!f.decor).length;
+  if(next!==lastNext){slide=Math.abs(next-lastNext)<3?1:0;lastNext=next;}
+  slide*=Math.exp(-dt*6);
+  g.font=font(F,600);g.textAlign='left';g.textBaseline='top';g.fillStyle='#fff';
+  g.fillText(next<NW?`Next: wave ${next+1}`:'All 200 waves, added up',C.l,0);
+  if(next>=NW){const mid=C.rack*.6,s=C.rack*.1,f=1-slide;g.globalCompositeOperation='lighter';g.strokeStyle='#FF6E1B';
+    poly(i=>mid-(cur[i]-P[0][i])*s*f,1);g.globalAlpha=.15;g.lineWidth=9;g.stroke();g.globalAlpha=1;g.lineWidth=2;g.stroke();g.globalCompositeOperation='source-over';}
+  for(let j=5;j>=0;j--){const k=next+j;if(k>=NW)continue;const d=j+slide,sc=Math.pow(.93,d);
+    g.globalAlpha=Math.max(0,1-d/5.6)*(j?.8:1);g.strokeStyle=color(k);g.lineWidth=2.2*sc;
+    wavePath(k,laneY(d),C.rack*.085*sc,sc,2);g.stroke();}
+  g.globalAlpha=1;
+}
+function drawFlyer(f,u){
+  if(u<=0)return;const a=W[f.k],m=zeros[f.k]/(2*Math.sqrt(X1)),e=ss(0,.85,u),y0=laneY(0),amp=C.rack*.085,ps=C.h/(Y1-Y0),cx=w/2;
+  const bulge=1+.1*Math.sin(PI*e),A=amp*m*(1+1.8*Math.sin(PI*Math.min(1,e)))*(1-e)+ps*e;
+  g.globalAlpha=1-ss(.82,1,u);g.strokeStyle=color(f.k);g.globalCompositeOperation='lighter';
+  g.beginPath();for(let i=0;i<NS;i+=2){const X=cx+(sx[i]-cx)*bulge,Y=y0+(sy[i]-y0)*e-a[i]*A;i?g.lineTo(X,Y):g.moveTo(X,Y);}
+  g.lineWidth=2.4;g.stroke();g.globalAlpha*=.16;g.lineWidth=10;g.stroke();
+  const tint=ss(.6,.85,u)*(1-ss(.85,1,u));
+  if(tint>0){g.globalAlpha=tint*.5;g.lineWidth=12;poly(i=>sy[i],4);g.stroke();}
+  g.globalAlpha=1;g.globalCompositeOperation='source-over';
+}
+function drawBreakTop(){
+  const mid=C.rack*.58+F*.3,s=C.rack*.36/6.2,z=zeros[0];
+  g.font=font(F,600);g.textAlign='left';g.textBaseline='top';g.fillStyle='#fff';g.fillText('The moved wave, alone',C.l,0);
+  const env=b=>x=>2*Math.pow(x,b)/Math.hypot(b,z);
+  const E=x=>beta>.5?env(beta)(x)+env(1-beta)(x):env(.5)(x);
+  g.beginPath();for(let i=0;i<NS;i+=16)g.lineTo(sx[i],mid-E(xs[i])*s);for(let i=NS-1;i>=0;i-=16)g.lineTo(sx[i],mid+E(xs[i])*s);
+  g.closePath();g.fillStyle='rgba(255,110,27,.16)';g.fill();
+  g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=1.6;poly(i=>mid-W[0][i]*s,8);g.stroke();
+  if(beta>.5){g.strokeStyle='#FF6E1B';g.lineWidth=2.6;poly(i=>mid-bw[i]*s,8);g.stroke();}
+  // the strip, in the empty top-left corner of the chart
+  const bw2=Math.min(C.w*.36,F*13),bh=Math.min(C.h*.3,F*8),x=C.l+F,y=C.t+F*.9,X=r=>x+bw2*r,yy=y+bh*.5;
+  g.fillStyle='rgba(7,7,7,.75)';g.fillRect(x,y,bw2,bh);g.strokeStyle='#4a433e';g.lineWidth=1;g.strokeRect(x,y,bw2,bh);
+  g.strokeStyle='#fff';g.lineWidth=2;g.beginPath();g.moveTo(X(.5),y);g.lineTo(X(.5),y+bh);g.stroke();
+  g.fillStyle='#b3aca6';g.font=font(F);g.textBaseline='top';g.textAlign='center';
+  g.fillText('0',X(0),y+bh+F*.3);g.fillText('½',X(.5),y+bh+F*.3);g.fillText('1',X(1),y+bh+F*.3);
+  for(const [r,c] of [[1-beta,'#fff'],[beta,'#FF6E1B']]){g.fillStyle=c;g.globalAlpha=.25;g.beginPath();g.arc(X(r),yy,15,0,TAU);g.fill();g.globalAlpha=1;g.beginPath();g.arc(X(r),yy,7,0,TAU);g.fill();}
+}
+function legend(){
+  const rx=C.l+C.w-F*.4;let y=C.b-F*3.2;g.textAlign='right';g.textBaseline='middle';g.font=font(F,600);
+  if(hover!==null){
+    let i=xs.findIndex(x=>x>=hover);if(i<0)i=NS-1;
+    g.strokeStyle='rgba(255,255,255,.5)';g.lineWidth=1;g.beginPath();g.moveTo(sx[i],C.t+F);g.lineTo(sx[i],C.b);g.stroke();
+    g.fillStyle='#070707';g.beginPath();g.arc(sx[i],sy[i],8,0,TAU);g.fill();g.fillStyle='#FF6E1B';g.beginPath();g.arc(sx[i],sy[i],6,0,TAU);g.fill();
+    g.fillStyle='rgba(7,7,7,.8)';g.fillRect(rx-F*9.2,y-F*2.6,F*9.5,F*5.2);
+    g.fillStyle='#fff';g.fillText(`At ${xs[i].toFixed(2)}`,rx,y-F*1.5);
+    g.fillText(`Waves ${cur[i].toFixed(2)}`,rx,y);g.fillText(`True ${tr[i].toFixed(2)}`,rx,y+F*1.5);
+  }else for(const [t,c] of [['Sum of waves','#FF6E1B'],['True prime steps','#fff']]){
+    g.fillStyle='#fff';g.fillText(t,rx,y);const tw=g.measureText(t).width;g.strokeStyle=c;g.lineWidth=4;g.beginPath();g.moveTo(rx-tw-F*2,y);g.lineTo(rx-tw-F*.5,y);g.stroke();y+=F*1.5;}
+}
+cv.onpointermove=cv.onpointerdown=e=>{const r=cv.getBoundingClientRect(),X=e.clientX-r.left,Y=e.clientY-r.top;hover=Y>C.t&&X>=C.l?Math.max(2,Math.min(X1,X0+(X-C.l)/C.w*(X1-X0))):null;};
+cv.onpointerleave=cv.onpointercancel=()=>hover=null;
+cv.onpointerup=e=>{if(e.pointerType!=='mouse')hover=null;};
+function step(dt){
+  if(playing){
+    wait-=dt;
+    let next=count+flyers.length;
+    while(wait<=0&&next<NW){
+      const iv=Math.max(.07,1.7*Math.pow(.935,next)),d=Math.max(.6,Math.min(1.5,iv*1.05));
+      const last=flyers.length?flyers[flyers.length-1]:null;
+      flyers.push({k:next,t:0,d:last?Math.max(d,last.d-last.t+.03):d});next++;wait+=iv;
+    }
+  }
+  let landed=false;
+  for(const f of flyers)f.t+=dt;
+  while(flyers.length&&flyers[0].t>=flyers[0].d){const f=flyers.shift();if(!f.decor){count=f.k+1;landed=true;}}
+  if(playing&&count>=NW){playing=false;landed=true;}
+  if(landed)ui();
+  if(sweep){beta=Math.min(.95,beta+dt*.075);if(beta>=.95)sweep=false;ui();}
+  if(view==='build'){
+    goal.set(P[count]);
+    for(const f of flyers)if(!f.decor){const q=ss(.6,1,f.t/f.d);if(q>0){const a=W[f.k];for(let i=0;i<NS;i++)goal[i]+=q*a[i];}}
+  }
+  const r=1-Math.exp(-dt*(view==='build'?(playing?30:12):6));
+  for(let i=0;i<NS;i++){cur[i]+=(goal[i]-cur[i])*r;sy[i]=py(cur[i]);}
+}
+function draw(now,dt){
+  g.setTransform(1,0,0,1,0,0);g.drawImage(back,0,0);g.setTransform(dpr,0,0,dpr,0,0);
+  g.fillStyle='#fff';
+  for(const d of dust){const x=((d.x+now*.000006*d.z)%1)*w;g.globalAlpha=.05+.13*d.z*d.z;g.fillRect(x,C.t+d.y*C.h,1.8*d.z,1.8*d.z);}
+  g.globalAlpha=1;
+  // light beams at steps that have appeared
+  g.globalCompositeOperation='lighter';
+  jumps.forEach((j,i)=>{if(!lit[i])return;const yv=psiTrue(j.q),x=px(j.q),pr=j.p===j.q;
+    g.fillStyle=pr?'rgba(255,110,27,.16)':'rgba(255,255,255,.07)';g.fillRect(x-1,py(yv),2,C.b-py(yv));
+    g.fillStyle=pr?'#FF6E1B':'#fff';g.beginPath();g.arc(x,C.b,pr?3:2,0,TAU);g.fill();});
+  g.globalCompositeOperation='source-over';
+  if(view==='build')drawRack(dt);else drawBreakTop();
+  g.save();g.beginPath();g.rect(C.l-2,C.t-F*.4,C.w+4,C.b-C.t+F*.4+4);g.clip();
+  g.lineJoin='round';
+  g.globalCompositeOperation='lighter';g.strokeStyle='#FF6E1B';
+  g.globalAlpha=.07;g.lineWidth=22;poly(i=>sy[i],4);g.stroke();
+  g.globalAlpha=.2;g.lineWidth=9;g.stroke();
+  g.globalCompositeOperation='source-over';g.globalAlpha=1;g.lineWidth=2.8;poly(i=>sy[i],1);g.stroke();
+  g.strokeStyle='#ffd9bf';g.lineWidth=.9;g.stroke();
+  g.restore();
+  for(const f of flyers)drawFlyer(f,f.t/f.d);
+  ripples=ripples.filter(r=>(r.t+=dt)<1);
+  for(const r of ripples){const x=px(r.j.q),y=py(psiTrue(r.j.q)-r.j.h/2),a=1-r.t;g.strokeStyle=r.j.p===r.j.q?'#FF6E1B':'#fff';g.globalAlpha=a;g.lineWidth=2;g.beginPath();g.arc(x,y,6+34*(1-a*a),0,TAU);g.stroke();
+    g.globalAlpha=a*.5;g.fillStyle=g.strokeStyle;g.fillRect(x-2,y,4,C.b-y);}
+  g.globalAlpha=1;legend();
+}
+let last=performance.now();
+function frame(now){const dt=Math.min(.1,Math.max(0,(now-last)/1000));last=now;if(w>0&&C.w){step(dt);draw(now,dt);}requestAnimationFrame(frame);}
+size();ui();requestAnimationFrame(frame);
+</script></body></html>

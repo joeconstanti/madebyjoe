@@ -1,0 +1,12 @@
+Take [OBJECT] apart for me in 3D. One file: index.html. Three.js from a CDN, no build step, no downloaded models: make every part from geometry in code.
+
+1. Research first: how [OBJECT] works and what its real parts are. Use a standard layout. Tell me at the end which parts and numbers you could not confirm.
+2. It must run. Every moving part moves the way it does in real life, at the right relative speed.
+3. An "explode" slider. At 0 it is the finished object. At 1 every part floats apart along its real assembly axis, in order, still moving.
+4. Click any part: the camera flies to it, the other parts fade, and a card gives its name, what it does and one number that matters. A breadcrumb lets me go back out.
+5. Let me go down to [THE SMALLEST INTERESTING PART] and see how it works.
+6. A "Tour" button: one smooth 40 second camera move. Start on the finished object, take it apart, dive to [THE SMALLEST INTERESTING PART], then put it back together.
+7. Make it look like a product film: dark background, studio lighting with reflections (RoomEnvironment or a generated environment map), real-looking materials, shallow depth of field if it stays fast. It must work in a 1080 x 1080 window and on a phone.
+8. The page must take ?tour=1 and ?explode=0.6.
+
+Serve it locally, test it in a real browser with Playwright, look at the screenshots at several explode values and during the tour, and fix what looks wrong before you say it is done.

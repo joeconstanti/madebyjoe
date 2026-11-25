@@ -1,0 +1,13 @@
+Build me one HTML file, index.html, that shows how Riemann's waves build the prime numbers. It must work offline: no CDN, no libraries, no downloads. No sound.
+
+Start with a smooth curve that runs through a chart. Behind it, show the real prime staircase: a line that steps up at each prime and each power of a prime. Use Chebyshev's psi(x), where the step at p^k has height log p, for x from 2 to 50. Use the exact explicit formula: psi(x) = x - sum over the zeta zeros of x^rho/rho - log(2 pi) - 0.5*log(1 - x^-2). Each pair of zeros on the line adds one wave.
+
+Compute the first 200 zeros yourself in the browser with the Riemann-Siegel Z function, and refine them well. Do not guess any digits from memory. Check the count against the known formula and show a small live check on the page.
+
+A big slider sets the number of waves from 0 to 200, plus a Play button that adds the waves one at a time: slowly at first, then faster. Show each new wave fly in from its own colored line and melt into the curve. As waves are added, the smooth curve must bend, wobble and snap into steps at 2, 3, 4, 5, 7, 8, 9, 11, 13 and so on. Light up each prime number when its step appears. Show the live wave count and the average error against the true staircase, in plain words.
+
+Add a second view, "Break it": a slider that moves ONE pair of zeros off the center line (real part from 0.5 up to 0.95, with its mirror partner at 1 minus that), so people see that one wave grow out of control and ruin the staircase. Say clearly that this is a what-if.
+
+Make it spectacular: black background #070707, glowing orange #FF6E1B and white lines, a little depth, smooth 60 fps, like a science film. Portrait phone layout first (540 by 960), works on a desktop too. Short labels, big text, no scrolling, nothing overlaps. For testing, window.setWaves(n) jumps to n waves and window.getState() returns the zeros, the count, and the curve value at any x.
+
+Test it in a browser, look at screenshots, check the math against a real sieve, and fix what is wrong before you finish.

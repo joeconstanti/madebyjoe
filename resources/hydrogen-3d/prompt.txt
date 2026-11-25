@@ -1,0 +1,11 @@
+Build one file, index.html, in this folder: a voxel world that fills a phone screen held upright (9:16).
+
+The scene: a small floating island in the sky, made of hundreds of tiny blocks. On it: a red and white lighthouse on a cliff, a fishing village with five little houses, a wooden pier, cherry trees, and a waterfall that pours off the edge of the island into the clouds below. Little boats sail slowly in the sky around the island, as if the clouds were the sea.
+
+1. The scene starts on a sunny day. The camera circles the island slowly, the whole island stays in view, and the viewer can drag to turn it and scroll or pinch to zoom.
+2. A button at the bottom says "STORM". It changes the world smoothly over 6 seconds: dark sky, rain, wind in the trees, lightning. Every house window and a string of paper lanterns light up one by one, and the lighthouse beam starts to sweep. Press it again to go back to the day.
+3. A button next to it says "WHALE". A giant voxel whale rises out of the clouds, leaps in an arc over the whole island, and dives back in with a big splash of cloud blocks. It takes about 5 seconds and can be pressed at any time, day or storm.
+
+Make it beautiful: real shadows or convincing light, glow, depth, rich colours, lots of small details. It must run smoothly on a laptop.
+
+Rules: plain HTML, CSS and JavaScript with WebGL in that one file. No libraries, no images, no downloads, no internet. Drive every animation from requestAnimationFrame time. No errors in the console. Do not ask questions. Check your work and stop when index.html is finished.

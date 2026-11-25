@@ -1,0 +1,12 @@
+I want to edit my video before I film it. Work in this folder.
+
+1. Read my script in script.txt. Do not change the words.
+2. Make a free stand-in: a simple drawn presenter with a moving mouth and a label that says STAND-IN, and my computer's built-in voice. Do not use a paid service.
+3. Get the time of every word with Whisper, running on my computer. Save it as draft_words.json: [{"t": word, "s": start, "e": end}].
+4. Plan a cut every two to three seconds. Pick the word each cut starts on. Save the plan as draft_edit.json: {"duration": seconds, "shots": [{"at": seconds, "src": file, ...}]}. Use only clips and images that are in my clips folder. Put a plain placeholder where a clip is missing.
+5. Render the draft as draft.mp4 and show me a list of what I should film.
+6. Stop here and wait. I will watch the draft and ask for changes.
+7. When I add take.mp4, get its word times the same way as new_words.json. Run:
+   python3 swap.py draft_edit.json draft_words.json new_words.json -o new_edit.json --words-out new_captions.json
+   If it stops, tell me which line is missing. Do not guess and do not force it.
+8. Replace the stand-in with take.mp4, use the new edit and captions, and render final.mp4. Then look at a frame from every shot and tell me what you had to fix by hand.

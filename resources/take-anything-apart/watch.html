@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Apart: a mechanical watch</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#f1ece4;--dim:#a39c92;--line:rgba(241,236,228,.16);--gold:#e2b768;--ruby:#ff4a68;--safe:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#0b0a0a;color:var(--ink);font:400 16px/1.5 Jost,Futura,"Avenir Next",system-ui,sans-serif;overflow:hidden;overscroll-behavior:none}
+canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab;opacity:0;transition:opacity 1.1s}
+canvas#c.on{opacity:1}canvas#c.hit{cursor:pointer}canvas#c:active{cursor:grabbing}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:4px}
+.ui{position:fixed;z-index:2;transition:opacity .5s}
+body::before{content:'';position:fixed;z-index:1;inset:0 0 auto;height:120px;pointer-events:none;background:linear-gradient(#0a0908b0,#0a090800)}
+#crumb{top:max(20px,env(safe-area-inset-top));left:24px;right:24px;display:flex;flex-wrap:wrap;gap:0 4px;align-items:center}
+#crumb button{min-height:44px;padding:0 4px;color:var(--dim)}#crumb button:hover{color:var(--ink)}
+#crumb b{font-weight:500;padding:0 4px;line-height:44px}#crumb i{font-style:normal;color:#645f58}
+#card{left:24px;bottom:calc(104px + var(--safe));width:340px;max-height:60vh;overflow:auto;padding:22px 24px;background:rgba(16,14,13,.86);border:1px solid var(--line);border-radius:14px;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .4s,transform .4s,visibility .4s}
+#card.on{opacity:1;visibility:visible;transform:none}
+#card h2{font-weight:400;font-size:26px;line-height:1.15;margin:0 0 8px;letter-spacing:-.005em}
+#card p{margin:0;color:#cdc6bc}
+#card .n{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);display:flex;align-items:baseline;gap:12px}
+#card .n strong{font-weight:300;font-size:38px;line-height:1;color:var(--gold);white-space:nowrap;font-variant-numeric:tabular-nums}
+#card .n span{color:var(--dim);line-height:1.3;font-size:15px}
+#card .sub{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}#card .sub:empty{display:none}
+.chip{border:1px solid var(--line);border-radius:99px;padding:0 14px;min-height:40px;font-size:15px}.chip:hover{border-color:var(--gold)}
+.chip.r{color:#ffb9c5;border-color:rgba(255,74,104,.5)}
+#bar{left:24px;right:24px;bottom:calc(24px + var(--safe));display:flex;gap:18px;align-items:center;max-width:860px;margin:0 auto}
+#bar label{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
+#bar input{flex:1;min-width:0;appearance:none;-webkit-appearance:none;height:44px;background:transparent;margin:0;cursor:pointer}
+#bar input::-webkit-slider-runnable-track{height:2px;background:linear-gradient(90deg,var(--gold) var(--p,0%),rgba(241,236,228,.25) var(--p,0%))}
+#bar input::-moz-range-track{height:2px;background:rgba(241,236,228,.25)}#bar input::-moz-range-progress{height:2px;background:var(--gold)}
+#bar input::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;margin-top:-10px;border-radius:50%;border:0;background:radial-gradient(circle at 35% 30%,#ff8497,#c0112f 55%,#6b0519);box-shadow:0 0 0 3px #12100f,0 0 0 4px #b58a45}
+#bar input::-moz-range-thumb{width:22px;height:22px;border-radius:50%;border:2px solid #b58a45;background:#c0112f}
+#bar output{width:3ch;font-variant-numeric:tabular-nums;color:var(--dim)}
+.btn{min-height:46px;padding:0 20px;border-radius:99px;border:1px solid var(--line);background:rgba(16,14,13,.7);white-space:nowrap}
+.btn:hover{border-color:var(--gold)}.btn[aria-pressed=true]{border-color:var(--gold);color:var(--gold)}
+.btn.p{background:var(--ink);color:#15110c;border-color:var(--ink);font-weight:500}.btn.p:hover{background:#fff}
+#cap{left:0;right:0;bottom:calc(92px + var(--safe));text-align:center;font-weight:300;font-size:clamp(21px,2.6vw,30px);line-height:1.25;padding:0 32px;opacity:0;pointer-events:none;text-shadow:0 1px 18px #000,0 0 4px #000;text-wrap:balance}
+#tip{left:0;top:0;pointer-events:none;font-size:15px;padding:3px 11px;border-radius:99px;background:rgba(16,14,13,.9);border:1px solid var(--line);opacity:0;white-space:nowrap;transition:opacity .15s}
+#dim{inset:0;pointer-events:none;opacity:0}#dim line{stroke:#fff;stroke-width:1.2}#dim text{fill:#fff;font:400 17px Jost,sans-serif;text-anchor:middle;paint-order:stroke;stroke:#000b;stroke-width:4px}
+body.tour #bar label,body.tour #slow,body.tour #crumb{opacity:0;pointer-events:none;visibility:hidden}
+body.tour #bar{justify-content:flex-end;right:24px}
+#err{inset:0;display:none;place-items:center;text-align:center;padding:32px}
+@media(max-width:700px){
+ #card{left:12px;right:12px;width:auto;bottom:calc(128px + var(--safe));padding:16px 18px;max-height:38vh}
+ #card h2{font-size:22px;margin-bottom:4px}#card p{font-size:15.5px;line-height:1.4}#card .n{margin-top:10px;padding-top:10px}#card .n strong{font-size:30px}#card .sub{margin-top:10px}
+ #bar{left:16px;right:16px;bottom:calc(12px + var(--safe));flex-wrap:wrap;gap:2px 10px}#bar label{flex:1 0 100%}.btn{flex:1;min-height:44px}
+ #crumb{left:14px;top:max(8px,env(safe-area-inset-top))}body.tour .btn.p{flex:0 1 auto;margin-left:auto}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+</head>
+<body>
+<canvas id="c" aria-label="Interactive 3D model of a hand-wound mechanical watch"></canvas>
+<nav id="crumb" class="ui" aria-label="Breadcrumb"></nav>
+<section id="card" class="ui" aria-live="polite"></section>
+<div id="cap" class="ui"></div><div id="tip" class="ui"></div>
+<svg id="dim" class="ui" width="100%" height="100%" aria-hidden="true"><line/><line/><line/><text></text></svg>
+<div id="bar" class="ui">
+ <label>Explode<input id="ex" type="range" min="0" max="1" step="0.001" value="0"><output id="exo">0</output></label>
+ <button id="slow" class="btn" aria-pressed="false">Slow motion</button>
+ <button id="tour" class="btn p">Tour</button>
+</div>
+<div id="err" class="ui">This page needs WebGL 2 and a connection to the Three.js CDN.</div>
+<script type="module">
+import * as T from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+
+/* ───────────────────────── 1. CALIBRE ─────────────────────────
+   Units: millimetres. +z = dial side, -z = bridge side, +x = 3 o'clock.
+   Hunter layout (crown at 3, seconds at 6), like a 6498: 18,000 vph, 17 jewels.
+   barrel 78 → centre pinion 12 (6.5 h per barrel turn × 7 turns ≈ 46 h)
+   centre 80 → 10 third 75 → 10 fourth 80 → 8 escape (15 teeth)
+   (80/10)(75/10)=60 ; 80/8=10 ; 10 rev/min ×15×2 = 300 beats/min = 18,000/h
+   motion work: 12→36, 10→40 = 12:1                                        */
+const TAU=Math.PI*2,D2R=Math.PI/180;
+const V=(x,y,z=0)=>new T.Vector3(x,y,z), polar=(r,a)=>[r*Math.cos(a),r*Math.sin(a)];
+const C=[0,0], mB=.2,mC=.13,m3=.12,m4=.11;
+const BA=polar(45*mB,60*D2R), F=[0,-9.4];
+function meet(a,ra,b,rb,s){const dx=b[0]-a[0],dy=b[1]-a[1],d=Math.hypot(dx,dy),k=(ra*ra+d*d-rb*rb)/(2*d),h=Math.sqrt(ra*ra-k*k)*s;return[a[0]+(k*dx-h*dy)/d,a[1]+(k*dy+h*dx)/d]}
+const TH=meet(C,45*mC,F,42.5*m3,1);
+const ER=2.4, EP=ER/Math.cos(30*D2R), PB=3.8, BAL=[-10.2,-6.5];
+const E=meet(F,44*m4,BAL,EP+PB,1);
+const eAng=Math.atan2(BAL[1]-E[1],BAL[0]-E[0]);
+const P=[E[0]+EP*Math.cos(eAng),E[1]+EP*Math.sin(eAng)];
+const CW=[11,0], mR=2*Math.hypot(CW[0]-BA[0],CW[1]-BA[1])/(56+45);
+const MW=polar(24*.13,-25*D2R);
+const LIFT=44*D2R, AMP=270*D2R, ROLL=.73;
+const STEMZ=-2;
+
+/* ───────────────────────── 2. RENDERER, STUDIO ───────────────── */
+const $=id=>document.getElementById(id), canvas=$('c');
+const coarse=matchMedia('(pointer:coarse)').matches;
+let R;
+try{R=new T.WebGLRenderer({canvas,antialias:false,powerPreference:'high-performance'})}catch(e){$('err').style.display='grid';throw e}
+R.toneMapping=T.ACESFilmicToneMapping;R.toneMappingExposure=1.0;
+R.shadowMap.enabled=true;R.shadowMap.type=T.PCFSoftShadowMap;
+const scene=new T.Scene(), cam=new T.PerspectiveCamera(28,1,.2,900);cam.up.set(0,0,1);
+function cv(w,h,f){const c=document.createElement('canvas');c.width=w;c.height=h;f(c.getContext('2d'),w,h);return c}
+{const t=new T.CanvasTexture(cv(512,512,(g,w,h)=>{const r=g.createRadialGradient(w*.5,h*.46,0,w*.5,h*.5,w*.74);r.addColorStop(0,'#5a524b');r.addColorStop(.45,'#332e2b');r.addColorStop(1,'#141211');g.fillStyle=r;g.fillRect(0,0,w,h)}));t.colorSpace=T.SRGBColorSpace;scene.background=t}
+// Softbox studio, baked to an environment map
+{const s=new T.Scene();
+ s.add(new T.Mesh(new T.SphereGeometry(60,32,16),new T.ShaderMaterial({side:T.BackSide,vertexShader:'varying vec3 p;void main(){p=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec3 p;void main(){float h=.5+.5*p.z;gl_FragColor=vec4(mix(vec3(.26,.235,.21),vec3(.2,.2,.21),h),1.);}'})));
+ const soft=(x,y,z,w,h,i,col='#fff')=>{const m=new T.Mesh(new T.PlaneGeometry(w,h),new T.ShaderMaterial({side:T.DoubleSide,transparent:true,uniforms:{c:{value:new T.Color(col).multiplyScalar(i)}},vertexShader:'varying vec2 u;void main(){u=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 u;uniform vec3 c;void main(){vec2 d=smoothstep(0.,.22,u)*smoothstep(0.,.22,1.-u);gl_FragColor=vec4(c,d.x*d.y);}'}));m.position.set(x,y,z);m.lookAt(0,0,0);s.add(m)};
+ soft(-6,26,40,46,20,4.2,'#fffaf2');   // key, above 12 o'clock
+ soft(-42,0,14,9,60,9,'#fff3e2');      // left strip
+ soft(44,10,10,6,56,8,'#e6efff');      // right strip, cool
+ soft(0,-48,22,60,7,3,'#fff');         // low front fill strip
+ soft(10,30,-42,44,14,3,'#fff6ea');soft(0,-24,-44,50,18,1.6,'#fff');    // under key
+ soft(-30,-24,-34,14,40,3.4,'#eaf1ff');  // under side
+ soft(34,-22,-30,7,44,5,'#ffe9cf');
+ const pm=new T.PMREMGenerator(R);scene.environment=pm.fromScene(s,.012,.1,200).texture;pm.dispose()}
+const key=new T.SpotLight('#fff2df',9000,0,.34,.8,2);key.position.set(-36,38,96);key.castShadow=true;
+key.shadow.mapSize.set(coarse?1024:2048,coarse?1024:2048);key.shadow.bias=-.0006;key.shadow.normalBias=.06;key.shadow.camera.near=20;key.shadow.camera.far=240;key.shadow.radius=5;scene.add(key,key.target);
+const rim=new T.DirectionalLight('#bcd3ff',.9);rim.position.set(50,40,-10);scene.add(rim);
+const under=new T.DirectionalLight('#ffe6c4',1.1);under.position.set(-20,-30,-60);scene.add(under);
+
+/* ───────────────────────── 3. MATERIALS ───────────────────────── */
+const tex=(c,rx,ry,srgb)=>{const t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=8;if(srgb)t.colorSpace=T.SRGBColorSpace;return t};
+let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+const streak=cv(512,512,(g,w,h)=>{g.fillStyle='#999';g.fillRect(0,0,w,h);for(let i=0;i<2600;i++){const v=rnd()*255|0;g.fillStyle=`rgba(${v},${v},${v},.16)`;const y=rnd()*h,x=rnd()*w,l=60+rnd()*300;g.fillRect(x,y,l,1);g.fillRect(x-w,y,l,1)}});
+const geneva=cv(512,512,(g,w,h)=>{const n=8,s=w/n;for(let i=0;i<n;i++){const r=g.createLinearGradient(i*s,0,(i+1)*s,0);r.addColorStop(0,'#a2a2a2');r.addColorStop(.06,'#b0b0b0');r.addColorStop(.97,'#fff');r.addColorStop(1,'#a2a2a2');g.fillStyle=r;g.fillRect(i*s,0,s+1,h)}for(let i=0;i<3000;i++){const v=rnd()>.5?255:0;g.fillStyle=`rgba(${v},${v},${v},.05)`;g.fillRect(rnd()*w,rnd()*h,1.2,5+rnd()*26)}});
+const perlage=cv(512,512,(g,w,h)=>{g.fillStyle='#909090';g.fillRect(0,0,w,h);const s=64;for(let y=-1;y<10;y++)for(let x=-1;x<10;x++){const cx=x*s+(y&1?s/2:0),cy=y*s;const q=g.createRadialGradient(cx,cy,2,cx,cy,s*.56);q.addColorStop(0,'#9a9a9a');q.addColorStop(.7,'#a8a8a8');q.addColorStop(.95,'#c8c8c8');q.addColorStop(1,'#7c7c7c');g.fillStyle=q;g.beginPath();g.arc(cx,cy,s*.56,0,TAU);g.fill();g.lineWidth=1;for(let k=4;k<34;k+=3){g.strokeStyle=k%2?'rgba(255,255,255,.16)':'rgba(0,0,0,.16)';g.beginPath();g.arc(cx,cy,k,0,TAU);g.stroke()}}});
+const M=(o)=>new T.MeshPhysicalMaterial({metalness:1,roughness:.2,...o});
+const mat={
+ steel:M({color:'#cfd2d6',roughness:.13}),
+ brushed:M({color:'#c3c6ca',roughness:.5,roughnessMap:tex(streak,3,3),bumpMap:tex(streak,3,3),bumpScale:.25}),
+ arbor:M({color:'#cfd2d8',roughness:.2}),
+ bridge:M({color:'#d2d3d6',roughness:.62,map:tex(geneva,1/17,1/17,true),roughnessMap:tex(geneva,1/17,1/17),bumpMap:tex(geneva,1/17,1/17),bumpScale:.9}),
+ plate:M({color:'#c8c7c6',roughness:.6,roughnessMap:tex(perlage,1/11,1/11),bumpMap:tex(perlage,1/11,1/11),bumpScale:.35}),
+ gold:M({color:'#efbd62',roughness:.32,roughnessMap:tex(streak,.3,.3),bumpMap:tex(streak,.3,.3),bumpScale:.35}),
+ goldB:M({color:'#dba94f',roughness:.42,roughnessMap:tex(streak,.22,.22),bumpMap:tex(streak,.22,.22),bumpScale:.3}),
+ balance:M({color:'#e8bd70',roughness:.14}),
+ rose:M({color:'#e6b08c',roughness:.16}),
+ blue:M({color:'#0d2490',roughness:.2,specularIntensity:.4}),
+ hair:M({color:'#2f5bd6',roughness:.22}),
+ spring:M({color:'#a9b3c4',roughness:.2}),
+ ruby:M({color:'#b80528',metalness:0,roughness:.06,ior:1.76,specularIntensity:1,clearcoat:1,clearcoatRoughness:.04,emissive:'#7a0018',emissiveIntensity:.28}),
+ rubyT:M({color:'#ff3c60',metalness:0,roughness:.03,ior:1.76,transmission:.94,thickness:.25,attenuationColor:'#ff1440',attenuationDistance:.45,specularIntensity:1,emissive:'#8a001c',emissiveIntensity:.2,side:T.FrontSide}),
+ oil:M({color:'#ffcf8a',metalness:0,roughness:.02,transparent:true,opacity:.2,depthWrite:false}),
+ glass:M({color:'#fff',metalness:0,roughness:.02,transparent:true,opacity:.07,envMapIntensity:1.1,depthWrite:false,side:T.FrontSide}),
+ ink:M({color:'#15171c',metalness:.3,roughness:.5}),
+};
+
+/* ───────────────────────── 4. GEOMETRY KIT ───────────────────── */
+// Revolve a closed [r,z] polygon; hard edges stay hard, shallow ones smooth.
+function rev(pr,seg=64){let a=0;const n=pr.length;for(let i=0;i<n;i++){const p=pr[i],q=pr[(i+1)%n];a+=p[0]*q[1]-q[0]*p[1]}if(a<0)pr=pr.slice().reverse();
+ const N=[];for(let i=0;i<n;i++){const p=pr[i],q=pr[(i+1)%n],l=Math.hypot(q[0]-p[0],q[1]-p[1])||1;N.push([(q[1]-p[1])/l,-(q[0]-p[0])/l])}
+ const av=(i,j)=>{const x=N[i],y=N[j];if(x[0]*y[0]+x[1]*y[1]<.8)return x;const s=[x[0]+y[0],x[1]+y[1]],l=Math.hypot(...s);return[s[0]/l,s[1]/l]};
+ const po=[],no=[],uv=[],ix=[];
+ for(let i=0;i<n;i++){const p=pr[i],q=pr[(i+1)%n];if(p[0]<1e-6&&q[0]<1e-6)continue;const n0=av(i,(i+n-1)%n),n1=av(i,(i+1)%n),b=po.length/3;
+  for(let k=0;k<=seg;k++){const u=k/seg*TAU,c=Math.cos(u),s=Math.sin(u);po.push(p[0]*c,p[0]*s,p[1],q[0]*c,q[0]*s,q[1]);no.push(n0[0]*c,n0[0]*s,n0[1],n1[0]*c,n1[0]*s,n1[1]);uv.push(k/seg,i/n,k/seg,(i+1)/n)}
+  for(let k=0;k<seg;k++){const v=b+k*2;ix.push(v,v+2,v+1,v+1,v+2,v+3)}}
+ const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(po,3));g.setAttribute('normal',new T.Float32BufferAttribute(no,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(ix);return g.toNonIndexed()}
+const cyl=(r,z0,z1,seg=40,c)=>{c??=Math.min(.06,r*.2,Math.abs(z1-z0)*.2);if(z0>z1)[z0,z1]=[z1,z0];return rev([[0,z0],[r-c,z0],[r,z0+c],[r,z1-c],[r-c,z1],[0,z1]],seg)};
+const ring=(a,b,z0,z1,seg=72,c)=>{c??=Math.min(.06,(b-a)*.2,Math.abs(z1-z0)*.2);if(z0>z1)[z0,z1]=[z1,z0];return rev([[a+c,z0],[b-c,z0],[b,z0+c],[b,z1-c],[b-c,z1],[a+c,z1],[a,z1-c],[a,z0+c]],seg)};
+const ext=(sh,z0,z1,bev=.04,cs=12,bs=2)=>{const g=new T.ExtrudeGeometry(sh,{depth:Math.max(.001,z1-z0-2*bev),bevelEnabled:bev>0,bevelThickness:bev,bevelSize:bev,bevelOffset:-bev,bevelSegments:bs,curveSegments:cs});g.translate(0,0,z0+bev);return g};
+const at=(g,x,y,z=0)=>g.translate(x,y,z), mg=(...a)=>mergeGeometries(a.flat().map(g=>g.index?g.toNonIndexed():g));
+const hole=(x,y,r)=>{const p=new T.Path();p.absarc(x,y,r,0,TAU,true);return p};
+const poly=pts=>{const s=new T.Shape();pts.forEach((p,i)=>i?s.lineTo(...p):s.moveTo(...p));s.closePath();return s};
+const bar=(a,b,w0,w1=w0)=>{const t=Math.atan2(b[1]-a[1],b[0]-a[0]),s=new T.Shape();s.absarc(a[0],a[1],w0,t+Math.PI/2,t+Math.PI*1.5,false);s.absarc(b[0],b[1],w1,t-Math.PI/2,t+Math.PI/2,false);return s};
+function rpoly(pts){// points [x,y,radius]
+ const s=new T.Shape(),n=pts.length;for(let i=0;i<n;i++){const a=pts[(i+n-1)%n],p=pts[i],b=pts[(i+1)%n],r=p[2]||0;
+ const da=Math.hypot(a[0]-p[0],a[1]-p[1]),db=Math.hypot(b[0]-p[0],b[1]-p[1]),k=Math.min(r,da*.48,db*.48);
+ const A=[p[0]+(a[0]-p[0])/da*k,p[1]+(a[1]-p[1])/da*k],B=[p[0]+(b[0]-p[0])/db*k,p[1]+(b[1]-p[1])/db*k];
+ i?s.lineTo(...A):s.moveTo(...A);if(k>.01)s.quadraticCurveTo(p[0],p[1],...B)}s.closePath();return s}
+const arcPts=(r,a0,a1,n)=>Array.from({length:n+1},(_,i)=>polar(r,(a0+(a1-a0)*i/n)*D2R));
+function gearShape(N,m,pin){const p=TAU/N,rp=m*N/2,ra=rp+(pin?.85:1.0)*m,rd=rp-1.2*m,w=pin?.2:.24,S=[];
+ for(let i=0;i<N;i++){const c=i*p;for(const[o,r]of[[-w-.07,rd],[-w,rp],[-w*.72,rp+(ra-rp)*.62],[-w*.3,ra],[w*.3,ra],[w*.72,rp+(ra-rp)*.62],[w,rp],[w+.07,rd]])S.push(polar(r,c+o*p))}return poly(S)}
+function wheel(N,m,z,th,{spokes=5,rim=.6,hub=.9,w=.42}={}){const s=gearShape(N,m),ro=m*N/2-1.25*m-rim,ri=hub;
+ for(let i=0;i<spokes;i++){const a0=i/spokes*TAU,a1=(i+1)/spokes*TAU,h=new T.Path(),o0=Math.asin(w/2/ro),o1=Math.min(.45,Math.asin(Math.min(.9,w/2/ri)));
+  h.absarc(0,0,ro,a0+o0,a1-o0,false);h.absarc(0,0,ri,a1-o1,a0+o1,true);h.closePath();s.holes.push(h)}
+ return ext(s,z-th/2,z+th/2,.025,14,1)}
+const pinion=(N,m,z0,z1)=>ext(gearShape(N,m,1),z0,z1,.03,6,1);
+function arbor(r,z0,z1,pv=.08){// z0<z1 ; pivots at both ends with conical shoulders
+ const l=.5;return rev([[0,z0],[pv*.7,z0],[pv,z0+pv*.4],[pv,z0+l-.1],[r*.75,z0+l+.05],[r,z0+l+.12],[r,z1-l-.12],[r*.75,z1-l-.05],[pv,z1-l+.1],[pv,z1-pv*.4],[pv*.7,z1],[0,z1]],36)}
+function spiral(r0,r1,turns,z0,z1,th,n){const pos=new Float32Array((n+1)*4*3),ix=[];for(let i=0;i<n;i++)for(let k=0;k<4;k++){const a=i*4+k,b=i*4+(k+1)%4;ix.push(a,a+4,b,b,a+4,b+4)}
+ const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(pos,3));g.setIndex(ix);
+ g.userData.set=(th0,br=0)=>{for(let i=0;i<=n;i++){const s=i/n,a=s*turns*TAU+th0*(1-s),r=r0+(r1-r0)*s+br*Math.sin(s*Math.PI)*(s),c=Math.cos(a),q=Math.sin(a);let o=i*12;for(const[rr,zz]of[[r-th/2,z0],[r+th/2,z0],[r+th/2,z1],[r-th/2,z1]]){pos[o++]=rr*c;pos[o++]=rr*q;pos[o++]=zz}}g.attributes.position.needsUpdate=true};
+ g.userData.set(0);g.computeVertexNormals();g.computeBoundingSphere();return g}
+// screw: head towards -z (bridge side)
+const screw=(x,y,z,r=.95,len=2.6)=>{const s=new T.Shape();s.absarc(0,0,r,0,TAU);const w=r*.14,h=poly([[-r*.98,-w],[r*.98,-w],[r*.98,w],[-r*.98,w]]);s.holes.push(h);
+ const a=rnd()*TAU;return at(mg(ext(s,z-.3,z-.1,.04,20,2),cyl(r*.97,z-.12,z,28),cyl(r*.5,z,z+len,20)).rotateZ(a),x,y)};
+const jewel=(x,y,z0,z1,R_=.6,h=.085,out=-1)=>{// olive hole, oil sink on the outer face
+ const t=z1-z0,k=.3*t;const pr=out<0?[[h,z0+k],[h+.1,z0+k*.55],[.34*R_/.6,z0+.02],[.42*R_/.6,z0],[R_-.04,z0],[R_,z0+.04],[R_,z1-.04],[R_-.04,z1],[h+.07,z1],[h,z1-.06]]:
+ [[h,z1-k],[h+.1,z1-k*.55],[.34*R_/.6,z1-.02],[.42*R_/.6,z1],[R_-.04,z1],[R_,z1-.04],[R_,z0+.04],[R_-.04,z0],[h+.07,z0],[h,z0+.06]];return at(rev(pr,56),x,y)};
+const meshPhase=(a,b,phiA,NA,NB)=>{const al=Math.atan2(b[1]-a[1],b[0]-a[0]),fa=(al-phiA)*NA/TAU;return al+Math.PI-TAU*(.5-fa)/NB};
+
+/* ───────────────────────── 5. PARTS ──────────────────────────── */
+const root=new T.Group();scene.add(root);
+const parts=[],by={};
+const GROUPS={
+ case:['Case','Steel shell, sapphire and seals. It keeps dust and water out and frames the dial.','42 mm','across, without the crown'],
+ face:['Dial and hands','The display. Three hands read three speeds from one gear train.','3','hands: hours, minutes, seconds'],
+ motion:['Motion work','A small reduction train under the dial. It makes the hour hand from the minute hand.','12 : 1','minute hand to hour hand'],
+ wind:['Winding','Turn the crown and this chain tightens the mainspring.','7','barrel turns to wind fully'],
+ power:['Power','A coiled spring in a drum. It is the only energy source in the watch.','46 h','of running time'],
+ train:['Gear train','Three wheels trade force for speed on the way to the escapement.','600 : 1','escape wheel to centre wheel'],
+ esc:['Escapement','It lets the train advance one step at a time and gives each step to the balance as a push.','5','ticks each second'],
+ osc:['Oscillator','Balance and hairspring swing at their own rate. That rate is the time base.','2.5 Hz','full swings each second'],
+ frame:['Plate and bridges','The frame that holds each arbor upright between two jewels.','36 mm','movement diameter'],
+ jewels:['Jewels','Synthetic ruby bearings. Hard, smooth, and they hold oil.','17','rubies in this movement'],
+};
+function part(id,name,g,ex,o,build){const p={id,name,g,ex,desc:o.d,num:o.n,pos:o.pos||[0,0],axis:o.axis||V(0,0,1),el:o.el,az:o.az,fade:1,want:1,mats:[]};
+ p.node=new T.Group();p.spin=new T.Group();p.node.add(p.spin);p.node.position.set(p.pos[0],p.pos[1],0);root.add(p.node);
+ const own=new Map();
+ p.add=(geo,m,o2={})=>{let mm=own.get(m);if(!mm){mm=m.clone();mm.userData={o:m.opacity,t:m.transparent,dw:m.depthWrite};own.set(m,mm);p.mats.push(mm)}const me=new T.Mesh(geo,mm);me.userData.part=p;me.castShadow=!m.transparent;me.receiveShadow=!m.transparent;(o2.to||p.spin).add(me);return me};
+ build(p);parts.push(p);by[id]=p;return p}
+
+/* case */
+part('crystal','Crystal','case',62,{el:42,d:'A domed sapphire window above the dial. Only diamond and a few ceramics scratch it.',n:['9','Mohs hardness. Steel is about 6']},p=>{
+ const pr=[];for(let i=0;i<=14;i++){const r=18*i/14;pr.push([r,5.35-.75*(r/18)**2])}pr.push([18.25,4.4],[18.25,3.5],[17.6,3.5]);for(let i=14;i>=0;i--){const r=17.6*i/14;pr.push([r,4.75-.7*(r/17.6)**2])}
+ p.glass=true;p.add(rev(pr,96),mat.glass).renderOrder=5;
+ p.add(ring(17.9,18.28,3.5,4.5,96),mat.glass)});
+part('bezel','Bezel','case',54,{el:38,d:'The polished ring that presses the crystal onto its gasket.',n:['40 mm','outside diameter']},p=>{p.add(rev([[18.3,3.2],[20.2,3.2],[20.35,3.5],[20.05,4.1],[19.2,4.75],[18.7,4.95],[18.3,4.9]],128),mat.steel)});
+part('case-middle','Case','case',45,{el:34,d:'The body of the watch. The movement drops in from the back, so here the case lifts away from the front.',n:['316L','the marine steel it is cut from']},p=>{
+ p.add(rev([[18.4,-4.9],[19.6,-4.9],[20.6,-4.1],[20.75,-3.6],[20.75,2.3],[20.55,2.8],[20.2,3.2],[18.4,3.2]],128),mat.brushed);
+ p.add(ring(20.5,20.95,2.15,2.45,128),mat.steel);
+ const s=new T.Shape();s.moveTo(13,2.2);s.lineTo(19.2,2.2);s.bezierCurveTo(22.5,1.9,25,-.6,26.2,-4.6);s.lineTo(25.8,-5.5);s.lineTo(24.2,-5.5);s.bezierCurveTo(23,-3.8,21.8,-3.5,20,-3.6);s.lineTo(13,-3.6);s.closePath();
+ for(const sx of[-1,1])for(const sy of[-1,1]){const g=ext(s,-1.2,1.2,.42,20,5);g.applyMatrix4(new T.Matrix4().set(0,0,1,0, 1,0,0,0, 0,1,0,0, 0,0,0,1));if(sy<0)g.rotateZ(Math.PI);g.translate(sx*10.7,0,0);
+  // trim lugs so they begin inside the case wall
+  const a=g.attributes.position;for(let i=0;i<a.count;i++){const x=a.getX(i),y=a.getY(i);const r=Math.hypot(x,y);if(r<19)a.setY(i,Math.sign(y)*Math.sqrt(19*19-x*x))}p.add(g,mat.steel)}
+ p.add(ring(1.2,1.9,20,21.5,40).applyMatrix4(new T.Matrix4().set(0,0,1,0, 1,0,0,0, 0,1,0,STEMZ, 0,0,0,1)),mat.steel)});
+part('case-back','Display back','case',-54,{el:-40,d:'A screwed ring with a second sapphire window, so you can see the bridges run.',n:['5 atm','water pressure rating']},p=>{
+ const s=new T.Shape();s.absarc(0,0,20,0,TAU);s.holes.push(hole(0,0,16.2));for(let i=0;i<6;i++){s.holes.push(hole(...polar(18.6,i/6*TAU+.26),.75))}
+ p.add(ext(s,-5.75,-4.9,.16,96,3),mat.brushed);p.glass=true;p.add(cyl(16.25,-5.55,-5.0,96),mat.glass).renderOrder=5});
+
+/* dial and hands */
+try{await Promise.race([Promise.all([document.fonts.load('500 20px Jost'),document.fonts.load('400 20px Jost')]),new Promise(r=>setTimeout(r,1500))])}catch(e){}
+part('seconds-hand','Seconds hand','face',31,{pos:F,el:50,d:'Pressed on the long front pivot of the fourth wheel. It moves in five small steps each second.',n:['1.2°','for each tick']},p=>{
+ p.add(ext(poly([[-.1,-1.5],[.1,-1.5],[.05,3.9],[-.05,3.9]]),2.86,2.98,.02),mat.blue);p.add(mg(cyl(.34,2.8,3.06,28),at(ring(.16,.36,2.86,2.98,24),0,-1.6)),mat.blue)});
+part('minute-hand','Minute hand','face',28.5,{el:50,d:'A blued steel leaf on the cannon pinion. One lap each hour.',n:['6°','each minute']},p=>{const s=new T.Shape();s.moveTo(-.28,0);s.lineTo(-.16,2);s.bezierCurveTo(-.72,6,-.6,10,0,15.4);s.bezierCurveTo(.6,10,.72,6,.16,2);s.lineTo(.28,0);s.closePath();p.add(ext(s,3.55,3.72,.06,24,2),mat.blue);p.add(mg(ring(.36,.85,3.5,3.78,48)),mat.blue)});
+part('hour-hand','Hour hand','face',26,{el:50,d:'Rides on the tube of the hour wheel, below the minute hand.',n:['0.5°','each minute']},p=>{const s=new T.Shape();s.moveTo(-.36,0);s.lineTo(-.2,1.8);s.bezierCurveTo(-1,4.4,-.85,6.6,0,10);s.bezierCurveTo(.85,6.6,1,4.4,.2,1.8);s.lineTo(.36,0);s.closePath();p.add(ext(s,3.1,3.28,.06,24,2),mat.blue);p.add(ring(.62,1.1,3.05,3.33,48),mat.blue)});
+part('dial','Dial','face',21.5,{el:52,d:'Silvered brass with a sunburst brush and applied rose gold markers. The small dial at 6 counts seconds.',n:['60','minute marks around the edge']},p=>{
+ const sun=n=>{const c=cv(n,n,(g)=>{const im=g.createImageData(n,n);for(let y=0;y<n;y++)for(let x=0;x<n;x++){const dx=x-n/2+.5,dy=-(y-n/2+.5),l=Math.hypot(dx,dy)||1,i=(y*n+x)*4;im.data[i]=127+127*(-dy/l);im.data[i+1]=127+127*(dx/l);im.data[i+2]=255;im.data[i+3]=255}g.putImageData(im,0,0)});return new T.CanvasTexture(c)};
+ const dt=sun(512);dt.repeat.set(1/36,1/36);dt.offset.set(.5,.5);
+ const s=new T.Shape();s.absarc(0,0,17.9,0,TAU);s.holes.push(hole(0,0,.75),hole(F[0],F[1],4.5));
+ p.add(ext(s,2.3,2.62,.03,96,1),M({color:'#d9d5cc',roughness:.34,anisotropy:.8,anisotropyMap:dt,metalness:.92}));
+ const groove=cv(512,512,(g,w)=>{g.fillStyle='#888';g.fillRect(0,0,w,w);for(let r=2;r<256;r+=5){g.strokeStyle=r%2?'#b8b8b8':'#666';g.lineWidth=2.4;g.beginPath();g.arc(256,256,r,0,TAU);g.stroke()}});
+ const gt=tex(groove,1/9.2,1/9.2);gt.offset.set(.5,.5);gt.center.set(0,0);
+ const ss=new T.Shape();ss.absarc(0,0,4.6,0,TAU);ss.holes.push(hole(0,0,.2));
+ p.add(at(ext(ss,2.18,2.38,.02,72,1),...F),M({color:'#d0ccc3',roughness:.4,bumpMap:gt,bumpScale:1.6,metalness:.9}));
+ p.add(at(rev([[4.4,2.6],[4.55,2.66],[4.7,2.62],[4.5,2.4]],80),...F),mat.steel);
+ for(let h=0;h<12;h++){if(h===6)continue;const a=Math.PI/2-h*TAU/12,two=h===0;for(const o of two?[-.5,.5]:[0]){const g=ext(poly([[12.2,-.24],[15.3,-.3],[15.3,.3],[12.2,.24]]),2.6,2.98,.13,4,2);g.translate(0,o,0).rotateZ(a);p.add(g,mat.rose)}}
+ const pr=new T.CanvasTexture(cv(2048,2048,(g,w)=>{g.translate(w/2,w/2);const k=w/36;g.strokeStyle=g.fillStyle='#20242c';
+  for(let i=0;i<60;i++){g.save();g.rotate(i*TAU/60);g.lineWidth=(i%5?.07:.17)*k;g.beginPath();g.moveTo(0,-16.15*k);g.lineTo(0,-17*k);g.stroke();g.restore()}
+  g.lineWidth=.05*k;for(const r of[16.15,17]){g.beginPath();g.arc(0,0,r*k,0,TAU);g.stroke()}
+  g.textAlign='center';g.textBaseline='middle';g.font=`500 ${1.25*k}px Jost,Futura,sans-serif`;try{g.letterSpacing=`${.5*k}px`}catch(e){}g.fillText('APART',.25*k,-7.4*k);
+  g.font=`400 ${.6*k}px Jost,Futura,sans-serif`;try{g.letterSpacing=`${.16*k}px`}catch(e){}g.fillText('HAND WOUND',0,-6.1*k);
+  g.translate(0,9.4*k);for(let i=0;i<60;i++){g.save();g.rotate(i*TAU/60);g.lineWidth=(i%5?.045:.09)*k;g.beginPath();g.moveTo(0,-(i%5?3.95:3.75)*k);g.lineTo(0,-4.25*k);g.stroke();g.restore()}
+  g.font=`400 ${.78*k}px Jost,Futura,sans-serif`;try{g.letterSpacing='0px'}catch(e){}[['60',0,-3.05],['15',3.0,0.04],['30',0,3.1],['45',-3.0,.04]].forEach(([t,x,y])=>g.fillText(t,x*k,y*k))}));
+ pr.colorSpace=T.SRGBColorSpace;pr.anisotropy=8;
+ const pl=p.add(new T.PlaneGeometry(36,36).translate(0,0,2.635),new T.MeshStandardMaterial({map:pr,transparent:true,roughness:.5,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2}));pl.castShadow=false;pl.renderOrder=2;pl.raycast=()=>{}});
+
+/* motion work */
+part('hour-wheel','Hour wheel','motion',17.8,{el:34,d:'Turns on the cannon pinion and carries the hour hand on its tube.',n:['40','teeth, one turn in 12 hours']},p=>{const g=gearShape(40,.1248);g.holes.push(hole(0,0,.62));p.add(ext(g,1.95,2.15,.02,20,1),mat.gold);p.add(ring(.62,.75,2.1,3.2,40),mat.gold)});
+part('minute-wheel','Minute wheel','motion',14.8,{pos:MW,el:34,d:'A go-between. The cannon pinion drives it, and its own pinion drives the hour wheel.',n:['36 / 10','teeth on the wheel and its pinion']},p=>{p.add(wheel(36,.13,1.66,.18,{spokes:4,rim:.35,hub:.7,w:.4}),mat.gold);p.pin=p.add(pinion(10,.1248,1.75,2.2),mat.arbor);p.add(cyl(.22,1.4,2.26,24),mat.arbor)});
+part('cannon-pinion','Cannon pinion','motion',11.5,{el:30,d:'A friction fit on the centre arbor. It slips when you set the time, so the train does not move.',n:['12','leaves, one turn each hour']},p=>{const s=gearShape(12,.13,1);s.holes.push(hole(0,0,.36));p.add(ext(s,1.45,1.85,.02,16,1),mat.arbor);p.add(ring(.36,.58,1.8,3.75,40),mat.arbor)});
+
+/* frame */
+const JB=[['third',TH],['fourth',F],['centre',C]];
+part('mainplate','Mainplate','frame',5,{el:30,d:'The base of the movement. Every arbor has one end here. The overlapping circles are perlage, ground with a spinning peg.',n:['36 mm','across, and 1.4 mm thick']},p=>{
+ const s=new T.Shape();s.absarc(0,0,18,0,TAU);for(const[x,y]of[TH,F,E,P,BAL])s.holes.push(hole(x,y,.6));s.holes.push(hole(0,0,.85),hole(...BA,1.0),hole(8,-13.6,.5),hole(-14,9,.5),hole(13.6,10,.45));
+ p.add(ext(s,0,1.4,.1,96,2),mat.plate);p.add(ring(17.4,18,.5,1,128),mat.steel);p.add(at(cyl(.22,1.2,2.2,20),...MW),mat.arbor)});
+const feet=(a)=>a.map(([x,y])=>at(cyl(1.25,-3.25,0,32),x,y));
+const FB=[[14,7.5],[-8.6,10.4],[-3,14.4]],FT=[[12.6,-9.4],[4.6,-14.2],[-5.2,-14.6]],FC=[[-13.1,3.2]];
+const chaton=(x,y)=>at(ring(.6,.92,-4.14,-3.7,48),x,y);
+part('barrel-bridge','Barrel bridge','frame',-30,{el:-38,d:'Holds the back of the barrel and the centre wheel. The stripes are Geneva waves, cut to catch dust and light.',n:['3','screws hold it down']},p=>{
+ const s=rpoly([...arcPts(17.6,-17,150,40).map((q,i)=>[...q,i===0||i===40?1.4:0]),[-7,4.5,2],[-2.6,-2.1,2.4],[2.8,-2.5,2],[7.8,-5.3,3]]);
+ s.holes.push(hole(0,0,.92),hole(...BA,1.25),hole(15.6,0,.01));s.holes.pop();s.holes.push(poly([[14.5,-1.5],[16.4,-1.5],[16.4,1.5],[14.5,1.5]]));
+ for(const[x,y]of FB)s.holes.push(hole(x,y,1.12));
+ p.add(ext(s,-4.1,-3.2,.14,40,3),mat.bridge);p.add(mg(feet(FB).map(g=>g)),mat.brushed);p.add(chaton(0,0),mat.gold);p.add(at(ring(.9,1.3,-4.12,-3.3,48),...BA),mat.gold)});
+part('train-bridge','Train bridge','frame',-30,{el:-38,d:'One plate that holds the back pivots of the third, fourth and escape wheels.',n:['0.01 mm','the play it must keep at each pivot']},p=>{
+ const s=rpoly([...arcPts(17.6,245,339,30).map((q,i)=>[...q,i===0||i===30?1.4:0]),[8,-6.5,3],[4.3,-3.3,1.6],[.9,-3.1,1.6],[-1,-6.4,1.6],[-3.7,-8.5,1],[-5,-9.05,.6],[-6.1,-10.9,1.2]]);
+ for(const[x,y]of[TH,F,E])s.holes.push(hole(x,y,.92));for(const[x,y]of FT)s.holes.push(hole(x,y,1.12));
+ p.add(ext(s,-4.1,-3.2,.14,30,3),mat.bridge);p.add(mg(feet(FT)),mat.brushed);p.add(mg([TH,F,E].map(q=>chaton(...q))),mat.gold)});
+part('balance-cock','Balance cock','frame',-41,{el:-38,d:'A bridge with one foot. It holds the back pivot of the balance and the stud of the hairspring.',n:['1','screw, so it lifts off alone']},p=>{
+ const s=rpoly([...arcPts(17.6,154,177,10).map(q=>[...q,0]),[-12.7,-.8,2],[-11.9,-7.2,1.5],[-10.2,-8.3,1.6],[-8.5,-7.2,1.5],[-8.1,-1,2],[-7.6,3.2,1.2]]);
+ s.holes.push(hole(...BAL,.92));s.holes.push(hole(...FC[0],1.12));
+ p.add(ext(s,-4.45,-3.6,.14,30,3),mat.bridge);p.add(at(cyl(1.4,-3.65,0,32),...FC[0]),mat.brushed);p.add(at(cyl(.5,-3.65,0,24),-9,1.4),mat.brushed);
+ p.add(at(ring(.6,.92,-4.5,-3.9,48),...BAL),mat.gold);
+ // regulator
+ p.add(ext(bar([BAL[0]+.9,BAL[1]+.8],[BAL[0]+2,BAL[1]+4.2],.3,.12),-4.62,-4.46,.04),mat.steel);p.add(at(ring(.95,1.3,-4.64,-4.46,48),...BAL),mat.steel);
+ p.add(at(cyl(.28,-3.65,-2.95,20),BAL[0]+3.15,BAL[1]+.0),mat.steel);p.add(ext(bar([BAL[0]+1.4,BAL[1]+.4],[BAL[0]+3.15,BAL[1]],.45,.36),-3.95,-3.6,.04),mat.steel)});
+part('pallet-bridge','Pallet bridge','frame',-23,{el:-40,d:'A small cock that holds the back pivot of the pallet fork, below the balance.',n:['2','screws']},p=>{const u=[-Math.sin(eAng),Math.cos(eAng)],a=[P[0]+u[0]*2.5,P[1]+u[1]*2.5],b=[P[0]-u[0]*2.5,P[1]-u[1]*2.5];
+ const s=bar(a,b,.85);s.holes.push(hole(...P,.42));p.add(ext(s,-1.95,-1.6,.06,20,2),mat.brushed);p.add(mg(at(cyl(.7,-1.65,0,28),...a),at(cyl(.7,-1.65,0,28),...b)),mat.brushed);p.add(mg(screw(...a,-1.9,.5,.4),screw(...b,-1.9,.5,.4)),mat.blue);p.add(jewel(...P,-1.94,-1.62,.42,.08),mat.ruby)});
+part('screws','Blued screws','frame',-48,{el:-35,d:'Steel heated until its oxide turns blue, at about 300 °C. The colour also resists rust.',n:['300 °C','for this exact blue']},p=>{
+ p.add(mg([...FB,...FT].map(([x,y])=>screw(x,y,-4.0,1.0,2.8)),FC.map(([x,y])=>screw(x,y,-4.35,1.05,3))),mat.blue)});
+
+/* winding */
+const sx=g=>g.applyMatrix4(new T.Matrix4().set(0,0,1,0, 1,0,0,0, 0,1,0,STEMZ, 0,0,0,1));
+const XA=V(1,0,0);
+part('crown','Crown','wind',14,{axis:XA,el:24,az:-25,d:'The knob you turn. Push for winding, pull to set the time.',n:['30','turns for a full wind, about']},p=>{
+ const s=new T.Shape();const N=36;for(let i=0;i<N*4;i++){const a=i/(N*4)*TAU,r=2.45+[0,.16,.16,0][i%4];i?s.lineTo(...polar(r,a)):s.moveTo(...polar(r,a))}s.closePath();
+ p.add(sx(ext(s,21.8,24.6,.14,8,2)),mat.steel);p.add(sx(rev([[0,24.4],[2.1,24.4],[1.9,24.75],[1.1,25],[0,25.1]],64)),mat.brushed);p.add(sx(cyl(1.15,20.6,21.9,40)),mat.steel)});
+part('stem','Winding stem','wind',9,{axis:XA,el:20,az:-40,d:'The steel rod from the crown into the movement. It pulls straight out sideways, before anything else can leave the case.',n:['1.2 mm','thick']},p=>{p.add(sx(rev([[0,9],[.35,9],[.4,9.2],[.4,11],[.6,11.2],[.6,16.6],[.45,16.7],[.45,17.1],[.6,17.2],[.6,20.6],[0,20.6]],40)),mat.arbor)});
+part('winding-pinion','Winding pinion','wind',5,{axis:XA,el:20,az:-40,d:'Sits on the stem and turns the crown wheel through a right angle.',n:['20','teeth on the face that drives the crown wheel']},p=>{const s=gearShape(20,.19);s.holes.push(hole(0,0,.62));p.add(sx(ext(s,14.8,16.1,.05,20,1)),mat.steel);const c=gearShape(14,.18);c.holes.push(hole(0,0,.62));p.add(sx(ext(c,12.2,13.6,.05,16,1)),mat.steel);p.add(sx(ring(.62,1.0,13.5,14.9,32)),mat.steel)});
+part('crown-wheel','Crown wheel','wind',-36,{pos:CW,el:-36,d:'Carries the turn of the stem across the bridge to the ratchet wheel.',n:['45','teeth']},p=>{const s=gearShape(45,mR);s.holes.push(hole(0,0,.9));p.ph=p.add(ext(s,-4.62,-4.18,.07,24,2),mat.brushed);p.add(ring(.95,2.4,-4.68,-4.58,64),mat.steel);p.add(mg(cyl(.9,-4.6,-3.9,32),screw(0,0,-4.5,1.15,.4)),mat.blue)});
+part('ratchet-wheel','Ratchet wheel','wind',-36,{pos:BA,el:-36,d:'Square on the barrel arbor. It turns when you wind, and a click stops it from running back.',n:['56','teeth']},p=>{const s=gearShape(56,mR);s.holes.push(hole(0,0,.7));p.ph=p.add(ext(s,-4.62,-4.18,.07,24,2),mat.brushed);p.add(ring(1.4,3.9,-4.68,-4.58,80),mat.steel);p.add(screw(0,0,-4.6,1.3,.8),mat.blue)});
+by['ratchet-wheel'].ph.rotation.z=0;by['crown-wheel'].ph.rotation.z=meshPhase(BA,CW,0,56,45);
+
+/* power */
+part('barrel','Mainspring barrel','power',-5,{pos:BA,el:-36,d:'A drum with teeth on its rim. The spring inside pushes it round and it drives the whole watch.',n:['6.5 h','for one turn']},p=>{
+ const s=gearShape(78,mB);s.holes.push(hole(0,0,6.7));p.ph=p.add(ext(s,-1.3,-.9,.04,40,1),mat.gold);
+ p.add(rev([[.8,-.72],[6.9,-.72],[7.2,-.9],[7.2,-2.75],[6.85,-2.75],[6.85,-1],[.8,-1]],96),mat.goldB)});
+part('mainspring','Mainspring','power',-11,{pos:BA,el:-40,d:'A long alloy ribbon, coiled tight. It unwinds from the inside out and its push stays nearly level.',n:['400 mm','long when straight, about']},p=>{p.add(spiral(1.0,6.75,11,-2.6,-1.1,.17,900),Object.assign(mat.spring.clone(),{side:T.DoubleSide}))});
+part('barrel-arbor','Barrel arbor','power',-15.5,{pos:BA,el:-25,d:'The axle the spring hooks onto. Winding turns the arbor, running turns the drum.',n:['1','hook holds the whole load']},p=>{p.add(rev([[0,.9],[.5,.9],[.75,.7],[.75,-.8],[1,-.9],[1,-2.7],[.8,-2.8],[.8,-4],[0,-4]],40),mat.arbor);p.add(at(cyl(.2,-2.1,-1.6,12),.98,0),mat.arbor)});
+part('barrel-lid','Barrel lid','power',-20,{pos:BA,el:-36,d:'Snaps into the drum and keeps the spring flat and its grease clean.',n:['0.2 mm','thick']},p=>{const s=new T.Shape();s.absarc(0,0,6.83,0,TAU);s.holes.push(hole(0,0,.85),hole(4.9,0,.4));p.add(ext(s,-2.95,-2.72,.04,64,1),mat.goldB);p.add(ring(1.2,1.9,-3.02,-2.9,48),mat.gold)});
+
+/* train: phases chain from the centre wheel so the teeth really mesh */
+const ph3=meshPhase(C,TH,0,80,10), ph4=meshPhase(TH,F,0,75,10), phE=meshPhase(F,E,0,80,8), phBar=meshPhase(C,BA,0,12,78);
+by.barrel.ph.rotation.z=phBar;
+part('centre-wheel','Centre wheel','train',-7,{el:-34,d:'In the middle of the watch. Its arbor goes through the dial and carries the minute hand.',n:['1','turn each hour, with 80 teeth']},p=>{p.add(wheel(80,mC,-.42,.24,{rim:.55,hub:1.15,w:.55}),mat.gold);p.add(pinion(12,mB,-1.65,-.65),mat.arbor);p.add(rev([[0,-4],[.18,-4],[.2,-3.5],[.5,-3.3],[.5,.3],[.35,.4],[.35,3.3],[0,3.4]],36),mat.arbor);p.add(cyl(.95,-.7,-.5,32),mat.arbor)});
+part('third-wheel','Third wheel','train',-12,{pos:TH,el:-34,d:'It makes up the speed between the minute and the seconds. It turns the opposite way.',n:['8','turns each hour, with 75 teeth']},p=>{p.add(wheel(75,m3,-1.92,.22,{rim:.5,hub:.85,w:.48}),mat.gold);p.add(pinion(10,mC,-.75,-.12),mat.arbor).rotation.z=ph3;p.add(arbor(.3,-4.05,.45),mat.arbor);p.add(cyl(.62,-1.85,-1.6,28),mat.arbor)});
+part('fourth-wheel','Fourth wheel','train',-17,{pos:F,el:-34,d:'It turns once a minute, so its front pivot carries the seconds hand.',n:['1','turn each minute, with 80 teeth']},p=>{p.add(wheel(80,m4,-2.6,.2,{rim:.48,hub:.75,w:.42}),mat.gold);p.add(pinion(10,m3,-2.25,-1.55),mat.arbor).rotation.z=ph4;p.add(arbor(.3,-4.05,1.0),mat.arbor);p.add(cyl(.12,.8,2.95,20),mat.arbor);p.add(cyl(.55,-2.55,-2.2,28),mat.arbor)});
+
+/* escapement */
+let pivotMark;
+part('escape-wheel','Escape wheel','esc',-13,{pos:E,el:-34,d:'Fifteen club-shaped teeth. Each tooth stops on one ruby stone and pushes it, then does the same on the other.',n:['15','teeth, and 10 turns each minute']},p=>{
+ const s=new T.Shape(),N=15;let k=0;for(let i=0;i<N;i++){const c=i/N*TAU;for(const[a,r]of[[-12.5,.735],[-8.5,.81],[-6.3,.93],[-4.2,1.025],[0,1],[-.6,.965],[-4.6,.82],[-7,.745]]){const q=polar(ER*r,c+a*D2R);k++?s.lineTo(...q):s.moveTo(...q)}}s.closePath();
+ for(let i=0;i<4;i++){const h=new T.Path(),a0=i*TAU/4,a1=a0+TAU/4;h.absarc(0,0,1.45,a0+.12,a1-.12,false);h.absarc(0,0,.6,a1-.3,a0+.3,true);h.closePath();s.holes.push(h)}
+ p.add(ext(s,-1.22,-.98,.02,14,1),mat.arbor);p.add(pinion(8,m4,-2.95,-2.25),mat.arbor).rotation.z=phE;
+ p.add(rev([[0,.36],[.05,.36],[.075,.32],[.075,-.05],[.22,-.2],[.25,-.3],[.25,-3.2],[.22,-3.4],[.09,-3.62],[.07,-3.7],[.065,-4.12],[.045,-4.16],[0,-4.165]],40),mat.arbor);p.add(cyl(.5,-1.5,-1.2,28),mat.arbor);
+ pivotMark=p.add(new T.BoxGeometry(.104,.018,.012).translate(0,0,-4.163),M({color:'#222c44',roughness:.4}));pivotMark.castShadow=false});
+part('pallet-fork','Pallet fork','esc',-16.5,{pos:P,el:-38,d:'An anchor with two ruby stones. It stops the escape wheel, lets one tooth go, and kicks the balance.',n:['10°','its whole swing']},p=>{
+ const g=new T.Group();g.rotation.z=eAng;p.spin.add(g);p.inner=g;const bd=[],st=[];
+ const c30=Math.cos(30*D2R);
+ for(const sg of[-1,1]){const ra=[c30,sg*.5],ta=[-sg*.5,c30],base=[ER*c30-EP,sg*ER/2];// radial, tangent (ccw)
+  const q=(r,t)=>[base[0]+ra[0]*r+ta[0]*t,base[1]+ra[1]*r+ta[1]*t];
+  st.push(ext(poly([q(.06,0),q(-.1,.36),q(.95,.36),q(.95,.0)]),-1.24,-.96,.015,4,1));
+  // pallet arm: two thin claws around the stone and a bar to the hub
+  bd.push(ext(bar(q(.72,.18),[0,0],.36,.42),-1.2,-1.0,.03,10,1),ext(bar(q(.8,.18),q(.45,.18),.34,.28),-1.215,-.985,.03,10,1))}
+ bd.push(ext(bar([0,0],[2.75,0],.3,.17),-1.2,-1.0,.03,10,1),cyl(.5,-1.3,-.9,32));
+ for(const s of[-1,1]){bd.push(ext(poly([[2.6,s*.02],[2.75,s*.28],[3.12,s*.3],[3.3,s*.5],[3.36,s*.46],[3.2,s*.115],[2.85,s*.115]]),-1.2,-1.0,.02,6,1))}
+ p.add(mg(bd),mat.steel,{to:g});p.add(mg(st),mat.ruby,{to:g});p.add(arbor(.2,-1.92,.32,.07),mat.arbor,{to:g})});
+
+/* oscillator */
+part('balance','Balance wheel','osc',-28,{pos:BAL,el:-38,d:'A weighted wheel that swings back and forth. The gold screws on its rim set its inertia.',n:['270°','to each side, in a full swing']},p=>{
+ p.add(ring(4.15,4.85,-2.8,-2.25,120),mat.balance);const ar=[];for(let i=0;i<3;i++)ar.push(ext(bar(polar(.3,i*TAU/3),polar(4.3,i*TAU/3),.42,.26),-2.62,-2.4,.04,8,1));p.add(mg(ar,cyl(.8,-2.75,-2.3,40)),mat.balance);
+ const sc=[];for(let i=0;i<18;i++){const g=cyl(.2,0,.42,14).rotateY(Math.PI/2);g.translate(4.83,0,-2.52).rotateZ((i+.5)/18*TAU);sc.push(g)}p.add(mg(sc),mat.gold);
+ p.add(rev([[0,.5],[.04,.5],[.06,.4],[.07,.0],[.3,-.2],[.35,-1.3],[.35,-2.3],[.4,-2.4],[.4,-3.2],[.22,-3.4],[.07,-3.8],[.06,-4.3],[0,-4.32]],40),mat.arbor);
+ p.add(mg(cyl(.95,-1.56,-1.36,48)),mat.steel);const pa=eAng+Math.PI;p.add(at(cyl(.085,-1.4,-.95,20),...polar(ROLL,pa)),mat.ruby)});
+let hairG;
+part('hairspring','Hairspring','osc',-34,{pos:BAL,el:-40,d:'A spiral thinner than a hair. It breathes with each swing and pulls the balance back to the middle.',n:['0.03 mm','thick in a real watch']},p=>{hairG=spiral(.62,3.15,11,-3.2,-2.95,.06,640);p.add(hairG,Object.assign(mat.hair.clone(),{side:T.DoubleSide,flatShading:true}));p.add(ring(.36,.64,-3.24,-2.92,40),mat.gold);p.add(at(cyl(.16,-3.3,-2.9,16),3.15,0),mat.steel);p.spin.children[1].name='collet'});
+
+/* jewels */
+part('ruby-jewel','Ruby jewel','jewels',-13,{pos:E,el:-46,az:-70,d:'The back bearing of the escape wheel. The steel pivot turns in the hole on a film of oil. It would sit on a fingertip like a grain of sugar. In the open watch it stays on its pivot so you can see it work.',n:['1.2 mm','across. The hole is 0.15 mm']},p=>{p.j=p.add(jewel(0,0,-4.1,-3.74,.6,.075),mat.ruby);p.jMat=p.j.material;
+ p.add(rev([[.066,-4.06],[.12,-4.035],[.105,-4.01],[.076,-3.99],[.066,-3.99]],40),mat.oil);p.j.geometry.computeBoundingBox()});
+part('bridge-jewels','Bridge jewels','jewels',-44,{el:-38,d:'Rubies pressed into gold rings. Each one holds a pivot of the gear train from the back.',n:['2400 HV','hardness, about three times a hard steel pivot']},p=>{p.add(mg(JB.map(([,q])=>jewel(...q,-4.1,-3.74))),mat.ruby)});
+part('balance-jewels','Balance jewels','jewels',-47,{pos:BAL,el:-40,d:'A hole jewel and a flat cap jewel on a spring. If you drop the watch, the spring gives way and the pivot survives.',n:['0.10 mm','pivot diameter']},p=>{p.add(jewel(0,0,-4.3,-4.0),mat.ruby);p.add(cyl(.56,-4.56,-4.36,48),mat.ruby);const t=[];for(let i=0;i<3;i++)t.push(ext(bar(polar(.16,i*TAU/3+.5),polar(.8,i*TAU/3+.5),.06),-4.66,-4.58,.015,6,1));p.add(mg(t,ring(.74,.9,-4.66,-4.5,40),ring(.1,.24,-4.66,-4.58,24)),mat.gold)});
+part('plate-jewels','Plate jewels','jewels',10,{el:34,d:'The front bearings, pressed into the mainplate. They face the jewels in the bridges.',n:['7','of the 17 rubies']},p=>{p.add(mg([TH,F,E,P,BAL,C].map((q,i)=>jewel(...q,.95-.95,.36,q===C?.84:.6,q===C?.4:.085,1)),at(cyl(.56,.52,.72,48),...BAL)),mat.ruby)});
+part('click','Click and spring','wind',-39.5,{pos:[BA[0],BA[1]],el:-38,d:'A small pawl. It is the sound you hear when you wind.',n:['1','tooth holds the full force of the spring']},p=>{const a=118*D2R,c=polar(56*mR/2+1.55,a),tip=polar(56*mR/2+.12,a-.16);p.add(mg(ext(bar(c,tip,.6,.14),-4.55,-4.2,.04,12,1)),mat.steel);p.add(screw(...c,-4.5,.6,.7),mat.blue);
+ const s=[];for(let i=0;i<8;i++){const p0=polar(56*mR/2+1.9,a+.1+i*.06),p1=polar(56*mR/2+1.9,a+.16+i*.06);s.push(ext(bar(p0,p1,.09),-4.4,-4.2,.02,4,1))}p.add(mg(s),mat.blue)});
+// Barrel bridge needs no jewel for its arbor: it turns only when wound.
+
+const maxEx=62;
+for(const p of parts){p.s=.55*(1-Math.min(1,Math.abs(p.ex)/maxEx));if(p.axis===XA)p.s=0;p.e=p.axis===XA?.32:1;
+ const b=new T.Box3().setFromObject(p.node),sp=b.getBoundingSphere(new T.Sphere());p.c0=sp.center.clone();p.r=sp.radius}
+by['ruby-jewel'].c0.set(E[0],E[1],-3.93);by['ruby-jewel'].r=.72;by.dial.r=18;by.dial.c0.set(0,0,2.5);
+const GKEYS=Object.keys(GROUPS);
+
+/* ───────────────────────── 6. THE WATCH RUNS ─────────────────── */
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)), sm=x=>(x=clamp(x),x*x*(3-2*x)), smm=x=>(x=clamp(x),x*x*x*(x*(x*6-15)+10)), lerp=(a,b,t)=>a+(b-a)*t;
+let lag=0,slow=false,slowTour=0;
+const localSec=()=>{const d=new Date();return d.getHours()*3600+d.getMinutes()*60+d.getSeconds()+d.getMilliseconds()/1000};
+function escProfile(f){// recoil on unlocking, impulse, free drop onto the next stone
+ if(f<.2)return -.03*Math.sin(f/.2*Math.PI);if(f<.86)return (f-.2)/.66*.86;return .86+(f-.86)/.14*.14}
+function beat(t){const u=t*5,k=Math.round(u),dir=k%2?-1:1,th=AMP*Math.sin(Math.PI*u),f=clamp((th*dir/(LIFT/2)+1)/2);return{th,f,dir,n:k-1+escProfile(f),phi:5*D2R*(1-2*f)*dir}}
+const tick={};
+function run(t,real){const b=beat(t),q=b.n/5;Object.assign(tick,b,{t});
+ by['escape-wheel'].spin.rotation.z=0;
+ const Z=(id,a)=>by[id].spin.rotation.z=a%TAU;
+ Z('centre-wheel',-q/3600*TAU);Z('barrel',q/3600*TAU*12/78);Z('barrel-lid',q/3600*TAU*12/78);
+ Z('third-wheel',q/3600*8*TAU);Z('fourth-wheel',-q/60*TAU);
+ // escape wheel: teeth keyed to the pallet stones; pinion keyed to the fourth wheel
+ Z('escape-wheel',b.n*12*D2R-30*D2R+eAng);
+ by['pallet-fork'].inner.rotation.z=eAng+b.phi;
+ Z('balance',b.th);hairG.userData.set(b.th,b.th*-.02);by.hairspring.spin.children[1].rotation.z=b.th;
+ const h=beat(real).n/5;
+ Z('seconds-hand',-h/60*TAU);Z('minute-hand',-h/3600*TAU);Z('cannon-pinion',-h/3600*TAU);Z('hour-hand',-h/43200*TAU);Z('hour-wheel',-h/43200*TAU);
+ by['minute-wheel'].spin.rotation.z=(h/3600*TAU/3)%TAU}
+{// Phase the parts whose base angle is not zero
+ const ew=by['escape-wheel'].spin.children[1];ew.rotation.z=phE+30*D2R-eAng;
+ const a0=meshPhase(C,MW,0,12,36);by['minute-wheel'].spin.children[0].rotation.z=a0;by['minute-wheel'].pin.rotation.z=0;
+ by['hour-wheel'].spin.children[0].rotation.z=meshPhase(MW,C,0,10,40)}
+
+/* ───────────────────────── 7. EXPLODE AND FADE ───────────────── */
+let explode=0;let seat=0;const offs=(p,e)=>{let o=p.ex*smm((e-p.s)/(p.e-p.s));return seat&&p.id==='pallet-fork'?lerp(o,by['escape-wheel'].ex*smm((e-by['escape-wheel'].s)/(1-by['escape-wheel'].s)),seat):o};
+function setExplode(e){explode=e;for(const p of parts){const o=offs(p,e);p.node.position.set(p.pos[0]+p.axis.x*o,p.pos[1]+p.axis.y*o,p.axis.z*o)}}
+const anchor=(p,e=explode,v=V(0,0,0))=>v.copy(p.c0).addScaledVector(p.axis,offs(p,e));
+let focusSet=null;// Set of part ids shown fully
+function applyFade(dt,hard){for(const p of parts){p.want=!focusSet||focusSet.has(p.id)?1:(p.glass?0:explode<.7?.016:.035);
+ p.fade=hard?p.want:lerp(p.fade,p.want,1-Math.exp(-dt*5));const f=Math.abs(p.fade-p.want)<.004?p.fade=p.want:p.fade,solid=f>.995;
+ p.node.visible=f>.008;for(const m of p.mats){const tr=m.userData.t||!solid;if(m.transparent!==tr){m.transparent=tr;m.needsUpdate=true}m.opacity=m.userData.o*f;m.depthWrite=(m.userData.dw||(p.glass&&m.userData.t&&explode>.2))&&f>.5}
+ p.node.traverse(o=>{if(o.isMesh&&o.userData.cs===undefined)o.userData.cs=o.castShadow;if(o.isMesh)o.castShadow=o.userData.cs&&f>.6})}}
+
+/* ───────────────────────── 8. CAMERA ─────────────────────────── */
+const ctl=new OrbitControls(cam,canvas);ctl.enableDamping=true;ctl.dampingFactor=.07;ctl.enablePan=false;ctl.minPolarAngle=.04;ctl.maxPolarAngle=Math.PI-.04;ctl.rotateSpeed=.75;ctl.zoomSpeed=.8;
+let W=1,H=1;
+const fitD=(w,h)=>{const t=Math.tan(cam.fov*D2R/2);return Math.max(h/t,w/(t*W/H))};
+function overview(e){const s=sm(e);const portrait=W/H<.8;return{tg:V(lerp(portrait?1.5:0,5,s),0,lerp(-.4,3.2,s)),az:lerp(-90,-62,s),el:lerp(62,15,s),d:fitD(lerp(portrait?27.5:29.5,portrait?38:42,s),lerp(31,portrait?82:78,s))}}
+const dirOf=(az,el)=>V(Math.cos(el*D2R)*Math.cos(az*D2R),Math.cos(el*D2R)*Math.sin(az*D2R),Math.sin(el*D2R));
+function getPose(){const o=cam.position.clone().sub(ctl.target),d=o.length();return{tg:ctl.target.clone(),d,az:Math.atan2(o.y,o.x)/D2R,el:Math.asin(clamp(o.z/d,-1,1))/D2R}}
+function setPose(p){cam.position.copy(dirOf(p.az,clamp(p.el,-87,87))).multiplyScalar(p.d).add(p.tg);ctl.target.copy(p.tg);cam.lookAt(p.tg)}
+function partPose(p){const front=p.axis===XA?false:p.c0.z>.5;return{tg:anchor(p),az:p.az??-76,el:p.el??(front?42:-36),d:p.id==='ruby-jewel'?fitD(1.35,1.35):fitD(p.r*1.12,p.r*1.22)}}
+function groupPose(ids){const b=new T.Box3();for(const i of ids){const p=by[i],a=anchor(p);b.expandByPoint(a.clone().addScalar(p.r*.8));b.expandByPoint(a.clone().addScalar(-p.r*.8))}const s=b.getBoundingSphere(new T.Sphere());let el=ids.reduce((k,i)=>k+(by[i].el||0),0)/ids.length;el=clamp(el,-36,36);if(explode>.4)el*=.6;return{tg:s.center,az:-72,el,d:fitD(s.radius*1.05,s.radius*1.05)}}
+let fly=null;const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function flyTo(get,dur=1.7){const a=getPose();if(reduced)dur=.01;fly={a,get,t:0,dur};ctl.enabled=false}
+function mixPose(a,b,k){let da=((b.az-a.az+540)%360)-180;return{tg:a.tg.clone().lerp(b.tg,k),az:a.az+da*k,el:lerp(a.el,b.el,k),d:Math.exp(lerp(Math.log(a.d),Math.log(b.d),k))}}
+
+/* ───────────────────────── 9. FOCUS, CARD, BREADCRUMB ────────── */
+let focus=null,lastAnchor=null;// {type:'part'|'group',id}
+const jewelParent=by['escape-wheel'];
+const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n};
+function chain(){if(!focus)return[];if(focus.type==='group')return[focus];const p=by[focus.id];if(p.id==='ruby-jewel')return[{type:'group',id:'esc'},{type:'part',id:'escape-wheel'},focus];return[{type:'group',id:p.g},focus]}
+const nm=f=>f.type==='group'?GROUPS[f.id][0]:by[f.id].name;
+function drawUI(){const c=$('crumb');c.replaceChildren();const ch=chain(),all=[null,...ch];
+ if(ch.length)all.forEach((f,i)=>{if(i)c.append(el('i','','›'));const name=f?nm(f):'Watch';if(i===all.length-1){const b=el('b','',name);b.setAttribute('aria-current','page');c.append(b)}else{const b=el('button','',name);b.onclick=()=>setFocus(f);c.append(b)}});
+ const k=$('card');k.classList.toggle('on',!!focus&&!tour);if(!focus)return;
+ const g=focus.type==='group',p=g?null:by[focus.id],G=g?GROUPS[focus.id]:null;k.replaceChildren();
+ k.append(el('h2','',g?G[0]:p.name),el('p','',g?G[1]:p.desc));const n=el('div','n');n.append(el('strong','',g?G[2]:p.num[0]),el('span','',g?G[3]:p.num[1]));k.append(n);
+ const s=el('div','sub');const chip=(t,f,r)=>{const b=el('button','chip'+(r?' r':''),t);b.onclick=()=>setFocus(f);s.append(b)};
+ if(g)parts.filter(q=>q.g===focus.id).forEach(q=>chip(q.name,{type:'part',id:q.id},q.id==='ruby-jewel'));
+ else if(p.id==='escape-wheel')chip('Go down to its ruby jewel',{type:'part',id:'ruby-jewel'},1);
+ k.append(s);k.scrollTop=0}
+function shown(f){if(!f)return null;if(f.type==='group')return new Set(parts.filter(p=>p.g===f.id).map(p=>p.id));if(f.id==='ruby-jewel')return new Set(['ruby-jewel','escape-wheel']);if(f.id==='hairspring')return new Set(['hairspring']);if(f.id==='escape-wheel')return new Set([f.id,'ruby-jewel']);return new Set([f.id])}
+function setFocus(f,hard){if(tour)stopTour(true);focus=f;focusSet=shown(f);lastAnchor=null;
+ const get=()=>!f?overview(explode):f.type==='group'?groupPose([...shown(f)]):partPose(by[f.id]);
+ if(hard){fly=null;ctl.enabled=true;setPose(get())}else flyTo(get,f&&f.id==='ruby-jewel'?2.6:1.7);drawUI()}
+const focusCenter=()=>focus?(focus.type==='group'?groupPose([...shown(focus)]).tg:anchor(by[focus.id])):null;
+$('ex').addEventListener('input',e=>{const v=+e.target.value;if(tour)stopTour(true);if(fly){fly=null;ctl.enabled=true}userExplode(v)});
+function userExplode(v){const prev=explode;setExplode(v);syncEx();
+ if(!focus){const a=overview(prev),b=overview(v),p=getPose();setPose({tg:p.tg.add(b.tg.clone().sub(a.tg)),az:p.az+b.az-a.az,el:p.el+b.el-a.el,d:p.d*b.d/a.d})}
+ else{const b=focusCenter(),p=getPose(),d=b.clone().sub(p.tg);if(focus.type==='group'){const g=groupPose([...shown(focus)]);p.d=g.d}setPose({...p,tg:p.tg.add(d)})}}
+function syncEx(){const i=$('ex');i.value=explode;i.style.setProperty('--p',explode*100+'%');$('exo').textContent=Math.round(explode*100)}
+$('slow').onclick=()=>{slow=!slow;$('slow').setAttribute('aria-pressed',slow)};
+$('tour').onclick=()=>tour?stopTour(true):startTour();
+addEventListener('keydown',e=>{if(e.key==='Escape'){if(tour)stopTour(true);else if(focus){const c=chain();setFocus(c[c.length-2]||null)}}});
+
+const ray=new T.Raycaster(),mp=new T.Vector2();let down=null;
+function pick(e){mp.set(e.clientX/W*2-1,1-e.clientY/H*2);ray.setFromCamera(mp,cam);const hs=ray.intersectObjects(root.children,true).filter(h=>h.object.userData.part&&h.object.userData.part.node.visible);
+ const solid=h=>{const p=h.object.userData.part;return p.fade>.5&&!(p.glass&&h.object.material.userData.t)};
+ const a=hs.filter(h=>h.object.userData.part.fade>.5);const s=a.find(solid),g=a[0];let h=g;if(s&&g&&g!==s&&s.distance-g.distance<9)h=s;
+ return(h||(focus?null:hs[0]))?.object.userData.part||null}
+canvas.addEventListener('pointerdown',e=>{if(tour){stopTour(true);down=null;return}if(fly){fly=null;ctl.enabled=true}down={x:e.clientX,y:e.clientY,t:performance.now(),id:e.pointerId,n:(down?.n||0)+1}});
+canvas.addEventListener('pointerup',e=>{if(!down)return;const mv=Math.hypot(e.clientX-down.x,e.clientY-down.y),ok=mv<8&&performance.now()-down.t<500&&e.pointerId===down.id;down=null;if(!ok)return;const p=pick(e);if(p&&!(focus&&focus.id===p.id))setFocus({type:'part',id:p.id})});
+canvas.addEventListener('wheel',()=>{if(tour)stopTour(true);if(fly){fly=null;ctl.enabled=true}},{passive:true});
+let hov=0;canvas.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||tour||e.buttons)return $('tip').style.opacity=0;const n=performance.now();if(n-hov<60)return;hov=n;const p=pick(e);canvas.classList.toggle('hit',!!p);const t=$('tip');t.style.opacity=p?1:0;if(p){t.textContent=p.name;t.style.transform=`translate(${Math.min(e.clientX+14,W-160)}px,${Math.max(e.clientY-34,4)}px)`}});
+canvas.addEventListener('pointerleave',()=>$('tip').style.opacity=0);
+
+/* ───────────────────────── 10. TOUR, 40 s ────────────────────── */
+let tour=null;
+const at2=(id,dx=0,dy=0,dz=0)=>()=>anchor(by[id]).add(V(dx,dy,dz));
+const mid=(...ids)=>()=>{const v=V(0,0,0);ids.forEach(i=>v.add(anchor(by[i])));return v.divideScalar(ids.length)};
+const ov=(f)=>()=>overview(explode)[f];
+const K=()=>{const o0=overview(0),o1=overview(1);return[
+ {t:0,  tg:()=>overview(0).tg,az:-90,el:62,d:o0.d*.98},
+ {t:4,  tg:()=>V(0,-1,2),az:-104,el:40,d:fitD(17,17)},
+ {t:8,  tg:()=>overview(explode).tg,az:-84,el:26,d:lerp(o0.d,o1.d,.5)},
+ {t:13, tg:()=>overview(1).tg,az:-58,el:11,d:o1.d*1.06},
+ {t:16, tg:()=>overview(1).tg,az:-46,el:8,d:o1.d*1.06},
+ {t:19.4,tg:mid('barrel','mainspring'),az:-66,el:-24,d:fitD(17,17)},
+ {t:21.8,tg:mid('centre-wheel','third-wheel'),az:-84,el:-30,d:fitD(11.5,11.5)},
+ {t:24,tg:mid('third-wheel','fourth-wheel'),az:-100,el:-30,d:fitD(9.5,9.5)},
+ {t:26.6,tg:mid('escape-wheel','pallet-fork'),az:-112,el:-38,d:fitD(5.4,5.4)},
+ {t:29,tg:mid('escape-wheel','pallet-fork'),az:-100,el:-44,d:fitD(4.6,4.6)},
+ {t:31.6,tg:at2('ruby-jewel'),az:-78,el:-46,d:fitD(1.3,1.3)},
+ {t:34,tg:at2('ruby-jewel'),az:-68,el:-47,d:fitD(1.15,1.15)},
+ {t:35.3,tg:at2('ruby-jewel'),az:-66,el:-24,d:fitD(16,16)},
+ {t:37,tg:()=>overview(explode).tg,az:-68,el:14,d:lerp(o0.d,o1.d,.75)},
+ {t:40, tg:()=>overview(0).tg,az:-90,el:62,d:o0.d}]};
+const CAPS=[[.6,4.6,'A watch with no battery'],[6.2,10.6,'Crown, crystal, hands, dial: each part leaves the way it went in'],[12,16,'45 parts shown, on one axis'],[17.6,20.4,'The mainspring stores 46 hours'],[20.8,23,'The centre wheel turns once an hour'],[23.3,25.4,'The fourth wheel turns once a minute'],[25.8,30,'The pallet fork lets one tooth go, five times a second'],[31.2,34.4,'It all turns in rubies like this one, 1.2 mm wide'],[36.4,39.2,'And back together']];
+CAPS[2][2]=parts.length+' parts on their assembly axes';
+function hermite(ks,f,t){let i=0;while(i<ks.length-2&&t>ks[i+1].t)i++;const x=ks.map(f),sl=j=>(x[j+1]-x[j])/(ks[j+1].t-ks[j].t);
+ const tan=j=>{if(j<=0||j>=ks.length-1)return 0;const a=sl(j-1),b=sl(j);if(a*b<=0)return 0;const h0=ks[j].t-ks[j-1].t,h1=ks[j+1].t-ks[j].t,w1=2*h1+h0,w2=h1+2*h0;return(w1+w2)/(w1/a+w2/b)};
+ const h=ks[i+1].t-ks[i].t,u=clamp((t-ks[i].t)/h),u2=u*u,u3=u2*u;return(2*u3-3*u2+1)*x[i]+(u3-2*u2+u)*h*tan(i)+(-2*u3+3*u2)*x[i+1]+(u3-u2)*h*tan(i+1)}
+const tourExplode=t=>t<4.5?0:t<14?sm((t-4.5)/9.5):t<35?1:1-sm((t-35)/4.5);
+const DIVE=new Set(parts.filter(p=>['power','train','esc','osc'].includes(p.g)||p.id==='ruby-jewel').map(p=>p.id));
+const ESCS=new Set(['escape-wheel','pallet-fork','fourth-wheel','balance','ruby-jewel']);const JS=new Set(['escape-wheel','ruby-jewel']);
+function startTour(){focus=null;fly=null;drawUI();tour={t:0,k:K()};ctl.enabled=false;document.body.classList.add('tour');$('tour').textContent='Stop tour';slow=false;$('slow').setAttribute('aria-pressed',false);$('card').classList.remove('on');$('tip').style.opacity=0}
+function stopTour(user){tour=null;seat=0;setExplode(explode);focusSet=shown(focus);document.body.classList.remove('tour');$('tour').textContent='Tour';$('cap').style.opacity=0;slowTour=0;syncEx();if(user){flyTo(()=>overview(explode),1.4)}else{setExplode(0);syncEx();setPose(overview(0));ctl.enabled=true}}
+function stepTour(dt){if(!tour.hold)tour.t+=dt;const t=Math.min(40,tour.t);seat=sm((t-24)/2.4)*(1-sm((t-31.2)/2));setExplode(tourExplode(t));
+ const ks=tour.k,tg=ks.map(k=>k.tg()),ix=new Map(ks.map((k,i)=>[k,i]));
+ setPose({tg:V(hermite(ks,k=>tg[ix.get(k)].x,t),hermite(ks,k=>tg[ix.get(k)].y,t),hermite(ks,k=>tg[ix.get(k)].z,t)),az:hermite(ks,k=>k.az,t),el:hermite(ks,k=>k.el,t),d:Math.exp(hermite(ks,k=>Math.log(k.d),t))});
+ focusSet=t<17||t>34.5?null:t<25.4?DIVE:t<30.2?ESCS:JS;slowTour=sm((t-25.2)/1.2)*(1-sm((t-30.2)/1));
+ const c=CAPS.find(c=>t>=c[0]&&t<=c[1]),n=$('cap');if(c){if(n.textContent!==c[2])n.textContent=c[2];n.style.opacity=1}else n.style.opacity=0;
+ if(tour.t>=40)stopTour(false)}
+
+/* ───────────────────────── 11. LENS: depth of field, grade ───── */
+let rt;const post=new T.ShaderMaterial({depthTest:false,depthWrite:false,uniforms:{tD:{value:null},tZ:{value:null},res:{value:new T.Vector2()},near:{value:cam.near},far:{value:cam.far},fd:{value:50},ap:{value:.01},mx:{value:12},time:{value:0},on:{value:1}},
+vertexShader:'varying vec2 u;void main(){u=uv;gl_Position=vec4(position.xy,0.,1.);}',
+fragmentShader:`varying vec2 u;uniform sampler2D tD;uniform sampler2D tZ;uniform vec2 res;uniform float near,far,fd,ap,mx,time,on;
+float Z(vec2 p){float d=texture2D(tZ,p).x;return near*far/(far-d*(far-near));}
+float coc(float z){return clamp(ap*(z-fd)/z*res.y,-mx,mx);}
+float hash(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
+void main(){vec3 c=texture2D(tD,u).rgb;
+ if(on>.5){float z0=texture2D(tZ,u).x;float z=Z(u);float c0=abs(coc(z));vec3 s=min(c,vec3(4.));float w=1.;float a0=hash(gl_FragCoord.xy)*6.2832;
+  for(int i=1;i<=28;i++){float f=float(i);float r=sqrt(f/28.)*mx;float a=a0+f*2.39996;vec2 q=u+vec2(cos(a),sin(a))*r/res;float zq=Z(q);float cq=abs(coc(zq));
+   float k=zq>z+.02*z?min(cq,c0):cq; float m=smoothstep(r-1.5,r+.5,k);vec3 sc=min(texture2D(tD,q).rgb,vec3(4.));if(z0>.99999&&texture2D(tZ,q).x>.99999)sc=c;s+=sc*m;w+=m;}
+  c=s/w;}
+ vec2 v=u-.5;c*=1.-dot(v,v)*.75;
+ gl_FragColor=vec4(c,1.);
+ #include <tonemapping_fragment>
+ #include <colorspace_fragment>
+ gl_FragColor.rgb+=(hash(gl_FragCoord.xy+fract(time)*61.)-.5)*.018;}`});
+post.toneMapped=true;
+const pScene=new T.Scene(),pCam=new T.OrthographicCamera(-1,1,1,-1,0,1);const q=new T.Mesh(new T.PlaneGeometry(2,2),post);q.frustumCulled=false;pScene.add(q);
+let pr=Math.min(devicePixelRatio||1,coarse?1.75:2),dof=true;
+function resize(){W=innerWidth;H=innerHeight;const px=Math.min(pr,Math.sqrt((coarse?2.6e6:4.2e6)/(W*H)));R.setPixelRatio(px);R.setSize(W,H,false);const w=Math.round(W*px),h=Math.round(H*px);
+ rt?.depthTexture?.dispose();rt?.dispose();rt=new T.WebGLRenderTarget(w,h,{type:T.HalfFloatType,samples:4,depthTexture:new T.DepthTexture(w,h,T.UnsignedIntType)});
+ post.uniforms.tD.value=rt.texture;post.uniforms.tZ.value=rt.depthTexture;post.uniforms.res.value.set(w,h);cam.aspect=W/H;cam.updateProjectionMatrix()}
+let vo=[0,0];
+function viewOffset(dt){let x=0,y=0;if(focus&&!tour){if(W<=700)y=.15;else if(W/H<1.35){x=-.1;y=.07}else x=-.1}else if(!tour)y=W<=700?.04:.025;else if(tour)y=.02;
+ const k=1-Math.exp(-dt*4);vo=[lerp(vo[0],x,k),lerp(vo[1],y,k)];cam.setViewOffset(W,H,vo[0]*W,vo[1]*H,W,H)}
+let rw;addEventListener('resize',()=>{const a=overview(explode).d;resize();const p=getPose();const b=overview(explode).d;if(!focus&&!tour&&!fly)setPose({...p,d:p.d*b/a});if(focus)setFocus(focus,true);if(tour)tour.k=K()});
+
+/* ───────────────────────── 12. LOOP ──────────────────────────── */
+let last=performance.now(),apS=.006,slowN=0,frames=0,fT=0,fps=60;
+const jwl=by['ruby-jewel'];const proj=V(0,0,0);
+const rubyHero=mat.rubyT.clone();rubyHero.userData={o:1,t:false,dw:true};
+function dimLine(){const on=focus&&focus.id==='ruby-jewel'&&!fly||(tour&&tour.t>31.4&&tour.t<34.3);$('dim').style.opacity=on?1:0;if(!on)return;
+ cam.updateMatrixWorld();const c=anchor(jwl);const right=V(1,0,0).applyQuaternion(cam.quaternion);const a=c.clone().addScaledVector(right,-.6).project(cam),b=c.clone().addScaledVector(right,.6).project(cam),dn=c.clone().addScaledVector(V(0,1,0).applyQuaternion(cam.quaternion),-.62).project(cam);
+ const X=n=>(n.x*.5+.5)*W,Y=n=>(-n.y*.5+.5)*H,x0=X(a),x1=X(b),y=Y(dn)+14;const L=$('dim').querySelectorAll('line');[[x0,y,x1,y],[x0,y-6,x0,y+6],[x1,y-6,x1,y+6]].forEach((v,i)=>['x1','y1','x2','y2'].forEach((k,j)=>L[i].setAttribute(k,v[j])));const t=$('dim').querySelector('text');t.setAttribute('x',(x0+x1)/2);t.setAttribute('y',y+24);t.textContent='1.2 mm'}
+function frame(now){requestAnimationFrame(frame);const raw=(now-last)/1000;last=now;const dt=Math.min(.1,Math.max(0,raw));
+ const sl=slow?1:slowTour;if(sl>.001)lag+=dt*sl*(1-1/14);else lag*=Math.exp(-dt*1.6);if(lag<.002&&sl<=.001)lag=0;
+ const real=localSec();run(real-lag,real);
+ if(tour)stepTour(Math.min(raw,.25));else if(fly){fly.t+=dt;const k=smm(fly.t/fly.dur);setPose(mixPose(fly.a,fly.get(),k));if(fly.t>=fly.dur){fly=null;ctl.enabled=true}}else ctl.update();
+ applyFade(dt);viewOffset(dt);
+ const hero=(focus&&focus.id==='ruby-jewel')||(tour&&tour.t>30.2&&tour.t<34.9);
+ jwl.j.material=hero&&jwl.fade>.95?rubyHero:jwl.jMat;
+ const d=cam.position.distanceTo(ctl.target);ctl.minDistance=1.6;ctl.maxDistance=overview(1).d*1.25;
+ cam.near=clamp(d*.06,.06,4);cam.far=d*4+260;cam.updateProjectionMatrix();post.uniforms.near.value=cam.near;post.uniforms.far.value=cam.far;
+ key.target.position.copy(ctl.target);
+ const macro=1-sm((Math.log(d)-Math.log(8))/(Math.log(120)-Math.log(8)));apS=lerp(apS,lerp(.006,.02,macro),1-Math.exp(-dt*4));
+ post.uniforms.fd.value=d-(focus?.0:0);post.uniforms.ap.value=apS;post.uniforms.mx.value=Math.min(16,rt.height*.011);post.uniforms.time.value=now/1000%10;post.uniforms.on.value=dof?1:0;
+ R.setRenderTarget(rt);R.render(scene,cam);R.setRenderTarget(null);R.render(pScene,pCam);dimLine();
+ frames++;fT+=raw;if(fT>1){fps=frames/fT;if(now>6000&&fps<38&&!document.hidden){if(++slowN>=2){slowN=0;if(pr>1.01)pr=Math.max(1,pr*.75),resize();else if(dof)dof=false;else if(R.shadowMap.enabled){key.castShadow=false}}}else slowN=0;frames=0;fT=0}}
+document.addEventListener('visibilitychange',()=>{last=performance.now();frames=0;fT=0});
+
+/* ───────────────────────── 13. START ─────────────────────────── */
+resize();const qs=new URLSearchParams(location.search);
+{const e=parseFloat(qs.get('explode'));setExplode(Number.isFinite(e)?clamp(e):0);syncEx();setPose(overview(explode));drawUI();
+ const id=qs.get('part');if(id&&by[id]){setFocus({type:'part',id},true);applyFade(0,true)}
+ else if(id&&GROUPS[id]){setFocus({type:'group',id},true);applyFade(0,true)}}
+run(localSec(),localSec());
+if(qs.get('tour')==='1')startTour();
+last=performance.now();requestAnimationFrame(t=>{last=t;frame(t);canvas.classList.add('on')});
+window.__apart={parts,by,get explode(){return explode},get fps(){return fps},get pr(){return pr},get dof(){return dof},tick,cam,seek(t,hold){if(!tour)startTour();tour.t=t;tour.hold=!!hold},get tour(){return tour&&tour.t},get focus(){return focus},project(id){cam.updateMatrixWorld();const v=anchor(by[id]).project(cam);return[(v.x*.5+.5)*W,(-v.y*.5+.5)*H]},R};
+</script>
+</body>
+</html>

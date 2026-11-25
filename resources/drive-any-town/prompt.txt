@@ -1,0 +1,11 @@
+Build me a driving game of any real place on Earth. One file: index.html. Three.js from a CDN, no build step, no API keys.
+
+1. Start screen: a search box. I type a place ("Deddington, England" or "Lombard Street, San Francisco"). Find it with OpenStreetMap Nominatim.
+2. Get the real roads, buildings, trees, water and parks within about 700 m from the Overpass API (use a fallback server if the first one fails). Use real building heights when the tags have them. Get the real hills from the free AWS Terrarium elevation tiles.
+3. Build the world in 3D: terrain, roads that follow the hills, buildings with believable walls, windows and roofs, lots of trees, and water. Golden-hour sun, soft shadows, sky, distance haze.
+4. Put me in an original red hatchback on the nearest road, facing along it. Arrow keys or WASD, space for handbrake, a smooth chase camera, C to change camera, R to reset. Weight, suspension lean, brake lights, tyre smoke on a slide. The car must hit buildings, not drive through them. It must sit on the road, never under it.
+5. Show speed in mph, the name of the street I am on, and a round minimap with real roads. Press N for day or night with headlights and lit windows.
+6. The page must also take a URL like index.html?q=Deddington,+England so I can share a place, and show "Map data © OpenStreetMap contributors".
+7. Make it look like something people will not believe came from one prompt. It must hold 60 fps on a laptop.
+
+Serve it locally, test it in a real browser with Playwright on two different places, look at the screenshots, and fix what looks wrong before you say it is done.

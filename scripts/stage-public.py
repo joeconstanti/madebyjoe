@@ -9,6 +9,19 @@ AUDIT = 'clients/audits'
 SPORTED_ASSETS = f'{AUDIT}/sported-assets'
 FILES = (
     '.htaccess', 'index.html', 'archive.html', 'makersclub.html', '404.html', 'robots.txt', 'sitemap.xml',
+    'resources/index.html',
+    'resources/resources.css',
+    *(f'resources/{slug}/{name}'
+      for slug, files in (
+          ('take-anything-apart', ('watch.html', 'camera.html', 'prompt-watch.txt',
+                                   'prompt-camera.txt', 'prompt-template.txt')),
+          ('drive-any-town', ('anyroad.html', 'prompt.txt')),
+          ('muse-uk', ('muse-uk-starter-sheet.html', 'muse-uk-starter-sheet.pdf', 'prompts.txt')),
+          ('edit-first', ('edit-first.zip', 'prompt.txt')),
+          ('riemann-home', ('explainer/index.html', 'prompt.txt')),
+          ('hydrogen-3d', ('opus/index.html', 'sol/index.html', 'prompt.txt')),
+      )
+      for name in ('index.html', *files)),
     f'{AUDIT}/sported.html',
     f'{SPORTED_ASSETS}/sported-live-homepage-hero.png',
     f'{SPORTED_ASSETS}/sported-logo.png',

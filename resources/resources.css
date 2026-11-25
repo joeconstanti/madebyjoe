@@ -1,0 +1,36 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  box-sizing: border-box;
+  max-width: 44rem;
+  margin-inline: auto;
+  padding: 2rem clamp(1rem, 5vw, 3rem) 4rem;
+}
+
+h1 {
+  line-height: 1.15;
+}
+
+li + li {
+  margin-block-start: 0.5rem;
+}
+
+a {
+  text-underline-offset: 0.18em;
+}
+
+pre {
+  padding: 0.8rem;
+  border: 1px solid;
+  border-radius: 0.25rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

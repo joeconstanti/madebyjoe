@@ -1,0 +1,12 @@
+Take a mechanical wristwatch apart for me in 3D. One file: index.html. Three.js from a CDN, no build step, no downloaded models: make every part from geometry in code.
+
+1. Research first: how a hand-wound mechanical watch movement works and what its real parts are (mainspring barrel, centre wheel, third wheel, fourth wheel, escape wheel, pallet fork, balance wheel, hairspring, jewels, bridges, mainplate, winding stem, crown, hands, dial, crystal, case). Use a standard layout and correct gear ratios.
+2. The watch must run. Balance swings, pallet fork ticks, the wheels turn at the right relative speeds, and the hands show my real local time.
+3. An "explode" slider. At 0 it is a finished, beautiful watch. At 1 every part floats apart along its real assembly axis, in order, still turning.
+4. Click any part: the camera flies to it, the other parts fade, and a card gives its name, what it does and one number that matters. A breadcrumb lets me go back out.
+5. Go down to one ruby jewel, small enough to hold on a fingertip, and show the pivot that turns inside it.
+6. A "Tour" button: one smooth 40 second camera move. Start on the finished watch, take it apart, dive through the gear train to the escapement and stop on the ruby jewel, then put it back together.
+7. Make it look like a product film: dark background, studio lighting with reflections (RoomEnvironment or a generated environment map), brushed and polished metal, gold wheels, blued steel screws, real ruby colour, shallow depth of field if it stays fast. It must work in a 1080 x 1080 window and on a phone.
+8. The page must take ?tour=1 (start the tour), ?explode=0.6 and ?part=escape-wheel.
+
+Serve it locally, test it in a real browser with Playwright, look at the screenshots at several explode values and during the tour, and fix what looks wrong before you say it is done.

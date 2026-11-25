@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>35 mm SLR, taken apart</title>
+<link rel="icon" href="data:,">
+<style>
+:root{--ink:#f1eee8;--dim:#a7a59f;--line:rgba(255,255,255,.14);--amber:#ffb454;--bg:rgba(16,17,19,.72)}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;overflow:hidden;background:#08090a;color:var(--ink);font:15px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+canvas.hot{cursor:pointer}
+button,select{font:inherit;color:inherit;background:none;border:1px solid var(--line);border-radius:999px;padding:0 15px;height:40px;cursor:pointer;white-space:nowrap}
+button:hover,select:hover{border-color:rgba(255,255,255,.45)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+select option{background:#16171a}
+#crumb{position:fixed;left:max(22px,env(safe-area-inset-left));top:max(18px,env(safe-area-inset-top));display:flex;flex-wrap:wrap;align-items:center;max-width:calc(100vw - 40px);z-index:3}
+#crumb button{border:0;padding:0 6px;height:36px;color:var(--dim)}
+#crumb button:last-child{color:var(--ink);font-weight:600}
+#crumb i{color:#6d6b67;font-style:normal}
+#hud{position:fixed;left:28px;top:60px;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums;pointer-events:none;transition:opacity .4s}
+#hud b{display:block;color:var(--ink);font-weight:500;font-size:14px}
+#tip{position:fixed;pointer-events:none;font-size:13px;background:var(--bg);padding:4px 10px;border-radius:6px;opacity:0;transition:opacity .15s;z-index:4}
+#card{position:fixed;right:26px;top:50%;transform:translate(16px,-50%);width:300px;padding:24px;background:var(--bg);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:14px;opacity:0;pointer-events:none;transition:.45s;z-index:3}
+#card.on{opacity:1;transform:translate(0,-50%);pointer-events:auto}
+#card h2{font-size:22px;line-height:1.15;font-weight:600;letter-spacing:-.01em;margin-bottom:10px;text-wrap:balance}
+#card p{color:#cbc8c1}
+#card .n{font-size:36px;font-weight:300;letter-spacing:-.02em;color:var(--amber);margin-top:18px;line-height:1.1}
+#card .l{font-size:13px;color:var(--dim);margin-top:3px}
+#card ul{list-style:none;padding:0;margin-top:14px;display:flex;flex-wrap:wrap;gap:6px}
+#card li button{height:32px;padding:0 12px;font-size:13px}
+#bar{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:10px;align-items:center;padding:10px;background:var(--bg);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:999px;z-index:3}
+#bar label{display:flex;align-items:center;gap:12px;padding-left:12px;font-size:14px;color:var(--dim)}
+input[type=range]{appearance:none;-webkit-appearance:none;width:230px;height:40px;background:none;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:linear-gradient(90deg,var(--amber) var(--v,0%),#55534f var(--v,0%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;margin-top:-9px;border-radius:50%;background:var(--ink)}
+input[type=range]::-moz-range-track{height:2px;background:#55534f}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border:0;border-radius:50%;background:var(--ink)}
+#tour{background:var(--amber);border-color:var(--amber);color:#17120a;font-weight:600}
+#err{position:fixed;inset:0;display:none;place-items:center;padding:30px;text-align:center}
+@media(max-width:700px){
+ #bar{left:12px;right:12px;transform:none;border-radius:20px;flex-wrap:wrap;justify-content:space-between;gap:6px}
+ #bar label{width:100%;padding:0 6px}#bar label input{flex:1;width:auto;min-width:0}
+ #bar button,#bar select{padding:0 13px}
+ #card{left:12px;right:12px;width:auto;top:auto;bottom:146px;transform:translateY(16px);padding:16px 18px;max-height:38vh;overflow:auto}
+ #card.on{transform:none}#card h2{font-size:19px;margin-bottom:6px}#card .n{font-size:28px;margin-top:10px}#card p{font-size:14px}
+ #crumb{left:12px;top:max(10px,env(safe-area-inset-top))}#hud{left:18px;top:50px}
+}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+</head><body>
+<canvas id="c" aria-label="3D model of a 35 mm film SLR camera"></canvas>
+<nav id="crumb" aria-label="Breadcrumb"></nav><div id="hud"></div><div id="tip"></div>
+<aside id="card" aria-live="polite"></aside>
+<div id="bar">
+ <label>Explode<input id="ex" type="range" min="0" max="1" step="0.001" value="0" aria-label="Explode"></label>
+ <button id="bm">Mirror</button><button id="bs">Shutter</button>
+ <select id="sp" aria-label="Shutter speed"></select>
+ <button id="tour">Tour</button>
+</div>
+<div id="err">This page needs WebGL 2 and access to cdn.jsdelivr.net.</div>
+<script>addEventListener('error',()=>{if(!window.__slr)document.getElementById('err').style.display='grid'})</script>
+<script type="module">
+import * as THREE from 'three';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+const $=id=>document.getElementById(id),PI=Math.PI,TAU=PI*2,D=PI/180;
+const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),lerp=(a,b,t)=>a+(b-a)*t;
+const lin=(v,a,b)=>clamp((v-a)/(b-a)),ss=x=>x*x*(3-2*x),s5=x=>x*x*x*(x*(x*6-15)+10);
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+/* Units: millimetres. z=0 film plane, +z to the subject, y up, optical axis x=y=0.
+   From the front, photographer's right hand (wind side) is -x, cassette is +x. */
+const FLANGE=45.46;
+
+/* ---------- renderer, studio ---------- */
+const canvas=$('c'),R=new THREE.WebGLRenderer({canvas,antialias:false,powerPreference:'high-performance'});
+R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(26,1,4,6000);
+function canv(w,h,f){const c=document.createElement('canvas');c.width=w;c.height=h;f(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t}
+scene.background=canv(512,512,(g,w,h)=>{const r=g.createRadialGradient(w*.5,h*.46,0,w*.5,h*.46,w*.72);r.addColorStop(0,'#565b64');r.addColorStop(.45,'#2b2e33');r.addColorStop(1,'#0c0d0e');g.fillStyle=r;g.fillRect(0,0,w,h)});
+{ // studio: softboxes in a dark room, baked to an environment map
+ const s=new THREE.Scene();s.add(new THREE.Mesh(new THREE.SphereGeometry(60,32,16),new THREE.MeshBasicMaterial({color:0x1a1c20,side:THREE.BackSide})));
+ const fall=canv(256,256,(g,w)=>{const r=g.createRadialGradient(w/2,w/2,w*.1,w/2,w/2,w*.62);r.addColorStop(0,'#fff');r.addColorStop(1,'#808080');g.fillStyle=r;g.fillRect(0,0,w,w)});
+ const soft=(w,h,x,y,z,i,c=0xffffff)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(c).multiplyScalar(i),side:THREE.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);s.add(m);m.material.map=fall};
+ soft(38,26,0,32,10,3.4);soft(34,18,0,30,-26,1.9);soft(20,18,25,27,18,2.2);soft(18,14,-25,28,20,2.2);soft(10,40,-36,8,14,7,0xfff1df);soft(5,36,37,6,10,9,0xdfeaff);soft(26,8,6,2,40,1.6);soft(40,34,-26,4,34,.75);soft(40,30,30,-4,34,.5);soft(30,7,0,10,-38,6,0xe6efff);soft(40,30,0,-34,0,.35);soft(3,26,-14,14,38,5);
+ const p=new THREE.PMREMGenerator(R);scene.environment=p.fromScene(s,.015).texture;scene.environmentIntensity=1.05;
+}
+const key=new THREE.DirectionalLight(0xfff3e4,2.1);key.position.set(-190,330,260);key.castShadow=true;key.shadow.mapSize.set(2048,2048);
+Object.assign(key.shadow.camera,{left:-280,right:280,top:280,bottom:-280,near:20,far:1000});key.shadow.normalBias=.5;key.shadow.bias=-.0004;key.target.position.set(0,0,90);scene.add(key,key.target);
+const rim=new THREE.DirectionalLight(0xcfe0ff,.7);rim.position.set(240,120,-200);scene.add(rim);
+
+/* ---------- materials ---------- */
+function noiseTex(n,f,rep){const t=canv(n,n,(g)=>{const im=g.createImageData(n,n);f(im.data,n);g.putImageData(im,0,0)});t.colorSpace=THREE.NoColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep,rep);return t}
+const pebble=noiseTex(256,(d,n)=>{let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;const p=Array.from({length:420},()=>[rnd()*n,rnd()*n]);
+ for(let y=0;y<n;y++)for(let x=0;x<n;x++){let a=1e9,b=1e9;for(const q of p){let dx=Math.abs(q[0]-x),dy=Math.abs(q[1]-y);dx=Math.min(dx,n-dx);dy=Math.min(dy,n-dy);const k=dx*dx+dy*dy;if(k<a){b=a;a=k}else if(k<b)b=k}
+  const v=clamp((Math.sqrt(b)-Math.sqrt(a))/4.5)*255,i=(y*n+x)*4;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255}},1/12);
+const grain=noiseTex(128,(d,n)=>{for(let i=0;i<n*n*4;i+=4){d[i]=d[i+1]=d[i+2]=150+Math.random()*105;d[i+3]=255}},1/9);
+const weave=noiseTex(64,(d,n)=>{for(let y=0;y<n;y++)for(let x=0;x<n;x++){const i=(y*n+x)*4,v=((x>>2)+(y>>2))&1?210:120;d[i]=d[i+1]=d[i+2]=v+Math.random()*30;d[i+3]=255}},1);weave.repeat.set(10,8);
+const P=o=>new THREE.MeshPhysicalMaterial(o);const DS=THREE.DoubleSide;
+const M={
+ chrome:P({color:0xcfcdc7,metalness:1,roughness:.3,roughnessMap:grain,side:DS}),
+ bright:P({color:0xe6e4df,metalness:1,roughness:.12,side:DS}),
+ steel:P({color:0x9fa1a4,metalness:1,roughness:.34,side:DS}),
+ brass:P({color:0xc79a4b,metalness:1,roughness:.27,side:DS}),
+ alu:P({color:0x7c7e82,metalness:.9,roughness:.5,side:DS}),
+ cast:P({color:0x6c6e71,metalness:.75,roughness:.55,bumpMap:grain,bumpScale:.4,side:DS}),
+ black:P({color:0x141517,metalness:.35,roughness:.38,clearcoat:.45,clearcoatRoughness:.3,side:DS}),
+ matte:P({color:0x16171a,metalness:.1,roughness:.8,side:DS}),
+ box:P({color:0x24262a,metalness:.35,roughness:.6,side:DS}),
+ leather:P({color:0x1b1b1c,metalness:0,roughness:.55,bumpMap:pebble,bumpScale:2.2,clearcoat:.15,clearcoatRoughness:.5}),
+ rubber:P({color:0x18191a,roughness:.62,side:DS}),
+ cloth:P({color:0x4b453e,roughness:.88,bumpMap:weave,bumpScale:.5,sheen:.5,sheenColor:new THREE.Color(0x554b40),side:DS}),
+ cloth2:P({color:0x685a49,roughness:.88,bumpMap:weave,bumpScale:.5,sheen:.5,sheenColor:new THREE.Color(0x665848),side:DS}),
+ tape:P({color:0x7a6a50,roughness:.8,side:DS}),
+ mirror:P({color:0xa3abb2,metalness:1,roughness:.03}),
+ glassA:P({color:0xa48bff,metalness:.05,roughness:.02,transparent:true,opacity:.3,iridescence:1,iridescenceIOR:1.7,iridescenceThicknessRange:[240,240],specularIntensity:1,ior:1.7,clearcoat:1,clearcoatRoughness:.01,side:DS}),
+ glassB:P({color:0xffc98a,metalness:.05,roughness:.02,transparent:true,opacity:.26,iridescence:1,iridescenceIOR:1.6,iridescenceThicknessRange:[330,330],ior:1.7,clearcoat:1,clearcoatRoughness:.01,side:DS}),
+ prism:P({color:0xbfdce6,metalness:.1,roughness:.02,transparent:true,opacity:.4,ior:1.52,clearcoat:1,clearcoatRoughness:.01,side:DS}),
+ silver:P({color:0xb8bdc2,metalness:1,roughness:.13,side:DS}),
+ screen:P({color:0xe8eef0,roughness:.6,transparent:true,opacity:.62,side:DS}),
+ red:P({color:0xc8321f,roughness:.4}),cass:P({color:0xd9a521,metalness:.45,roughness:.35,side:DS}),
+ spool:P({color:0x2b2d30,roughness:.45,side:DS}),cds:P({color:0x9a5a2a,roughness:.35,clearcoat:1})
+};
+
+/* ---------- geometry helpers ---------- */
+const mesh=(g,m,p)=>{const o=new THREE.Mesh(g,m);if(p)o.position.set(...p);o.castShadow=o.receiveShadow=true;return o};
+const box=(w,h,d,x,y,z,m,r=0)=>mesh(r?new RoundedBoxGeometry(w,h,d,3,r):new THREE.BoxGeometry(w,h,d),m,[x,y,z]);
+// turned part: one flat-shaded band per profile segment, axis z
+function turn(pts,m,seg=72,ph0=0,ph=TAU,close=true){const gs=[],n=pts.length;for(let i=0;i<(close?n:n-1);i++){const a=pts[i],b=pts[(i+1)%n];gs.push(new THREE.LatheGeometry([new THREE.Vector2(a[0],a[1]),new THREE.Vector2(b[0],b[1])],seg,ph0,ph))}
+ return mesh(mergeGeometries(gs).rotateX(PI/2),m)}
+const ring=(ri,ro,z0,z1,m,c=.4,seg)=>turn([[ri,z0],[ro-c,z0],[ro,z0+c],[ro,z1-c],[ro-c,z1],[ri,z1]],m,seg);
+const turnY=(pts,m,x=0,y=0,z=0,seg=48)=>{const o=turn(pts,m,seg);o.rotation.x=-PI/2;const g=new THREE.Group();g.add(o);g.position.set(x,y,z);return g};
+const cylY=(r,h,x,y,z,m,c=.25,ri=.001,seg=40)=>turnY([[ri,-h/2],[r-c,-h/2],[r,-h/2+c],[r,h/2-c],[r-c,h/2],[ri,h/2]],m,x,y,z,seg);
+const shp=a=>{const s=new THREE.Shape();a.forEach((p,i)=>i?s.lineTo(p[0],p[1]):s.moveTo(p[0],p[1]));return s};
+// extrude an x-z outline along y
+function exY(pts,y0,y1,m,holes=[],bev=0){const s=shp(pts.map(p=>[p[0],-p[1]]));holes.forEach(h=>s.holes.push(shp(h.map(p=>[p[0],-p[1]]))));
+ const g=new THREE.ExtrudeGeometry(s,{depth:y1-y0-2*bev,bevelEnabled:bev>0,bevelSize:bev,bevelThickness:bev,bevelOffset:-bev,bevelSegments:3});g.rotateX(-PI/2);g.translate(0,y0+bev,0);return mesh(g,m)}
+function exZ(s,z0,z1,m,bev=0){const g=new THREE.ExtrudeGeometry(s,{depth:z1-z0-2*bev,bevelEnabled:bev>0,bevelSize:bev,bevelThickness:bev,bevelOffset:-bev,bevelSegments:3,curveSegments:40});g.translate(0,0,z0+bev);return mesh(g,m)}
+const rrect=(x0,y0,x1,y1,r)=>{const s=new THREE.Shape();s.moveTo(x0+r,y0);s.lineTo(x1-r,y0);s.absarc(x1-r,y0+r,r,-PI/2,0);s.lineTo(x1,y1-r);s.absarc(x1-r,y1-r,r,0,PI/2);s.lineTo(x0+r,y1);s.absarc(x0+r,y1-r,r,PI/2,PI);s.lineTo(x0,y0+r);s.absarc(x0+r,y0+r,r,PI,PI*1.5);return s};
+function gearPts(r,n,d){const o=[];for(let i=0;i<n;i++)for(const[k,q]of[[-.26,-d],[-.13,d],[.13,d],[.26,-d]]){const a=(i+k)/n*TAU;o.push([Math.cos(a)*(r+q),Math.sin(a)*(r+q)])}return o}
+const circ=(r,n=28)=>Array.from({length:n},(_,i)=>[Math.cos(i/n*TAU)*r,Math.sin(i/n*TAU)*r]);
+function gearY(r,n,h,m,d=.32,hole=.9){return exY(gearPts(r,n,d).map(p=>[p[0],-p[1]]),-h/2,h/2,m,[circ(hole)])}
+function knurlZ(ri,r,n,z0,z1,m,d=.5){const s=shp(gearPts(r,n,d));s.holes.push(shp(circ(ri,72)));return exZ(s,z0,z1,m,.3)}
+// convex solid from half-spaces n·p<=d; skip = faces left open
+function hull(planes,m,skip=[]){const pos=[],nor=[],uv=[];planes.forEach((A,i)=>{if(skip.includes(i))return;let pts=[];
+ for(let j=0;j<planes.length;j++)for(let k=j+1;k<planes.length;k++){if(j==i||k==i)continue;const B=planes[j],C=planes[k],bc=B.n.clone().cross(C.n),det=A.n.dot(bc);if(Math.abs(det)<1e-6)continue;
+  const p=bc.multiplyScalar(A.d).add(C.n.clone().cross(A.n).multiplyScalar(B.d)).add(A.n.clone().cross(B.n).multiplyScalar(C.d)).divideScalar(det);
+  if(planes.every(q=>q.n.dot(p)<=q.d+1e-4)&&!pts.some(q=>q.distanceTo(p)<1e-3))pts.push(p)}
+ if(pts.length<3)return;const c=pts.reduce((s,p)=>s.add(p),V(0,0,0)).divideScalar(pts.length),u=pts[0].clone().sub(c).normalize(),v=A.n.clone().cross(u);
+ pts.sort((a,b)=>Math.atan2(a.clone().sub(c).dot(v),a.clone().sub(c).dot(u))-Math.atan2(b.clone().sub(c).dot(v),b.clone().sub(c).dot(u)));
+ for(let q=1;q<pts.length-1;q++)for(const p of[pts[0],pts[q],pts[q+1]]){pos.push(p.x,p.y,p.z);nor.push(A.n.x,A.n.y,A.n.z);uv.push(p.x,p.y+p.z)}});
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));return mesh(g,m)}
+const pl=(n,p)=>{n.normalize();return{n,d:n.dot(p)}};
+const bevel=(a,b,c)=>{const n=a.n.clone().add(b.n),l=n.length();return{n:n.divideScalar(l),d:(a.d+b.d)/l-c}};
+const screw=(r,x,y,z,ax='z')=>{const g=new THREE.Group();g.add(turn([[0,0],[r,0],[r,.25],[r*.75,.55],[0,.6]],M.bright,20));const s=box(r*1.5,r*.28,.1,0,0,.6,M.matte);s.rotation.z=x*3.1+y;g.add(s);g.position.set(x,y,z);if(ax=='y')g.rotation.x=-PI/2;if(ax=='-y')g.rotation.x=PI/2;return g};
+// printed band on a z-axis cylinder; items:[text,angleDeg(0=top, + toward -x),color]
+function band(r,z0,z1,items,size=46){const w=2048,h=Math.round(w*(z1-z0)/(TAU*r));
+ const t=canv(w,h,g=>{g.font=`600 ${size}px Helvetica,Arial`;g.textAlign='center';g.textBaseline='middle';for(const[s,a,c]of items){g.fillStyle=c||'#f2f0ea';g.fillText(s,((a/360+1.5)%1)*w,h/2+2)}});
+ const geo=new THREE.CylinderGeometry(r,r,z1-z0,96,1,true);geo.rotateX(PI/2);geo.rotateZ(0);const m=mesh(geo,P({map:t,transparent:true,roughness:.5,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2}),[0,0,(z0+z1)/2]);m.castShadow=false;m.userData.band=1;return m}
+function disc(r,f,px=512){const m=mesh(new THREE.CircleGeometry(r,56),P({map:canv(px,px,f),transparent:true,roughness:.5,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2}));m.rotation.x=-PI/2;m.castShadow=false;return m}
+
+/* ---------- part registry ---------- */
+const root=new THREE.Group();scene.add(root);const lensRoot=new THREE.Group(),cell=new THREE.Group(),doorPivot=new THREE.Group();lensRoot.add(cell);root.add(lensRoot,doorPivot);
+const parts=[],byId={};
+// moves:[[x,y,z,t0,t1],...]; est = model estimate
+function part(id,name,group,desc,num,label,moves,est=false,parent=root){const g=new THREE.Group();parent.add(g);const p={id,name,group,desc,num,label,moves,est,g,fade:1};g.userData.part=p;parts.push(p);byId[id]=p;return g}
+const GROUPS={Lens:'Focuses the image, and controls how much light goes through. It turns and unlocks from the body as one unit.',Body:'The light-tight structure. All distances are measured from it.',Viewfinder:'Takes the light from the mirror and shows an upright, correct image to the eye.','Mirror box':'The dark chamber behind the lens. The mirror sends light up to the eye, then swings away for the exposure.',Shutter:'Two cloth curtains in front of the film. The first one opens the gate. The second one closes it.','Film transport':'Moves the film by exactly one frame, and cocks the shutter with the same stroke.',Controls:'The parts that the photographer moves.'};
+
+/* ----- LENS ----- */
+const zI=61.5;
+let g=part('front','Front ring and filter thread','Lens','Holds the front optics in the barrel. The internal thread takes filters and hoods.','49 mm','filter thread, usual for a small 50 mm lens',[[0,0,122,.1,.5]],true,cell);
+g.add(turn([[19.5,80.8],[22,81],[22.6,84.6],[23.6,84.6],[24.6,83.8],[24.6,74.5],[19.5,74.5]],M.black));for(let i=0;i<4;i++)g.add(ring(22.35,22.7,81.6+i*.7,81.9+i*.7,M.black,.05));
+{const t=canv(1024,1024,(c)=>{c.translate(512,512);c.fillStyle='#e9e6df';c.font='600 40px Helvetica,Arial';c.textAlign='center';const s='STANDARD LENS   1:2   f = 50 mm   ';for(let k=0;k<s.length;k++){c.save();c.rotate((k-s.length/2)/s.length*TAU*.72);c.fillText(s[k],0,-450);c.restore()}});
+ const rg=new THREE.RingGeometry(19.6,21.9,72);const pp=rg.attributes.position,uu=rg.attributes.uv;for(let i=0;i<pp.count;i++)uu.setXY(i,.5+pp.getX(i)/43.8,.5+pp.getY(i)/43.8);const o=mesh(rg,P({map:t,transparent:true,depthWrite:false,roughness:.5,polygonOffset:true,polygonOffsetFactor:-2}),[0,0,81.02]);o.castShadow=false;g.add(o)}
+const sag=(r,q)=>r?Math.sign(r)*(Math.abs(r)-Math.sqrt(r*r-q*q)):0;
+function lensGeo(zb,zf,rb,rf,s){const n=20,F=[],B=[];for(let i=0;i<=n;i++){const q=s*i/n;F.push(new THREE.Vector2(q,zf-sag(rf,q)));B.push(new THREE.Vector2(q,zb+sag(rb,q)))}
+ return mergeGeometries([new THREE.LatheGeometry(F.slice().reverse(),64),new THREE.LatheGeometry(B,64),new THREE.LatheGeometry([B[n].clone(),F[n].clone()],64)]).rotateX(PI/2)}
+function elems(g,list){for(const[zb,zf,rb,rf,s,m]of list){const o=mesh(lensGeo(zb,zf,rb,rf,s),m);o.castShadow=false;o.renderOrder=2;g.add(o);g.add(ring(s,s+1.3,zb+sag(rb,s)-.4,zf-sag(rf,s)+.4,M.black,.15))}}
+g=part('L1','Front element','Lens','The first positive glass. It collects the light and starts to bend it. The purple colour is the anti-reflection coating.','6 in 4','elements in groups, a usual double-Gauss',[[0,0,84,.16,.54]],false,cell);elems(g,[[74,79.2,-60,34,15.5,M.glassA]]);
+g=part('L23','Front doublet','Lens','A positive and a negative glass, cemented together. It corrects colour error.','2','glasses cemented as one group',[[0,0,76,.2,.56]],false,cell);elems(g,[[68.8,73.2,70,24,13.6,M.glassB],[66,68.8,-15.5,-70,12,M.glassA]]);
+g=part('iris','Iris diaphragm','Lens','Six blades turn together and make a smaller hole. It stays wide open while you look, closes when you press the button, and opens again after.','f/2 → f/8','hole diameter goes to one quarter',[[0,0,68,.22,.58]],false,cell);
+g.add(turn([[15.2,zI-1.5],[17.6,zI-1.5],[17.6,zI+1.6],[15.2,zI+1.6]],M.alu));const blades=[];g.add(ring(11.4,15.4,zI-1.5,zI-1.1,M.matte,.1));
+{const s=new THREE.Shape(),px=14.2;s.absarc(0,0,16.2,-8*D,128*D,false);s.absarc(0,0,10.6,128*D,-8*D,true);const bg=new THREE.ExtrudeGeometry(s,{depth:.12,bevelEnabled:false,curveSegments:40});bg.translate(-px,0,0);
+ for(let i=0;i<6;i++){const h=new THREE.Group();h.rotation.z=i*60*D;const b=new THREE.Group();b.position.set(px,0,zI-.6+i*.17);b.add(mesh(bg,M.steel));const pin=turn([[0,-.7],[.7,-.7],[.7,.9],[0,.9]],M.brass,16);b.add(pin);h.add(b);g.add(h);blades.push(b)}}
+g=part('L45','Rear doublet','Lens','The mirror twin of the front doublet. The near symmetry about the iris cancels distortion.','2','glasses cemented as one group',[[0,0,18,.2,.56]],false,cell);elems(g,[[54.4,57,-70,-15.5,11.5,M.glassA],[50.4,54.4,26,70,13,M.glassB]]);
+g=part('L6','Rear element','Lens','The last positive glass. It brings the light to a point on the film.','50 mm','focal length of the full lens',[[0,0,10,.24,.6]],false,cell);elems(g,[[46.4,49.8,40,-95,13.2,M.glassA]]);
+g=part('barrel','Helicoid barrel','Lens','A multi-start screw thread. When the focus ring turns, all of the glass moves straight forward.','7.2 mm','movement to focus at 0.45 m (calculated)',[[0,0,46,.14,.52]],false,cell);
+g.add(turn([[17.8,52],[20,52],[20,56],[22.5,56],[22.5,73.5],[17.8,73.5]],M.alu));for(let i=0;i<14;i++)g.add(ring(22.4,23.1,58+i,58.55+i,M.brass,.15));
+g=part('focus','Focus ring','Lens','Turn it and the helicoid moves the glass to or from the film. Distances are on the ring.','∞ – 0.45 m','focus range, usual for this lens type',[[0,0,112,.08,.48]],true,lensRoot);
+const focusN=new THREE.Group();g.add(focusN);focusN.add(turn([[24.8,57.5],[29.2,57.5],[29.8,58.1],[29.8,63.4],[29,64],[24.8,64]],M.black));focusN.add(knurlZ(24.8,30.3,64,64,75.4,M.rubber,.55));focusN.add(turn([[24.8,75.4],[29,75.4],[28,77],[24.8,77]],M.black));
+focusN.add(band(29.86,58.3,63.2,[['∞',0],['5',26],['3',42],['2',62],['1.5',83],['1',116],['0.7',156],['0.45 m',200,'#ffb454']],58));
+g=part('apring','Aperture ring','Lens','Sets the f-number. It limits how far the blades can close.','1 stop','halves or doubles the light',[[0,0,34,.14,.52]],false,lensRoot);
+g.add(knurlZ(24,29,48,48.8,52,M.black,.45));g.add(ring(23.2,28.4,52,56.2,M.black,.3));g.add(band(28.46,52.2,56,[['2',56],['2.8',42],['4',28],['5.6',14],['8',0,'#ffb454'],['11',-14],['16',-28],['22',-42]],44));g.add(ring(23.2,28.9,56.4,57.3,M.chrome,.2));
+g=part('lmount','Lens bayonet','Lens','Three lugs lock behind the body ring. A small lever goes through the mount and lets the body close the iris.','3 lugs','turn, then click',[[0,0,0,0,1]],false,lensRoot);
+g.add(turn([[21.6,FLANGE],[29.5,FLANGE],[29.5,48],[28.6,48.8],[21.6,48.8]],M.chrome));g.add(ring(20.4,21.8,41.6,FLANGE+.2,M.chrome,.2));
+for(let i=0;i<3;i++)g.add(turn([[21.6,41.8],[23.2,41.8],[23.2,43.1],[21.6,43.1]],M.chrome,16,i*120*D,52*D));
+for(let i=0;i<5;i++){const a=i/5*TAU+.3,s=screw(1,Math.cos(a)*25.6,Math.sin(a)*25.6,FLANGE);s.rotation.y=PI;g.add(s)}
+const lensLever=new THREE.Group();lensLever.add(box(1.2,6,5,0,-19.2,40,M.bright,.3));g.add(lensLever);
+const dot=turn([[0,0],[1,0],[1,.3],[0,.6]],M.red,20);dot.position.set(0,29.4,47);dot.rotation.x=-PI/2;g.add(dot);
+
+/* ----- BODY ----- */
+const halfR=[[23,24],[58,24],[66,21],[70.5,15],[71.5,8],[71.5,-3.4],[69.4,-3.4],[69.4,8],[68.5,14],[64.8,19.2],[57.6,22],[23,22]];
+const mir=a=>a.map(p=>[-p[0],p[1]]);
+const outl=[[58,24],[66,21],[70.5,15],[71.5,8],[71.5,-2],[69,-6],[-69,-6],[-71.5,-2],[-71.5,8],[-70.5,15],[-66,21],[-58,24]];
+const inset=(a,k)=>a.map(([x,z])=>[x*(1-k/71),(z-9)*(1-k/15)+9]);
+g=part('chassis','Body casting','Body','One die-cast metal frame. It holds the mount and the film exactly parallel. The rails behind the gate guide the film.','36 × 24 mm','film gate',[[0,0,0,0,1]]);
+g.add(exY(halfR,-33,25,M.cast,[]),exY(mir(halfR),-33,25,M.cast));
+const rect=(x0,z0,x1,z1)=>[[x0,z0],[x1,z0],[x1,z1],[x0,z1]];
+const deck=[[58,23],[65.4,20.2],[69.6,14.6],[70.6,8],[70.6,-3],[-70.6,-3],[-70.6,8],[-69.6,14.6],[-65.4,20.2],[-58,23]];
+g.add(exY(deck,24,25,M.cast,[rect(-21,5,21,22.6)]));g.add(exY(deck,-33,-32,M.cast,[circ(10,40).map(p=>[p[0]-54,p[1]+8.2]).filter(p=>p[1]>-2.9),circ(7,32).map(p=>[p[0]-36.3,p[1]+6.1])]));
+{const s=rrect(-29,-32,37,24,.5);s.holes.push(rrect(-18,-12,18,12,.6));g.add(exZ(s,.7,2.1,M.box));for(const y of[-19,-14.3,14.3,19])g.add(box(66,1.1,.8,4,y,.5,M.bright,.2))}
+g.add(box(46,6,18,0,-29,14,M.cast));g.add(box(2,56,18,38.5,-4,12,M.cast));
+for(const s of[1,-1]){const l=new THREE.Mesh(new THREE.TorusGeometry(3,.7,12,32),M.bright);l.position.set(s*74,17,9);l.rotation.y=.4*s;l.castShadow=true;g.add(l,box(3,3,3,s*72,17,9,M.bright,.8))}
+g=part('leather','Leatherette','Body','The textured cover. Glue holds it on the casting, and it hides screws. Repair persons peel it off to open the body.','≈ 0.8 mm','thickness',[[0,0,6,.1,.34]],true);
+const lea=[[24,24.05],[58,24.05],[66,21.05],[70.55,15],[71.55,8],[71.55,-3],[72.3,-3],[72.3,8.1],[71.2,15.4],[66.5,21.7],[58.2,24.85],[24,24.85]];
+const leaN=[exY(lea,-32.6,24.6,M.leather),exY(mir(lea),-32.6,24.6,M.leather)];g.add(...leaN);
+g=part('plate','Front plate','Body','Closes the front and carries the lens mount. Thin metal shims behind it set the mount distance.','4','corner screws in this model',[[0,0,94,.16,.44]],true);
+{const s=rrect(-33,-32,33,24.6,4);const h=new THREE.Path();h.absarc(0,0,29.2,0,TAU,true);s.holes.push(h);const pp=exZ(rrect(-33,-32,33,24.6,4),24.9,26.6,M.chrome,.5);pp.geometry.dispose();const q=rrect(-33,-32.4,33,24.6,4);const a=new THREE.Path();a.absarc(0,-2,22.2,0,TAU,true);q.holes.push(a);const e=exZ(q,24.9,26.8,M.chrome,.5);g.add(e)}
+g.add(turn([[27.6,26.5],[31.4,26.5],[30.2,38],[27.6,38]],M.chrome,72,PI+42*D,TAU-84*D));g.add(turn([[27.6,37.6],[30.24,37.6],[29.8,42.6],[29.2,43.2],[24,43.2],[24,42],[27.6,42]],M.chrome));
+for(const[x,y]of[[-29.6,-28.8],[29.6,-28.8],[-29.6,21],[29.6,21]])g.add(screw(1.3,x,y,26.6));
+{const b=cylY(0,0,0,0,0,M.chrome);const k=turn([[0,0],[4,0],[4,3],[3.2,4],[0,4.3]],M.chrome,36);k.position.set(-30.2,-12,26.8);g.add(k)}
+g=part('mount','Body mount ring','Body','The steel ring that the lens locks to. The distance from this face to the film must be correct to a few hundredths of a millimetre.','45.46 mm','face to film (Pentax K value)',[[0,0,104,.14,.42]]);
+g.add(turn([[23.4,42.6],[29,42.6],[29,FLANGE-.5],[28.6,FLANGE],[23.4,FLANGE]],M.bright));for(let i=0;i<5;i++){const a=i/5*TAU+PI/2+.6;g.add(screw(1.15,Math.cos(a)*26.2,Math.sin(a)*26.2,FLANGE-.45))}
+{const k=turn([[0,0],[1.1,0],[1.1,.25],[0,.5]],M.red,20);k.position.set(-26.4,9.5,FLANGE);g.add(k)}
+// top cover
+const T=Math.tan(22.5*D),a0=23,zr=10.5,yb=25.5,ca=Math.cos(22.5*D),sa=Math.sin(22.5*D);
+const ridge=V(0,yb+a0,zr),N0=V(0,ca,-sa);
+function prismPlanes(o,w,tr){const rN=[V(1,ca,-sa),V(-1,ca,-sa)].map(n=>pl(n,ridge));rN.forEach(p=>p.d+=o);
+ const bot=pl(V(0,-1,0),V(0,yb,0)),rear=pl(V(0,0,-1),V(0,0,zr-o)),front=pl(V(0,-sa,ca),V(0,yb,zr+a0+o*1.08)),L=pl(V(-1,0,0),V(-w,0,0)),Rr=pl(V(1,0,0),V(w,0,0)),tp=pl(V(0,1,.62),V(0,yb+30.2+tr,29+tr*.5));return[bot,rear,front,L,Rr,rN[0],rN[1],tp]}
+g=part('top','Top cover','Body','A pressed metal cover, chrome plated. The roof shape over the lens is there because of the prism below.','0.8 mm','wall of the cover in this model',[[0,72,0,.06,.34]],true);
+{const hol=rect(-19,4,19,30);g.add(exY(outl,25,33,M.chrome,[inset(outl,1.3)]));
+ const w=[[58,24],[66,21],[70.5,15],[71.5,8],[71.5,-2],[69,-6],[-69,-6],[-71.5,-2],[-71.5,8],[-70.5,15],[-66,21],[-58,24]];
+ g.add(exY(w,32.5,35.5,M.chrome,[],.9));
+ const q=prismPlanes(2.6,22,1.6);q[0].d=-25;q[1]=pl(V(0,0,-1),V(0,0,-5));q[2]=pl(V(0,-sa*.15,ca),V(0,yb,36));q[2].d=q[2].n.dot(V(0,44,42.2));
+ q[3]=pl(V(-1,.16,0),V(-21,33,0));q[4]=pl(V(1,.16,0),V(21,33,0));
+ const rr=[V(1,.95,-.05),V(-1,.95,-.05)].map(n=>pl(n,V(0,63.5,12)));q[5]=rr[0];q[6]=rr[1];q[7]=pl(V(0,1,-.06),V(0,58.6,20));
+ const fr=pl(V(0,.75,1),V(0,57,36.5));const base=[...q,fr];
+ const add=[[2,3],[2,4],[2,5],[2,6],[3,5],[4,6],[7,5],[7,6],[8,5],[8,6],[8,7],[8,2],[1,3],[1,4],[1,7]].map(([i,j])=>bevel(base[i],base[j],.55));
+ g.add(hull([...base,...add],M.chrome,[0]));
+ const eb=exZ((()=>{const s=rrect(-11,30,11,45,2.5);s.holes.push(rrect(-7.2,32.2,7.2,42.2,1.5));return s})(),-8,-4.6,M.black,.4);g.add(eb);
+ for(const[x,z]of[[-64,16],[64,16]])g.add(screw(1.2,x,35.4,z,'y'));
+ g.add(cylY(9.5,.8,54,35.7,9.3,M.chrome));g.add(cylY(10,.7,-54,35.7,8.2,M.chrome))}
+g=part('bottom','Bottom plate','Body','Closes the base. It has the tripod socket and the rewind release button.','1/4-20','tripod thread (UNC)',[[0,-88,0,.1,.38]]);
+g.add(exY(outl,-37,-33,M.chrome,[],.8));g.add(cylY(7,1.2,0,-37.2,9,M.chrome),cylY(3.1,1.4,0,-37.2,9,M.matte),cylY(2,2,-36.3,-37.6,6.1,M.bright));for(const x of[-64,64])g.add(screw(1.2,x,-36.9,14,'-y'));
+g=part('battery','Battery','Body','Supplies only the light meter. The shutter is fully mechanical and works without it.','1.5 V','silver-oxide or alkaline button cell',[[0,-112,0,.06,.36]]);
+g.add(cylY(5.8,3.6,26,-34.8,9,M.bright),cylY(6.8,1.3,26,-37.3,9,M.chrome),box(8,.4,1.2,26,-38,9,M.matte));
+doorPivot.position.set(-70,0,-4);
+g=part('door','Back door','Body','Opens on its hinge to load film. Foam in the edge channels keeps light out.','≈ 100°','opening angle in this model',[[0,0,0,0,1]],true,doorPivot);
+g.add(box(139,57,2.2,70,-4,-.6,M.black,.8));{const b=box(132,55,.9,70,-4,-1.9,M.leather,.4);g.add(b);const pa=b.geometry.attributes.position,u=b.geometry.attributes.uv;for(let i=0;i<pa.count;i++)u.setXY(i,pa.getX(i),pa.getY(i))}
+g.add(box(136,.9,.9,70,23.4,.9,M.matte),box(136,.9,.9,70,-31.4,.9,M.matte));for(const y of[-24,16])g.add(cylY(1.2,9,0,y,0,M.bright));
+g=part('pressure','Pressure plate','Film transport','Springs push this smooth plate on the rails. It keeps the film flat and in focus.','2','leaf springs in this model',[[0,0,26,.2,.42]],true,doorPivot);
+g.add(box(62,40,1,68,0,2.7,M.black,.3));for(const y of[-9,9]){const b=box(40,5,.3,68,y,1.2,M.steel);b.rotation.y=.02;g.add(b)}
+
+/* ----- VIEWFINDER ----- */
+const MB=62; // mirror-box travel
+g=part('screen','Focusing screen','Viewfinder','Matte glass at the same optical distance as the film. If the image is sharp here, it is sharp on the film.','22 mm','mirror to screen = mirror to film, in this model',[[0,14,0,.3,.5],[0,0,MB,.36,.62]],true);
+g.add(box(36,1,25,0,21.8,22,M.screen));g.add(cylY(3.5,.2,0,22.4,22,M.silver,.02));{const s=new THREE.Shape(rrect(-19,-14,19,14,.5).getPoints());s.holes.push(rrect(-17.6,-12,17.6,12,.3));const f=exZ(s,-.7,.7,M.brass);f.rotation.x=PI/2;f.position.set(0,21.8,22);g.add(f)}
+g=part('cond','Condenser lens','Viewfinder','Bends light from the corners of the screen to the eye. Without it the finder gets dark at the edges.','1','flat face, 1 convex face',[[0,27,0,.28,.48],[0,0,MB,.36,.62]]);
+{const geo=new THREE.PlaneGeometry(34,24,24,16);const p=geo.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i);p.setZ(i,1.6-(x*x+y*y)/270)}geo.computeVertexNormals();geo.rotateX(-PI/2);const a=mesh(geo,M.prism,[0,23.6,22]);a.castShadow=false;g.add(a,box(34,.5,24,0,23,22,M.prism))}
+g=part('prism','Pentaprism','Viewfinder','A solid glass block with a roof. Reflections in the glass turn the picture upright and correct it left to right.','3','reflections per ray: roof, roof, front',[[0,48,0,.22,.46],[0,0,MB,.36,.62]]);
+{const q=prismPlanes(0,15.5,0);const ad=[[5,6],[7,5],[7,6],[2,7]].map(([i,j])=>bevel(q[i],q[j],.35));const all=[...q,...ad];const o=hull(all,M.prism);o.castShadow=false;o.renderOrder=2;g.add(o);
+ const sil=hull(all.map(p=>({n:p.n.clone(),d:p.d+.06})),M.silver,[0,1,3,4,7,8,9,10,11]);sil.material=P({color:0xaab4ba,metalness:1,roughness:.1,transparent:true,opacity:.55,side:DS,depthWrite:false});g.add(sil)}
+g=part('eye','Eyepiece','Viewfinder','A magnifier. It lets the eye focus on a screen that is only a few centimetres away.','≈ 0.88×','viewfinder magnification',[[0,48,0,.22,.46],[0,0,MB-30,.36,.62]],true);
+elems(g,[]);{const o=mesh(lensGeo(-1.5,2.5,38,-60,8.2),M.glassB,[0,37,0]);const o2=mesh(lensGeo(3,6.5,60,30,8.2),M.glassA,[0,37,0]);o.castShadow=o2.castShadow=false;const r=turn([[8.2,-2.6],[10,-2.6],[10,7.6],[8.2,7.6]],M.black);r.position.y=37;g.add(o,o2,r)}
+g=part('cds','Meter cells','Viewfinder','Cadmium sulphide resistors on each side of the eyepiece. More light gives less resistance.','2','CdS cells in this model',[[0,48,0,.22,.46],[0,0,MB-14,.36,.62]],true);
+for(const x of[-13.4,13.4]){const t=turn([[0,0],[2.6,0],[2.6,2.6],[0,2.8]],M.cds,28);t.position.set(x,37,6);g.add(t);g.add(ring(2.6,3.1,5.8,8.6,M.steel,.1).translateX(x).translateY(37))}
+
+/* ----- MIRROR BOX ----- */
+g=part('mbox','Mirror box','Mirror box','A black box with low reflection between lens and shutter. It holds the mirror and the parts that move it.','40 mm','inner width in this model',[[0,0,MB,.36,.62]],true);
+{const sd=shp([[5,-17],[41,-17],[41,15],[36,20.6],[5,20.6]]);for(const x of[-20.6,19.6]){const e=exZ(sd,0,1,M.box);const h=new THREE.Group();e.rotation.y=-PI/2;h.add(e);h.position.x=x+1;g.add(h)}
+ g.add(box(40,1,36,0,-17,23,M.box));const s=rrect(-20.6,-17.5,20.6,20.6,.4);s.holes.push(rrect(-18.5,-12.5,18.5,12.5,.5));g.add(exZ(s,4.8,5.8,M.box));
+ for(const x of[-20.3,20.3])for(const[y,z]of[[-13,10],[-13,37],[17,10]]){const c=screw(1.1,0,0,0);c.position.set(x+(x>0?.3:-.3),y,z);c.rotation.y=x>0?PI/2:-PI/2;g.add(c)}
+ g.add(box(40,1.4,1.6,0,20,40-4,M.matte))}
+const HY=15,HZ=7,ML=33;
+g=part('mirror','Reflex mirror','Mirror box','At 45 degrees it sends all the light up to the finder. At the press it turns up on its rear hinge and the finder goes dark. It falls back when the second curtain has closed.','45°','swing, up and back on each frame, in this model',[[0,0,MB,.36,.62]],true);
+const mirrorN=new THREE.Group();mirrorN.position.set(0,HY,HZ);g.add(mirrorN);
+{const inner=new THREE.Group();inner.rotation.x=0;mirrorN.add(inner);const s=shp([[-17.6,1],[17.6,1],[17.6,20],[13.6,ML],[-13.6,ML],[-17.6,20]]);
+ const f=exZ(s,0,.8,M.steel,.15),gl=exZ(shp([[-17.2,1.4],[17.2,1.4],[17.2,19.8],[13.3,ML-.4],[-13.3,ML-.4],[-17.2,19.8]]),.8,1.9,M.mirror,.12);
+ for(const o of[f,gl]){o.rotation.x=PI/2;o.scale.z=-1;}
+ // shape (x,s) -> (x, up, +z=s)
+ inner.add(f,gl);const ax=turn([[0,-19],[.9,-19],[.9,19],[0,19]],M.bright,20);ax.rotation.y=PI/2;inner.add(ax)}
+g=part('mlever','Mirror lever','Mirror box','A spring drives this lever and it lifts the mirror. The wind stroke loads the spring again for the next frame.','≈ 25 ms','time to lift the mirror',[[0,0,MB,.36,.62],[-18,0,0,.6,.8]],true);
+const mlev=new THREE.Group();mlev.position.set(-22.6,-6,18);g.add(mlev);{const a=exZ(shp([[-2,-2.2],[2,-2.6],[2.4,10],[6,20],[4,21],[-1,11]]),0,1,M.brass,.15);a.rotation.y=-PI/2;const k=turn([[0,-1],[2.6,-1],[2.6,1.2],[0,1.2]],M.steel,28);k.rotation.y=PI/2;mlev.add(a,k)}
+{class Hx extends THREE.Curve{getPoint(t,o=V()){const a=t*TAU*9;return o.set(Math.cos(a)*1.5,Math.sin(a)*1.5,t*15)}}const sp=mesh(new THREE.TubeGeometry(new Hx,220,.28,6),M.bright,[-23,-6,20]);g.add(sp)}
+g=part('stop','Stop-down lever','Mirror box','Moves the lever on the lens and closes the iris at the moment the mirror goes up.','1','link between body and iris',[[0,0,MB,.36,.62],[0,-14,0,.6,.8]]);
+const stopN=new THREE.Group();g.add(stopN);stopN.add(box(8,1.4,2,0,-19.4,36.5,M.brass,.3),box(1.6,3.2,2,3.2,-19.4,38.6,M.brass,.3),box(1.4,1.4,20,-2.5,-19.4,27,M.brass,.3));
+
+/* ----- SHUTTER ----- */
+const DX=-25.2,DZ=7.5,DR=4.128,R1X=24.8,R2X=31,RR=2.5,Z1=2.8,Z2=3.4;
+const unit=new THREE.BoxGeometry(1,1,1);const strip=(h,d,y,z,m)=>{const o=mesh(unit,m,[0,y,z]);o.scale.set(1,h,d);return o};
+const span=(o,a,b)=>{o.scale.x=Math.max(.01,b-a);o.position.x=(a+b)/2};
+g=part('c1','First curtain','Shutter','Rubberised cloth. It covers the gate until the press. Then a spring pulls it across and the exposure starts.','2.57 mm/ms','curtain speed (one measured-value estimate)',[[0,0,44,.4,.68]],true);
+const c1={cloth:strip(27,.22,0,Z1,M.cloth),t:[14.6,-14.6].map(y=>strip(1.8,.16,y,Z1,M.tape)),lath:strip(31,.6,0,Z1,M.bright)};c1.lath.scale.x=1.5;g.add(c1.cloth,...c1.t,c1.lath);
+g=part('c2','Second curtain','Shutter','Follows the first curtain and ends the exposure. At fast speeds it starts early, so only a moving slit crosses the film.','10.3 mm','slit width at 1/250 s',[[0,0,32,.42,.7]],true);
+const c2={cloth:strip(27,.22,0,Z2,M.cloth2),t:[14.6,-14.6].map(y=>strip(1.8,.16,y,Z2,M.tape)),lath:strip(31,.6,0,Z2,M.brass)};c2.lath.scale.x=1.5;g.add(c2.cloth,...c2.t,c2.lath);
+g=part('drum','Curtain drum','Shutter','Winding turns the drum and pulls the two curtains back with their edges overlapped, so no light gets through.','1.6 turns','per wind stroke, in this model',[[0,0,26,.44,.72],[-6,0,0,.6,.8]],true);
+const drum1=new THREE.Group(),drum2=new THREE.Group();g.add(cylY(1.1,47,DX,0,DZ,M.bright),drum1,drum2);drum1.position.set(DX,0,DZ);drum2.position.set(DX,0,DZ);
+drum2.add(cylY(DR,27,0,0,0,M.alu));for(let i=0;i<3;i++){const s=screw(.7,0,-8+8*i,0);s.rotation.y=PI/2;s.position.x=DR-.15;drum2.add(s)}
+for(const y of[14.8,-14.8]){drum1.add(cylY(DR+.5,2.2,0,y,0,M.brass));const s=box(1,2.4,1,DR,y,0,M.steel);drum1.add(s)}
+g=part('rollers','Spring rollers','Shutter','Each roller has a coil spring inside. The tension sets the curtain speed. Repair persons adjust it here.','14.0 ms','to cross the 36 mm gate at 2.57 mm/ms',[[0,0,26,.44,.72],[6,0,0,.6,.8]],true);
+const rol1=new THREE.Group(),rol2=new THREE.Group();rol1.position.set(R1X,0,Z1+RR);rol2.position.set(R2X,0,Z2+RR);g.add(rol1,rol2);
+for(const[r,h]of[[rol1,26.4],[rol2,31.5]]){r.add(cylY(RR-.12,h,0,0,0,M.alu),cylY(.8,46,0,0,0,M.bright));const rt=gearY(2.2,12,1.2,M.brass,.35);rt.position.y=-21;r.add(rt);const k=box(.5,h*.9,.5,RR-.2,0,0,M.bright);r.add(k)}
+
+/* ----- FILM TRANSPORT ----- */
+const SX=-36.3,SZ=6.12,TX=-54,TZ=8.2,CX=54,CZ=9.3;
+const FR=8.1,SR=38/TAU;
+const filmTex=canv(1024,944,(c,w,h)=>{c.fillStyle='#8f7f7a';c.fillRect(0,0,w,h);const py=h/35;c.globalCompositeOperation='destination-out';for(let i=0;i<8;i++)for(const y of[2.01+1.4,35-2.01-1.4]){const x=(i+.5)/8*w,pw=1.98/38*w,ph=2.8*py;c.beginPath();c.roundRect(x-pw/2,y*py-ph/2,pw,ph,9);c.fill()}
+ c.globalCompositeOperation='source-over';c.fillStyle='#5f5350';c.font='20px Helvetica';c.fillText('SAFETY FILM',60,18);c.fillText('24',560,h-5);c.fillText('24A',930,h-5)});
+filmTex.wrapS=THREE.RepeatWrapping;
+g=part('film','135 film','Film transport','Light-sensitive strip with holes along each edge. Eight holes are one frame: 36 mm of picture and a 2 mm gap.','38 mm','movement per frame = 8 × 4.75 mm',[[0,0,-34,.3,.6]]);
+{const pts=[];for(let x=42;x>=TX;x-=1)pts.push([x,0]);let L0=0;const turns=2.2;for(let i=1;i<=150;i++){const a=i/150*turns*TAU,r=FR-a/TAU*.32;pts.push([TX-Math.sin(a)*r,TZ-Math.cos(a)*r])}
+ const pos=[],uv=[],idx=[];let L=0;const sprL=42-SX;pts.forEach((p,i)=>{if(i)L+=Math.hypot(p[0]-pts[i-1][0],p[1]-pts[i-1][1]);const u=(L-sprL)/38+.5/8;pos.push(p[0],17.5,p[1],p[0],-17.5,p[1]);uv.push(u,1,u,0);if(i)idx.push(2*i-2,2*i-1,2*i,2*i,2*i-1,2*i+1)});
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geo.setIndex(idx);geo.computeVertexNormals();
+ g.add(mesh(geo,P({map:filmTex,alphaTest:.5,side:DS,roughness:.28,clearcoat:.6,clearcoatRoughness:.2})))}
+g=part('cassette','Film cassette','Film transport','A light-tight metal can. Film goes out through a felt slit and goes back in when you rewind.','36','exposures on a full roll',[[0,0,-52,.26,.56]]);
+{const lab=canv(1024,512,(c,w,h)=>{c.fillStyle='#d6a01c';c.fillRect(0,0,w,h);c.fillStyle='#17181a';c.fillRect(0,0,w,90);c.fillRect(0,h-90,w,90);c.font='700 120px Helvetica,Arial';c.textAlign='center';for(const x of[200,712]){c.save();c.translate(x,h/2);c.fillText('135-36',0,20);c.font='500 54px Helvetica,Arial';c.fillText('ISO 400',0,92);c.restore();c.font='700 120px Helvetica,Arial'}});
+ const b=mesh(new THREE.CylinderGeometry(12.4,12.4,43,64,1,true),P({map:lab,metalness:.35,roughness:.32,side:DS}),[CX,0,CZ]);g.add(b);for(const y of[-21.8,21.8])g.add(cylY(12.7,1.8,CX,y,CZ,M.bright,.5));g.add(box(9,42,2.6,CX-10,0,.6,M.matte,.8))}
+const casN=new THREE.Group();casN.position.set(CX,0,CZ);g.add(casN);casN.add(cylY(3.8,4,0,23,0,M.spool,.3,2.6),cylY(5,3,0,-24,0,M.spool),box(5.4,2,.9,0,23,0,M.spool));
+g=part('sprocket','Sprocket','Film transport','Its teeth go in the film holes. It measures the film: one turn, then it locks.','8 teeth','one turn = one frame',[[0,-50,0,.3,.58]]);
+const sprN=new THREE.Group();sprN.position.set(SX,0,SZ);g.add(sprN);sprN.add(cylY(SR-1.2,32,0,0,0,M.alu),cylY(1.4,54,0,-1,0,M.bright));
+for(const y of[-14.1,14.1]){sprN.add(cylY(SR-.1,3.2,0,y,0,M.alu));for(let i=0;i<8;i++){const t=mesh(new THREE.ConeGeometry(.95,1.7,4),M.bright);const a=i/8*TAU;t.position.set(Math.sin(a)*(SR+.6),y,-Math.cos(a)*(SR+.6));t.rotation.order='YXZ';t.rotation.y=-a+PI;t.rotation.x=PI/2;const h=new THREE.Group();h.add(t);sprN.add(h)}}
+g=part('spool','Take-up spool','Film transport','Pulls the film after the sprocket. A slip clutch lets it turn less as the roll of film gets thicker.','270°','turn per frame at this roll size (calculated)',[[0,-50,0,.28,.56]]);
+const spoN=new THREE.Group();spoN.position.set(TX,0,TZ);g.add(spoN);spoN.add(cylY(7,36,0,0,0,M.spool),cylY(9.4,1.4,0,19,0,M.spool),cylY(9.4,1.4,0,-19,0,M.spool),cylY(2,50,0,-1,0,M.bright));for(let i=0;i<3;i++){const b=box(.8,34,1.2,0,0,0,M.matte);b.position.set(Math.cos(i*2.09)*7,0,Math.sin(i*2.09)*7);spoN.add(b)}
+// gear train: 36T lever : 16T sprocket = 2.25, so 160 deg -> 360 deg. Sprocket 16T : drum 10T = 1.6
+g=part('gears','Wind gear train','Film transport','Connects the lever, the sprocket and the curtain drum. One stroke moves the film and cocks the shutter.','36 : 16','lever to sprocket, so 160° gives one turn',[[0,30,0,.26,.52]],true);
+const GY=28.6,gl=[];function addGear(x,z,n,par,m,y=GY,col=M.brass){const r=n*.25,o=new THREE.Group();o.position.set(x,y,z);const ge=gearY(r,n,1.5,m||col,.28,.8);o.add(ge,cylY(.8,4.6,0,-.4,0,M.bright));if(r>4)for(let i=0;i<5;i++){const c=cylY(r*.16,1.55,Math.cos(i*1.257)*r*.62,0,Math.sin(i*1.257)*r*.62,M.matte,.05);o.add(c)}g.add(o);const k={o,n,par,x,z};gl.push(k);return k}
+const third=(ax,az,bx,bz,ra,rb,s)=>{const dx=bx-ax,dz=bz-az,d=Math.hypot(dx,dz),a=(ra*ra-rb*rb+d*d)/(2*d),h=Math.sqrt(Math.max(0,ra*ra-a*a))*s;return[ax+dx/d*a-dz/d*h,az+dz/d*a+dx/d*h]};
+const gW=addGear(TX,TZ,36,null),i1=third(TX,TZ,SX,SZ,14,9,1),gI=addGear(i1[0],i1[1],20,gW,M.steel),gS=addGear(SX,SZ,16,gI),i2=third(SX,SZ,DX,DZ,6.5,5,-1),gJ=addGear(i2[0],i2[1],10,gS,M.steel),gD=addGear(DX,DZ,10,gJ);
+function setGears(th){for(const k of gl){if(!k.par)k.th=th;else{const p=k.par,ph=Math.atan2(-(k.z-p.z),k.x-p.x);k.th=-(p.th-ph)*p.n/k.n+ph+PI+PI/k.n}k.o.rotation.y=k.th}}
+
+/* ----- CONTROLS ----- */
+g=part('lever','Advance lever','Controls','One push moves the film by a frame, cocks the shutter, loads the mirror spring and moves the counter.','160°','stroke in this model',[[0,104,0,.02,.26]],true);
+const levN=new THREE.Group();levN.position.set(TX,37.4,TZ);g.add(levN);{const s=new THREE.Shape();s.absarc(0,0,8,PI*.35,PI*1.62);s.quadraticCurveTo(12,-7.4,25,-3.4);s.absarc(25,-.6,2.8,-PI/2,PI/2);s.quadraticCurveTo(13,3.4,3.6,7.2);
+ const l=exZ(s,-1,.8,M.bright,.3);l.rotation.x=-PI/2;levN.add(l);levN.add(cylY(6.6,1.6,0,1.5,0,M.chrome),cylY(3,.7,0,2.5,0,M.black));const tip=box(8,3.2,4,23.5,-.2,1.4,M.black,1.2);levN.add(tip);levN.rotation.y=0}
+g=part('dial','Shutter speed dial','Controls','Sets the delay between the first curtain and the second curtain. The curtain speed does not change.','1 – 1/1000 s','mechanical speeds, and B',[[0,96,0,.03,.27]]);
+const DXX=-31.5,DZZ=8,dialN=new THREE.Group();dialN.position.set(DXX,37.9,DZZ);g.add(dialN);
+const dk=knurlZ(1,7.2,44,-2.3,2.3,M.chrome,.35);dk.rotation.x=-PI/2;dialN.add(dk);const SPD=[1000,500,250,125,60,30,15,8,4,2,1];
+dialN.add((()=>{const d=disc(6.9,(c,w)=>{c.fillStyle='#17181a';c.beginPath();c.arc(w/2,w/2,w/2,0,TAU);c.fill();c.translate(w/2,w/2);c.font='600 50px Helvetica,Arial';c.textAlign='center';['B',...SPD.slice().reverse()].forEach((s,i)=>{c.save();c.rotate(i*30*D);c.fillStyle=s==60?'#ff6a4d':s=='B'?'#ffb454':'#f2f0ea';c.fillText(s,0,-196);c.restore()})});d.position.y=2.42;return d})(),cylY(2.4,.9,0,2.7,0,M.bright));
+g=part('button','Shutter button','Controls','Releases the mirror. The mirror releases the first curtain when it is fully up.','1 press','starts the full sequence',[[0,90,0,.04,.28]]);
+const btnN=new THREE.Group();btnN.position.set(-43,36.6,17.2);g.add(btnN);btnN.add(turnY([[0,-3],[3,-3],[3,1.4],[2.4,1.9],[1,1.4],[0,1.3]],M.bright));g.add(turnY([[3.2,-1],[4.6,-1],[4.6,.4],[3.8,.9],[3.2,.9]],M.chrome,-43,36.2,17.2));
+g=part('counter','Frame counter','Controls','Moves one mark per frame. It goes back to the start when you open the back.','1 mark','per frame',[[0,84,0,.05,.3]]);
+const cntN=new THREE.Group();cntN.position.set(-62.5,36.1,15.5);g.add(turnY([[3.2,0],[4.1,0],[4.1,.7],[3.2,.7]],M.bright,-62.5,35.6,15.5),cntN);cntN.add(disc(3.3,(c,w)=>{c.fillStyle='#141517';c.fillRect(0,0,w,w);c.translate(w/2,w/2);c.fillStyle='#fff';c.font='600 60px Helvetica';c.textAlign='center';for(let i=0;i<40;i++){c.save();c.rotate(i*9*D);if(i%5==0)c.fillText(i,0,-165);c.fillRect(-4,-240,8,i%5?20:40);c.restore()}}));
+g=part('rewind','Rewind knob','Controls','Turns the cassette spool. It also turns by itself when you wind on, which shows that the film moves. Pull it up to open the back.','≈ 29 turns','to rewind 36 frames at this spool size',[[0,104,0,.02,.26]],true);
+const rewN=new THREE.Group();rewN.position.set(CX,38.4,CZ);g.add(rewN);const rk=knurlZ(1,8,40,-2.4,1.6,M.chrome,.35);rk.rotation.x=-PI/2;rewN.add(rk);rewN.add(cylY(6.6,.8,0,1.8,0,M.black),box(12,1.2,2.6,0,2.4,0,M.bright,.4),cylY(1.5,4,5.2,3.8,0,M.bright),cylY(1.4,16,0,-9,0,M.bright),box(5,1.2,.9,0,-17,0,M.bright));
+
+// each part gets its own material copies, so that it can fade alone
+for(const p of parts){const map=new Map();p.meshes=[];p.mats=[];p.g.traverse(o=>{if(!o.isMesh)return;o.userData.cs=o.castShadow;p.meshes.push(o);if(!map.has(o.material)){const c=o.material.clone();c.userData={t:c.transparent,o:c.opacity,dw:c.depthWrite};map.set(o.material,c);p.mats.push(c)}o.material=map.get(o.material)})}
+// light path
+const beam=new THREE.Group();scene.add(beam);const bm=new THREE.MeshBasicMaterial({color:new THREE.Color(3.2,1.75,.55),transparent:true,opacity:0,depthWrite:false});
+const segs=Array.from({length:6},()=>{const o=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,1,10),bm);beam.add(o);o.renderOrder=-1;return o}),UP=V(0,1,0),tv=V();
+function seg(i,a,b){const o=segs[i];o.visible=true;tv.copy(b).sub(a);o.scale.y=tv.length();o.position.copy(a).addScaledVector(tv,.5);o.quaternion.setFromUnitVectors(UP,tv.normalize())}
+
+/* ---------- the cycle ---------- */
+// Exposure in real milliseconds. All moving parts read this one clock.
+const VEL=2.57,X1A=-22,X1B=19.5,X2A=-19.5,X2B=22,TR=41.5,TRT=TR/VEL,LAP=(X2A-X1A)/VEL,M0=5,M1=30,C0=36;
+let speed=250;const expMs=()=>1000/speed;
+// the second curtain waits for the exposure time plus the edge overlap
+const closeEnd=()=>C0+expMs()+LAP+TRT,expEnd=()=>closeEnd()+38;
+const SLOW=100;
+function pose(n,ms,w,lev,fo,st={}){ // n frames done, ms exposure clock, w wind 0..1, lever 0..1, fo focus 0..1
+ const ce=closeEnd(),up=s5(lin(ms,M0,M1))*(1-s5(lin(ms,ce+3,ce+30)));
+ const r1=w>0?1-w:clamp((ms-C0)/TRT),r2=w>0?1-w:clamp((ms-C0-expMs()-LAP)/TRT);
+ const x1=lerp(X1A,X1B,r1),x2=lerp(X2A,X2B,r2);
+ mirrorN.rotation.x=lerp(45*D,0,up);mlev.rotation.x=up*.5;
+ const ir=s5(lin(ms,M0,M1-4))*(1-s5(lin(ms,ce+3,ce+20)));blades.forEach(b=>b.rotation.z=ir*32.8*D);lensLever.rotation.z=ir*.16;stopN.rotation.z=ir*.16;
+ span(c1.cloth,x1,R1X);c1.t.forEach(t=>span(t,DX,x1));c1.lath.position.x=x1;span(c2.cloth,DX,x2);c2.t.forEach(t=>span(t,x2,R2X));c2.lath.position.x=x2;
+ // curtain path is tangent at z- side: dx = -r dθ
+ drum1.rotation.y=-(x1-X1A)/DR;drum2.rotation.y=-(x2-X2A)/DR;rol1.rotation.y=-(x1-X1A)/RR;rol2.rotation.y=-(x2-X2A)/RR;
+ const A=(n+w)*38;filmTex.offset.x=-A/38%1;sprN.rotation.y=A/SR;spoN.rotation.y=A/FR;casN.rotation.y=rewN.rotation.y=A/7.5;
+ levN.rotation.y=160*D*lev+ -.12;setGears((n+w)*160*D);cntN.rotation.y=(n+w)*9*D;
+ btnN.position.y=36.6-1.1*ss(lin(ms,-6,0))*(1-ss(lin(ms,60,90)));
+ focusN.rotation.z=-fo*83*D;cell.position.z=fo*3;
+ pose.st={up,x1,x2,ir,w,ms}}
+const loop={t:0,n:3};const FOC=2.4,WT=2.6,GAP=.7;
+function liveCycle(dt){const E=(expEnd()+8)/1000*SLOW;const total=FOC+E+GAP+WT+GAP;loop.t+=dt;if(loop.t>=total){loop.t-=total;loop.n++;if(loop.t>total)loop.t=0}
+ const t=loop.t,a=loop.n%2,fo=s5(lin(t,.2,FOC-.3)),f=a?1-fo:fo;let ms=-8,w=0,lev=0,txt,ratio;
+ if(t<FOC){txt='Focus';ratio='real time'}
+ else if(t<FOC+E){ms=(t-FOC)/SLOW*1000-8;ratio='1/'+SLOW+' speed'}
+ else{ms=1e4;const q=t-FOC-E-GAP;w=s5(lin(q,0,WT*.68));lev=w*(1-ss(lin(q,WT*.7,WT)));txt=q<0?'Ready to wind':w<1?'Wind: film moves, curtains cock':'Cocked';ratio='1/3 speed'}
+ pose(loop.n,ms,w,lev,f);hudText(txt,ms,ratio)}
+let lastHud='';
+function hudText(txt,ms,ratio){const ce=closeEnd();if(!txt)txt=ms<M0?'Button pressed':ms<M1?'Mirror goes up, iris closes':ms<C0?'Mirror up':ms<C0+TRT||ms<ce?(expMs()<36/VEL?`Slit ${(expMs()*VEL).toFixed(1)} mm moves over the film`:ms<C0+TRT?'First curtain opens':ms<C0+expMs()+LAP?'Gate fully open':'Second curtain closes'):ms<ce+3?'Gate closed':'Mirror returns, iris opens';
+ const s=`<b>${txt}</b>${ms>-8&&ms<1e3?Math.max(0,ms).toFixed(0).padStart(2,'0')+' ms · ':''}${ratio}`;if(s!==lastHud)$('hud').innerHTML=lastHud=s}
+
+/* ---------- explode ---------- */
+let e=0,eT=0;
+function explode(v){for(const p of parts){let x=0,y=0,z=0;for(const m of p.moves){const k=s5(lin(v,m[3]/.8,m[4]/.8));x+=m[0]*k;y+=m[1]*k;z+=m[2]*k}p.g.position.set(x,y,z)}
+ lensRoot.rotation.z=s5(lin(v,.0,.1))*60*D;lensRoot.position.z=114*s5(lin(v,.09,.5));doorPivot.rotation.y=s5(lin(v,.03,.36))*100*D;const k=s5(lin(v,.12,.45));leaN[0].position.x=40*k;leaN[1].position.x=-40*k;}
+
+/* ---------- framing ---------- */
+explode(0);pose(0,-8,0,0,0);root.updateMatrixWorld(true);
+for(const p of parts){const b=new THREE.Box3();const inv=p.g.matrixWorld.clone().invert();for(const m of p.meshes){m.geometry.computeBoundingBox();b.union(m.geometry.boundingBox.clone().applyMatrix4(inv.clone().multiply(m.matrixWorld)))}
+ p.c=[];for(let i=0;i<8;i++)p.c.push(V(i&1?b.max.x:b.min.x,i&2?b.max.y:b.min.y,i&4?b.max.z:b.min.z))}
+let W=1,H=1,phone=false;const vr=V(),vu=V(),vd=V(),vp=V();
+function dirOf(th,ph,o){return o.set(Math.sin(th)*Math.cos(ph),Math.sin(ph),Math.cos(th)*Math.cos(ph))}
+function fit(list,th,ph,pad=1.1,side=1){dirOf(th,ph,vd);vr.set(Math.cos(th),0,-Math.sin(th));vu.crossVectors(vd,vr);
+ let a=[1e9,1e9,1e9],b=[-1e9,-1e9,-1e9];const P3=[];for(const p of list)for(const c of p.c){vp.copy(c).applyMatrix4(p.g.matrixWorld);const q=[vp.dot(vr),vp.dot(vu),vp.dot(vd)];P3.push(q);for(let i=0;i<3;i++){a[i]=Math.min(a[i],q[i]);b[i]=Math.max(b[i],q[i])}}
+ const c=a.map((v,i)=>(v+b[i])/2);const ty=Math.tan(cam.fov*D/2),free=phone?.66:.84,tx=ty*cam.aspect*side;let d=0;
+ for(const q of P3)d=Math.max(d,(q[2]-c[2])+Math.max(Math.abs(q[0]-c[0])/tx,Math.abs(q[1]-c[1])/(ty*free))*pad);
+ return{t:V(0,0,0).addScaledVector(vr,c[0]).addScaledVector(vu,c[1]).addScaledVector(vd,c[2]),d:Math.max(d,34)}}
+
+/* ---------- state ---------- */
+let crumb=[];// [] | [group] | [group,partId]
+const HERO={th:-.58,ph:.3};
+const rig={th:HERO.th,ph:HERO.ph,zoom:1,t:V(0,0,20),d:900,thT:HERO.th,phT:HERO.ph,zT:1,off:[0,0],fw:0};
+const VIEW={Lens:[-.85,.22],Body:[-.58,.3],Viewfinder:[-.95,.2],'Mirror box':[-.8,.28],Shutter:[-.42,.2],'Film transport':[-.5,.34],Controls:[-.4,.55]},PVIEW={mirror:[-.72,.34],c1:[-.35,.16],c2:[-.35,.16],door:[2.7,.25],pressure:[2.5,.2],eye:[2.5,.2],film:[-.35,.25],gears:[-.4,.75],bottom:[-.5,-.55],battery:[-.5,-.4],stop:[-.7,.05],mlever:[-1.1,.2],dial:[-.2,.8],counter:[-.2,.85],lever:[-.3,.75],rewind:[.3,.6],top:[-.5,.5],lmount:[2.7,.2],iris:[-.4,.1],L1:[-.5,.15],cassette:[.5,.3]};
+const CTX={Shutter:['film'],mirror:['mbox'],c1:['film','c2','drum','rollers'],c2:['film','c1','drum','rollers']};// context that fades less
+let tourT=-1;
+function targets(){return crumb.length==2?[byId[crumb[1]]]:crumb.length?parts.filter(p=>p.group==crumb[0]):parts}
+function go(c,view=true){if(tourT>=0)stopTour();crumb=c;const v=c.length==2?PVIEW[c[1]]||VIEW[c[0]]:c.length?VIEW[c[0]]:[HERO.th,HERO.ph];if(view){rig.thT=rig.th+Math.atan2(Math.sin(v[0]-rig.th),Math.cos(v[0]-rig.th));rig.phT=v[1];rig.zT=1}render()}
+function render(){const n=$('crumb');n.innerHTML='';['Camera',...(crumb[0]?[crumb[0]]:[]),...(crumb[1]?[byId[crumb[1]].name]:[])].forEach((s,i)=>{if(i){const k=document.createElement('i');k.textContent='/';n.append(k)}const b=document.createElement('button');b.textContent=s;b.onclick=()=>go(crumb.slice(0,i));n.append(b)});
+ const k=$('card');k.classList.toggle('on',crumb.length>0);if(!crumb.length)return;
+ if(crumb[1]){const p=byId[crumb[1]];k.innerHTML=`<h2>${p.name}</h2><p>${p.desc}</p><div class="n">${p.num}</div><div class="l">${p.label}${p.est?' (estimate)':''}</div>`;if(p.id=='c2'){k.querySelector('.n').textContent=expMs()<14?(expMs()*VEL).toFixed(1)+' mm':'36 mm';k.querySelector('.l').textContent=(expMs()<14?'slit width':'gate fully open')+` at 1/${speed} s (estimate)`}}
+ else{k.innerHTML=`<h2>${crumb[0]}</h2><p>${GROUPS[crumb[0]]}</p><ul></ul>`;for(const p of targets()){const li=document.createElement('li'),b=document.createElement('button');b.textContent=p.name;b.onclick=()=>go([p.group,p.id]);li.append(b);k.querySelector('ul').append(li)}}}
+function wantFade(p){if(!crumb.length)return 1;if(p.group!==crumb[0])return crumb[1]?(CTX[crumb[1]]?.includes(p.id)?.5:.008):CTX[crumb[0]]?.includes(p.id)?.6:crumb[0]=='Shutter'||crumb[0]=='Mirror box'?.008:.014;if(!crumb[1]||p.id==crumb[1])return 1;return CTX[crumb[1]]?.includes(p.id)?(crumb[1]=='mirror'?.16:.55):.012}
+function applyFade(p,f){if(Math.abs(p.fade-f)<1e-4&&p.done)return;p.fade=f;const full=f>.995;for(const m of p.mats){const u=m.userData,t=u.t||!full;if(m.transparent!==t){m.transparent=t;m.needsUpdate=true}m.opacity=u.o*f;m.envMapIntensity=Math.min(1,.25+f);m.depthWrite=full?u.dw:(f>.6&&u.dw)}for(const o of p.meshes){o.visible=f>.011;o.castShadow=o.userData.cs&&f>.5;o.renderOrder=full?(o.userData.ro??=o.renderOrder):3}p.done=true}
+
+/* ---------- tour: 40 s, one clock ---------- */
+const TL=40;
+// t, theta, elev, explode, view weights [all, mirror, shutter], zoom
+const TK=[[0,-.95,.16],[5,-.45,.3],[13,-.78,.3],[17,-.8,.3],[22,-.62,.24],[25,-.42,.06],[30,-.2,.08],[34.5,-.42,.34],[40,-.58,.3]];
+function herm(k,t){let i=0;while(i<TK.length-2&&t>TK[i+1][0])i++;const A=TK[i],B=TK[i+1],P=TK[Math.max(0,i-1)],N=TK[Math.min(TK.length-1,i+2)],h=B[0]-A[0],u=clamp((t-A[0])/h);const m0=i?(B[k]-P[k])/(B[0]-P[0]):0,m1=i<TK.length-2?(N[k]-A[k])/(N[0]-A[0]):0;const u2=u*u,u3=u2*u;return(2*u3-3*u2+1)*A[k]+(u3-2*u2+u)*h*m0+(-2*u3+3*u2)*B[k]+(u3-u2)*h*m1}
+const pw=(t,k)=>{if(t<=k[0][0])return k[0][1];for(let i=1;i<k.length;i++)if(t<=k[i][0])return lerp(k[i-1][1],k[i][1],(t-k[i-1][0])/(k[i][0]-k[i-1][0]));return k[k.length-1][1]};
+let tourN=10;
+function tourCycle(t){const ce=C0+4+LAP+TRT;// tour uses 1/250 s
+ let ms,w=0,lev=0,fo=0,txt,ratio;
+ if(t<17){const u=t%8.5,f=s5(lin(t%17,.5,2.5))-s5(lin(t,13,15));fo=f;ms=-8;if(t>2.6&&t<13){const q=t-2.6;ms=q<9?q*10-8:1e4;if(q>=9){w=0}}ratio='1/100 speed';
+  if(t<2.6||(t>=13)){txt='Focus';ratio='real time'}
+  if(t>=11.7&&t<16){ms=1e4;w=s5(lin(t,12,13.8));lev=w*(1-ss(lin(t,13.9,15)));txt='Wind: film moves, curtains cock';ratio='1/3 speed'}if(t>=16){ms=-8;w=0;txt='Cocked';ratio=''}
+  pose(t>=16?tourN+1:tourN,ms,w,lev,fo);hudText(txt,ms,ratio);return}
+ ms=pw(t,[[17,-2],[17.5,M0],[21.3,M1],[24.2,C0],[30.2,ce],[30.7,ce+3],[33.6,ce+32]]);ratio=t<21.3?'1/150 speed':t<24.2?'1/480 speed':t<30.2?'1/300 speed':'1/100 speed';
+ if(t>34){ms=1e4;w=s5(lin(t,34.6,36.4));lev=w*(1-ss(lin(t,36.5,37.6)));txt=w<1?'Wind: film moves, curtains cock':'Cocked';ratio='1/3 speed'}
+ pose(tourN+1,ms,w,lev,fo);hudText(txt,ms,ratio)}
+const mirSet=['mirror','mbox','mlever'],shSet=['c1','c2','drum','rollers'];
+function tourFrame(t){e=eT=t<20?s5(lin(t,4.5,13)):1-s5(lin(t,30.2,38));explode(e);root.updateMatrixWorld(true);
+ const th=herm(1,t),ph=herm(2,t);const wM=s5(lin(t,12,17.2))*(1-s5(lin(t,20.8,24.6))),wS=s5(lin(t,20.8,24.6))*(1-s5(lin(t,29.6,34.5))),wA=1-wM-wS;
+ const A=fit(parts,th,ph,1.06),Mv=fit([byId.mirror],th,ph,1.35),S=fit([byId.c1,byId.c2],th,ph,1.34);
+ rig.t.set(0,0,0).addScaledVector(A.t,wA).addScaledVector(Mv.t,wM).addScaledVector(S.t,wS);rig.d=Math.exp(Math.log(A.d)*wA+Math.log(Mv.d)*wM+Math.log(S.d)*wS);
+ const other=1-lin(wM+wS,.25,.9);for(const p of parts){let f=other;if(mirSet.includes(p.id))f=Math.max(f,wM*(p.id=='mirror'?1:p.id=='mbox'?.22:.8));if(shSet.includes(p.id))f=Math.max(f,wS,wM*.1);if(p.id=='film'||p.id=='chassis')f=Math.max(f,wS*(p.id=='film'?.85:.1));applyFade(p,f)}
+ rig.th=rig.thT=th;rig.ph=rig.phT=ph;rig.zoom=rig.zT=1;beamWant=Math.max(wM,wS)}
+let preTourSpeed=250;
+function startTour(at=0){if(tourT<0)preTourSpeed=speed;crumb=[];render();tourT=at;setSpeed(250);$('tour').textContent='Stop'}
+function stopTour(){tourT=-1;$('tour').textContent='Tour';setSpeed(preTourSpeed);loop.t=0;rig.thT=rig.th;rig.phT=rig.ph}
+
+/* ---------- beam ---------- */
+let beamWant=0,beamO=0;const wp=(id,x,y,z)=>V(x,y,z).applyMatrix4(byId[id].g.matrixWorld);
+function updBeam(dt){beamO=lerp(beamO,beamWant,1-Math.exp(-dt*5));bm.opacity=beamO*.9;beam.visible=beamO>.01;if(!beam.visible)return;segs.forEach(s=>s.visible=false);
+ const s=pose.st,src=wp('front',0,0,110);src.x=0;
+ if(s.up<.02){const m=wp('mirror',0,0,22),p1=wp('prism',0,yb+a0+11.5*T,22),p2=wp('prism',0,yb+a0/2,zr+a0*1.2071),ex=wp('eye',0,37,-26);seg(0,src,m);seg(1,m,p1);seg(2,p1,p2);seg(3,p2,ex)}
+ else if(s.up<.98){const a=mirrorN.rotation.x;// hit point of the axis on the tilted mirror
+  const z=HZ+HY/Math.tan(Math.max(a,.05));seg(0,src,wp('mirror',0,0,Math.min(z,HZ+ML*Math.cos(a))));if(z>HZ+ML*Math.cos(a)){seg(0,src,wp(s.x1>-.2?'c2':'c1',0,0,3))}}
+ else{const open=s.x1>.6&&s.x2<-.6;seg(0,src,open?wp('film',0,0,0):wp(s.x2>=-.6?'c2':'c1',0,0,3))}}
+
+/* ---------- post: depth of field, tone map ---------- */
+let rt;const pScene=new THREE.Scene(),pCam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+const pm=new THREE.ShaderMaterial({depthTest:false,depthWrite:false,uniforms:{tC:{value:null},tD:{value:null},res:{value:new THREE.Vector2()},near:{value:cam.near},far:{value:cam.far},foc:{value:500},ap:{value:.03},time:{value:0}},defines:{TAPS:48},
+ vertexShader:'varying vec2 v;void main(){v=uv;gl_Position=vec4(position.xy,0.,1.);}',
+ fragmentShader:`varying vec2 v;uniform sampler2D tC,tD;uniform vec2 res;uniform float near,far,foc,ap,time;
+ float dep(vec2 u){float z=texture2D(tD,u).x*2.-1.;return 2.*near*far/(far+near-z*(far-near));}
+ float coc(float d){return min(ap*abs(d-foc)/d*res.y,res.y*.008);}
+ float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
+ vec3 aces(vec3 x){x*=.92;return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}
+ void main(){float d0=dep(v),c0=coc(d0);vec3 col=min(texture2D(tC,v).rgb,vec3(1.8));
+ #if TAPS>0
+ float mx=res.y*.008,W=1.,ro=0.;vec3 s=col;
+ for(int i=0;i<TAPS;i++){float f=sqrt((float(i)+.5)/float(TAPS)),a=float(i)*2.39996+ro,r=f*mx;vec2 u=v+vec2(cos(a),sin(a))*r/res;float d=dep(u),c=coc(d);if(d>d0)c=min(c,c0);float w=smoothstep(r-1.5,r+.5,c);w/=max(1.,c*c*.04+.6);vec3 q=min(texture2D(tC,u).rgb,vec3(1.8));s+=q*w;W+=w;}
+ col=s/W;
+ #endif
+ vec2 k=v-.5;col*=1.-dot(k,k)*.55;col=aces(col);col=mix(col*12.92,1.055*pow(max(col,vec3(0.)),vec3(1./2.4))-.055,step(.0031308,col));
+ col+=(h(gl_FragCoord.xy+fract(time)*91.)-.5)*.018;gl_FragColor=vec4(col,1.);}`});
+pScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),pm));
+let dpr=Math.min(devicePixelRatio||1,2),quality=0;
+function size(){W=innerWidth;H=innerHeight;phone=W<=700;if(W*H*dpr*dpr>4.6e6)dpr=Math.sqrt(4.6e6/(W*H));R.setPixelRatio(dpr);R.setSize(W,H,false);const w=Math.floor(W*dpr),h=Math.floor(H*dpr);rt?.depthTexture.dispose();rt?.dispose();rt=new THREE.WebGLRenderTarget(w,h,{type:THREE.HalfFloatType,samples:4});rt.depthTexture=new THREE.DepthTexture(w,h,THREE.UnsignedIntType);pm.uniforms.tC.value=rt.texture;pm.uniforms.tD.value=rt.depthTexture;pm.uniforms.res.value.set(w,h);cam.aspect=W/H;cam.updateProjectionMatrix()}
+addEventListener('resize',size);size();
+let acc=0,cnt=0;
+function adapt(dt){if(document.hidden||dt>.25)return;acc+=dt;if(++cnt<50)return;const a=acc/cnt;acc=cnt=0;if(a<.027||quality>3)return;quality++;if(quality==1)dpr=Math.min(dpr,1.4);if(quality==2){pm.defines.TAPS=20;pm.needsUpdate=true;dpr=Math.min(dpr,1.1)}if(quality==3){key.shadow.mapSize.set(1024,1024);key.shadow.map?.dispose();key.shadow.map=null;dpr=Math.min(dpr,1)}if(quality==4){pm.defines.TAPS=0;pm.needsUpdate=true}size()}
+
+/* ---------- input ---------- */
+const ray=new THREE.Raycaster(),mp=new THREE.Vector2();
+function pick(x,y){mp.set(x/W*2-1,1-y/H*2);ray.setFromCamera(mp,cam);const L=[];for(const p of parts){if(crumb.length&&p.group!==crumb[0])continue;L.push(...p.meshes)}const h=ray.intersectObjects(L,false)[0];if(!h)return null;let o=h.object;while(o&&!o.userData.part)o=o.parent;return o&&o.userData.part}
+const ptr=new Map();let moved=0,pinch=0;
+canvas.addEventListener('pointerdown',v=>{canvas.setPointerCapture(v.pointerId);ptr.set(v.pointerId,[v.clientX,v.clientY]);if(ptr.size==1)moved=0;pinch=0});
+canvas.addEventListener('pointermove',v=>{const q=ptr.get(v.pointerId);if(!q){hover(v);return}const dx=v.clientX-q[0],dy=v.clientY-q[1];q[0]=v.clientX;q[1]=v.clientY;moved+=Math.abs(dx)+Math.abs(dy);
+ if(moved>6&&tourT>=0)stopTour();
+ if(ptr.size==1){if(moved>6){rig.thT-=dx*.006;rig.phT=clamp(rig.phT+dy*.005,-1.35,1.45)}}else{const a=[...ptr.values()],d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);if(pinch)rig.zT=clamp(rig.zT*pinch/d,.3,2.2);pinch=d}});
+const up=v=>{const had=ptr.delete(v.pointerId);if(had&&v.type=='pointerup'&&moved<=6&&!ptr.size){if(tourT>=0){stopTour();return}const p=pick(v.clientX,v.clientY);if(p)go([p.group,p.id]);else if(crumb.length)go(crumb.slice(0,-1))}};
+canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+canvas.addEventListener('wheel',v=>{v.preventDefault();rig.zT=clamp(rig.zT*Math.exp(v.deltaY*.001),.3,2.2)},{passive:false});
+let hv=0;function hover(v){if(v.pointerType=='touch'||tourT>=0||performance.now()-hv<60)return;hv=performance.now();const p=pick(v.clientX,v.clientY),t=$('tip');canvas.classList.toggle('hot',!!p);t.style.opacity=p?1:0;if(p){t.textContent=p.name;t.style.left=Math.min(v.clientX+14,W-190)+'px';t.style.top=v.clientY+14+'px'}}
+canvas.addEventListener('pointerleave',()=>$('tip').style.opacity=0);
+addEventListener('keydown',v=>{if(v.key=='Escape'){if(tourT>=0)stopTour();else if(crumb.length)go(crumb.slice(0,-1))}});
+const ex=$('ex');ex.oninput=()=>{if(tourT>=0)stopTour();eT=+ex.value};
+$('bm').onclick=()=>go(['Mirror box','mirror']);$('bs').onclick=()=>go(['Shutter']);$('tour').onclick=()=>tourT>=0?stopTour():startTour();
+function setSpeed(s){speed=s;$('sp').value=s}
+for(const s of SPD.slice(0,7)){const o=document.createElement('option');o.value=s;o.textContent='1/'+s+' s';$('sp').append(o)}
+$('sp').onchange=v=>{if(tourT>=0)stopTour();speed=+v.target.value;preTourSpeed=speed;loop.t=Math.min(loop.t,FOC);render()};setSpeed(250);
+
+/* ---------- frame ---------- */
+const q=new URLSearchParams(location.search);e=eT=clamp(parseFloat(q.get('explode'))||0);render();
+let last=performance.now(),first=true,clock=0,frozen=false;
+function frame(now){const dt=Math.min((now-last)/1000,.1);const raw=(now-last)/1000;last=now;clock+=dt;if(!first)adapt(raw);
+ const k=first?1:1-Math.exp(-dt*3.4);let sh=0;
+ if(tourT>=0){if(!frozen)tourT+=raw<1?raw:0;if(tourT>=TL){tourT=TL;tourFrame(TL);tourCycle(TL);stopTour()}else{tourCycle(tourT);tourFrame(tourT)}rig.fw=0}
+ else{e=lerp(e,eT,first?1:1-Math.exp(-dt*9));if(Math.abs(e-eT)<5e-4)e=eT;explode(e);if(!frozen)liveCycle(dt);root.updateMatrixWorld(true);
+  rig.th=lerp(rig.th,rig.thT,k);rig.ph=lerp(rig.ph,rig.phT,k);rig.zoom=lerp(rig.zoom,rig.zT,k);
+  const tp=crumb.length?0:(phone?.3:.13)*e,tw=crumb.length?0:(phone?.2:-.3)*e,f=fit(targets(),rig.th+tw,rig.ph+tp,crumb.length==2?1.45:crumb.length?1.15:1.02,crumb.length&&!phone?Math.max(.45,1-340/W):1);rig.t.lerp(f.t,k);rig.d=first?f.d:Math.exp(lerp(Math.log(rig.d),Math.log(f.d),k));
+  for(const p of parts)applyFade(p,first?wantFade(p):Math.abs(p.fade-wantFade(p))<.006?wantFade(p):lerp(p.fade,wantFade(p),1-Math.exp(-dt*6)));
+  beamWant=crumb.length&&['Mirror box','Shutter','Viewfinder'].includes(crumb[0])?1:0}
+ dialN.rotation.y=lerp(dialN.rotation.y,(SPD.length-SPD.indexOf(speed))*30*D,k);
+ const ox=crumb.length&&!phone?163:0,oy=crumb.length&&phone?H*.2:phone?H*.04:H*.03;rig.off[0]=lerp(rig.off[0],ox,k);rig.off[1]=lerp(rig.off[1],oy,k);
+ cam.setViewOffset(W,H,rig.off[0],rig.off[1],W,H);
+ const sway=tourT>=0||crumb.length?0:Math.sin(clock*.25)*.05;dirOf(rig.th+sway+(tourT>=0||crumb.length?0:(phone?.2:-.3)*e),rig.ph+(tourT>=0||crumb.length?0:(phone?.3:.13)*e),vd);cam.position.copy(rig.t).addScaledVector(vd,rig.d*rig.zoom);cam.up.set(0,1,0);cam.lookAt(rig.t);
+ cam.near=Math.max(2,rig.d*rig.zoom*.06);cam.far=rig.d*rig.zoom+1500;cam.updateProjectionMatrix();cam.updateMatrixWorld();updBeam(dt);
+ const u=pm.uniforms;u.near.value=cam.near;u.far.value=cam.far;u.foc.value=rig.d*rig.zoom;u.ap.value=lerp(.022,.011,e);u.time.value=clock;
+ if(tourT>=0||Math.abs(+ex.value-eT)>.0005)ex.value=tourT>=0?e:eT;ex.style.setProperty('--v',ex.value*100+'%');
+ R.setRenderTarget(rt);R.render(scene,cam);R.setRenderTarget(null);R.render(pScene,pCam);first=false}
+R.info.autoReset=false;
+window.__slr={parts,rig,loop,pose:()=>pose.st,startTour,stopTour,freeze:v=>frozen=v,get tourT(){return tourT},get e(){return e},get crumb(){return crumb},get quality(){return quality},set(ms,w=0,lev=0,fo=0){frozen=true;pose(3,ms,w,lev,fo);hudText('',ms,'')},go,R,project(id){const p=byId[id],c=V();p.c.forEach(x=>c.add(x));c.divideScalar(8).applyMatrix4(p.g.matrixWorld).project(cam);return[(c.x+1)/2*W,(1-c.y)/2*H]}};
+if(q.get('tour')==='1')startTour(clamp(parseFloat(q.get('seek'))||0,0,TL-.1));
+R.setAnimationLoop(t=>{R.info.reset();frame(performance.now())});
+</script></body></html>

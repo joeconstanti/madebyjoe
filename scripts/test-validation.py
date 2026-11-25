@@ -18,7 +18,7 @@ class ValidationTests(unittest.TestCase):
         self.root.mkdir()
         for name in ('index.html', 'archive.html', 'makersclub.html', '404.html', '.htaccess', 'robots.txt', 'sitemap.xml'):
             shutil.copy2(ROOT / name, self.root / name)
-        for name in ('css', 'fonts', 'img', 'js', 'media', 'scripts'):
+        for name in ('css', 'fonts', 'img', 'js', 'media', 'resources', 'scripts'):
             shutil.copytree(ROOT / name, self.root / name,
                             ignore=shutil.ignore_patterns('node_modules', '__pycache__'))
         shutil.copytree(ROOT / 'clients/audits', self.root / 'clients/audits')
@@ -195,6 +195,7 @@ class ValidationTests(unittest.TestCase):
 
     def test_staging_excludes_private_files_and_rejects_checkout(self):
         (self.root / 'PRIVATE.md').write_text('Do not publish')
+        (self.root / 'resources/hydrogen-3d/private.html').write_text('Do not publish')
         audits = self.root / 'clients/audits'
         (audits / 'private.html').write_text('Do not publish')
         (audits / 'sported-assets/local/raw.json').write_text('Do not publish')
@@ -205,7 +206,9 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual({p.name for p in destination.iterdir()},
                          {'.htaccess', 'index.html', 'archive.html', 'makersclub.html', '404.html', 'robots.txt', 'sitemap.xml',
-                          'css', 'fonts', 'img', 'js', 'media', 'clients'})
+                          'css', 'fonts', 'img', 'js', 'media', 'clients', 'resources'})
+        self.assertTrue((destination / 'resources/hydrogen-3d/sol/index.html').is_file())
+        self.assertFalse((destination / 'resources/hydrogen-3d/private.html').exists())
         expected = {'audits/sported.html', 'audits/sported-assets/sported-live-homepage-hero.png',
                     'audits/sported-assets/sported-logo.png'}
         expected.update(f'audits/sported-assets/{environment}/{page}-{device}.json'
