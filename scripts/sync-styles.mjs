@@ -71,9 +71,12 @@ for (const name of ['archive.html', 'makersclub.html', '404.html', 'resources/in
   if (footerPattern.test(current) !== hasSharedFooter) {
     throw new Error(`Unexpected shared footer state in ${name}`);
   }
-  const pageHeader = name === 'archive.html'
-    ? secondaryHeader.replace('href="/archive"', 'href="/archive" aria-current="page"')
-    : secondaryHeader;
+  let pageHeader = secondaryHeader;
+  if (name === 'archive.html') {
+    pageHeader = secondaryHeader.replace('href="/archive"', 'href="/archive" aria-current="page"');
+  } else if (name === 'resources/index.html') {
+    pageHeader = secondaryHeader.replace('href="/resources/"', 'href="/resources/" aria-current="page"');
+  }
   const withHeader = current.replace(headerPattern, () => pageHeader);
   const generated = hasSharedFooter ? withHeader.replace(footerPattern, () => footer) : withHeader;
   pages.push([name, path, current, generated]);
