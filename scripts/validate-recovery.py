@@ -105,7 +105,11 @@ def validate_reference(root, reference, anchor, allow_fragment):
     decoded = unquote(url.path, errors='strict')
     if '\\' in decoded or '\0' in decoded:
         raise ValueError('Invalid local path')
-    public_routes = {'/': 'index.html', '/archive': 'archive.html'}
+    public_routes = {
+        '/': 'index.html',
+        '/archive': 'archive.html',
+        '/resources/': 'resources/index.html',
+    }
     if anchor and decoded in public_routes:
         check_file(root, public_routes[decoded])
         return
