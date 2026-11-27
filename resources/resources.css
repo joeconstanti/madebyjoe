@@ -181,3 +181,9 @@
     transition: none;
   }
 }
+
+.project-story figure { margin: 0 0 2rem; }
+.project-story video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; }
+.project-story figcaption { margin-top: .5rem; color: var(--muted); }
+.project-story p + p { margin-top: 1rem; }
+.project-story p a { text-decoration: underline; }

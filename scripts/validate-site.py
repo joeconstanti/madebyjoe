@@ -125,7 +125,10 @@ def validate(root=ROOT):
             check_local_path(root, target, page.errors, f'Missing CSS asset: {reference}')
     tree = ET.parse(sources['sitemap.xml'])
     locations = [node.text for node in tree.iter('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
-    if locations != [CANONICAL, MAKERSCLUB_CANONICAL, CANONICAL + 'archive']:
+    directories = ('resources/', 'resources/take-anything-apart/',
+                   'projects/samsung-space-selfie/', 'projects/audi-red-blue/')
+    if locations != [CANONICAL, MAKERSCLUB_CANONICAL, CANONICAL + 'archive',
+                     *(CANONICAL + route for route in directories)]:
         page.errors.append('Unexpected canonical sitemap URLs')
     if page.canonicals != [CANONICAL]:
         page.errors.append('Expected exactly one homepage canonical matching the sitemap URL in the head')
@@ -149,6 +152,28 @@ def validate(root=ROOT):
         elif url.fragment and unquote(url.fragment) not in archive.ids:
             archive.errors.append(f'Missing archive fragment: {reference}')
     page.errors.extend(archive.errors)
+    for route in directories:
+        target = check_local_path(root, root / route / 'index.html', page.errors,
+                                  f'Missing sitemap page: /{route}')
+        if not target:
+            continue
+        linked = Page()
+        linked.feed(target.read_text(encoding='utf-8'))
+        if linked.canonicals != [CANONICAL + route]:
+            linked.errors.append(f'Expected one canonical for /{route}')
+        for reference, resource in linked.references:
+            url = urlsplit(reference)
+            if url.scheme or url.netloc or not url.path:
+                continue
+            if url.path == '/archive':
+                asset = sources['archive.html']
+            elif url.path.startswith('/'):
+                asset = root / unquote(url.path).lstrip('/')
+            else:
+                asset = target.parent / unquote(url.path)
+            check_local_path(root, asset, linked.errors, f'Missing local asset on /{route}: {reference}',
+                             require_file=resource)
+        page.errors.extend(linked.errors)
     validate_share_metadata(page, root)
     if 'Sitemap: https://madebyjoe.co/sitemap.xml' not in sources['robots.txt'].read_text(encoding='utf-8'):
         page.errors.append('Missing sitemap discovery')

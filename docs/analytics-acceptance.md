@@ -4,7 +4,7 @@ Use the deployed homepage at `https://madebyjoe.co/` and a browser profile
 with storage available and no analytics blockers. Use a fresh visitor profile
 for visitor checks and a separate profile for the staff check. For checks in
 GA4, select the property whose web stream measurement ID matches the Google
-tag in [index.html](../index.html). Record the date, time zone, browser, URL
+tag in [analytics.js](../js/analytics.js). Record the date, time zone, browser, URL
 path, and result for each check. Keep raw network captures, cookies, client
 and session identifiers, and account details out of shared evidence.
 
@@ -34,6 +34,7 @@ Use the visitor profile on `madebyjoe.co`. The custom-event handler in
 | --- | --- | --- |
 | Scroll a section or project chapter with an ID into view and keep at least a quarter of it visible for one second in the active tab. | `section_view` | `section_id` matches the section or chapter ID. |
 | Click an external HTTP(S) link inside a project chapter. | `project_click` | `section_id`, `link_domain`, and `link_url` match the chapter and destination. |
+| Click a project source link on one of the project pages. | `project_click` | `section_id` is the project identifier, such as `jg-audi-a1-red-and-blue`. |
 | Click the contact email link. | `contact_intent` | `contact_method` is `email_copy` after a successful copy or `email_link` when the mail link is used as a fallback. |
 
 Check the Network panel for each exact event name and its parameters. Then
@@ -50,8 +51,10 @@ from other traffic, record delivery in GA4 as unverified.
 1. In the staff profile, open `https://madebyjoe.co/?mbj_staff=1`. Check that
    the flag disappears from the address bar and that the document's
    `<html>` element has `data-staff-traffic="internal"`. Reload the clean URL
-   to check that the marker persists. The homepage stores the choice in
-   localStorage and sets `traffic_type: 'internal'` in the Google tag config.
+   to check that the marker persists. Open the archive or a resource guide
+   in the same profile and check for the same marker. The shared Analytics
+   script stores the choice in localStorage and sets
+   `traffic_type: 'internal'` in the Google tag config.
    If the browser blocks storage, the flag applies only to that visit.
 2. Check the new page-view request and a custom-event request for the
    `internal` traffic type. Compare with a clean visitor profile. Run both
@@ -70,7 +73,8 @@ from other traffic, record delivery in GA4 as unverified.
    active exclusion permanently drops matching incoming data. See Google's
    [internal traffic filter guidance](https://support.google.com/analytics/answer/10104470).
 4. Open `https://madebyjoe.co/?mbj_staff=0` in the staff profile and reload.
-   Verify that the document marker and client traffic type are absent.
+   Verify that the document marker and client traffic type are absent on
+   both the homepage and the secondary page.
 
 ## 4. Dashboard attribution
 
