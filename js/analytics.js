@@ -12,6 +12,7 @@
   } catch (_) {
     // Keep the explicit choice for this view if storage is unavailable.
   }
+  if (staff) document.documentElement.dataset.staffTraffic = 'internal';
   if (choice === '1' || choice === '0') {
     url.searchParams.delete('mbj_staff');
     history.replaceState(history.state, '', url.pathname + url.search + url.hash);
@@ -44,7 +45,7 @@
     if (!link || !/^https?:$/.test(link.protocol)) return;
     const project = link.closest('article.entry[id], [data-project]');
     const details = { link_domain: link.hostname, link_url: link.href };
-    const projectId = link.dataset.featureLink || (project && (project.id || project.dataset.project));
+    const projectId = link.dataset.featureLink || (project && (project.dataset.project || project.id));
     if (projectId && (link.matches('.entry-link, [data-feature-link], [data-project-link]') || link.closest('.detail-links'))) {
       window.gtag('event', 'project_click', { ...details, section_id: projectId });
     } else if (link.hasAttribute('download') && link.closest('.resource-content')) {
