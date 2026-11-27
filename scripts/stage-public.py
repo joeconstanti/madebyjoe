@@ -9,6 +9,7 @@ AUDIT = 'clients/audits'
 SPORTED_ASSETS = f'{AUDIT}/sported-assets'
 FILES = (
     '.htaccess', 'index.html', 'archive.html', 'makersclub.html', '404.html', 'robots.txt', 'sitemap.xml',
+    'projects/samsung-space-selfie/index.html', 'projects/audi-red-blue/index.html',
     'resources/index.html',
     'resources/resources.css',
     *(f'resources/{slug}/{name}'

@@ -2,24 +2,6 @@
 <html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
-  <!-- Staff mode is browser-specific and runs before Analytics starts. -->
-  <script>
-    (() => {
-      const url = new URL(location.href);
-      const choice = url.searchParams.get('mbj_staff');
-      let staff = false;
-      try {
-        if (choice === '1') localStorage.setItem('mbj_staff', '1');
-        if (choice === '0') localStorage.removeItem('mbj_staff');
-        staff = localStorage.getItem('mbj_staff') === '1';
-      } catch (_) { staff = choice === '1'; }
-      if (staff) document.documentElement.dataset.staffTraffic = 'internal';
-      if (choice === '1' || choice === '0') {
-        url.searchParams.delete('mbj_staff');
-        history.replaceState(history.state, '', url.pathname + url.search + url.hash);
-      }
-    })();
-  </script>
   <!-- Microsoft Clarity: loads automatically on every page view. -->
   <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -28,6 +10,7 @@
       y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "z59pgupcro");
   </script>
+  <script src="/js/analytics.js" data-partytown></script>
   <!-- Google tag (gtag.js) -->
   <!-- partytown:start -->
   <script>window.partytown = { lib: '/js/vendor/partytown-1.0.2/', forward: ['dataLayer.push', 'gtag'] };
@@ -35,13 +18,6 @@
 !function(){const t=(t,e,r)=>{var n;if(void 0===(r=globalThis)._pttt){r._pttt=null;try{r._pttt=(null===(n=r.trustedTypes)||void 0===n?void 0:n.createPolicy("partytown",{createHTML:t=>t,createScript:t=>t,createScriptURL:t=>t}))||null}catch(t){}}return r._pttt?r._pttt[t](e):e},e={preserveBehavior:!1},r=t=>{if("string"==typeof t)return[t,e];const[r,n=e]=t;return[r,{...e,...n}]},n=Object.freeze((()=>{const t=new Set;let e=[];do{Object.getOwnPropertyNames(e).forEach(r=>{"function"==typeof e[r]&&t.add(r)})}while((e=Object.getPrototypeOf(e))!==Object.prototype);return Array.from(t)})());!function(e,o,i,a,c,s,p,l,d,u,f=e,y){function h(){y||(y=1,"/"==(p=(s.lib||"/~partytown/")+(s.debug?"debug/":""))[0]&&(d=o.querySelectorAll('script[type="text/partytown"]'),a!=e&&function(){try{return!!a.dispatchEvent}catch(t){return!1}}()?a.dispatchEvent(new CustomEvent("pt1",{detail:e})):(0!=(null==s?void 0:s.fallbackTimeout)&&(l=setTimeout(m,(null==s?void 0:s.fallbackTimeout)||1e4),o.addEventListener("pt0",w),o.addEventListener("pt2",m)),c?v(1):i.serviceWorker?i.serviceWorker.register(t("createScriptURL",p+(s.swPath||"partytown-sw.js")),{scope:p}).then(function(t){t?t.active?v():t.installing&&t.installing.addEventListener("statechange",function(t){"activated"==t.target.state&&v()}):m()},function(t){console.error(t),m()}):m())))}function v(r){u=o.createElement(r?"script":"iframe"),e._pttab=Date.now()+Math.round(Math.random()*Number.MAX_SAFE_INTEGER).toString(36),r||(u.style.display="block",u.style.width="0",u.style.height="0",u.style.border="0",u.style.visibility="hidden",u.setAttribute("aria-hidden",!0)),u.src=r?t("createScriptURL",p+"partytown-atomics.js?v=1.0.2"):p+"partytown-sandbox-sw.html?"+e._pttab,o.querySelector(s.sandboxParent||"body").appendChild(u)}function m(){if(w(),a==e){const t=(s.forward||[]).map(r);t.map(function([r]){const n=r.split(".")[0];t.some(function([t,{preserveBehavior:e}]){return e&&(r=n+".",t.startsWith(r));var r})||delete e[n]})}d=o.querySelectorAll('script[type="text/partytown"]');for(let t=0;t<d.length;t++)b(d[t]);"undefined"!=typeof MutationObserver&&new MutationObserver(function(t){t.map(function(t){for(var e=0;e<t.addedNodes.length;e++){var r=t.addedNodes[e];1==r.nodeType&&("SCRIPT"==r.nodeName&&"text/partytown"==r.type?b(r):r.querySelectorAll&&r.querySelectorAll('script[type="text/partytown"]').forEach(b))}})}).observe(o.documentElement,{childList:!0,subtree:!0}),u&&u.parentNode.removeChild(u)}function b(e,r){r=o.createElement("script"),e.src?r.src=t("createScriptURL",e.src):r.innerHTML=t("createHTML",e.innerHTML),r.nonce=s.nonce,e.type+="-x",o.head.appendChild(r)}function w(){clearTimeout(l),o.removeEventListener("pt2",m)}s=e.partytown||{},a==e&&(s.forward||[]).map(function(t){const[o,{preserveBehavior:i}]=r(t);f=e,o.split(".").map(function(t,r,o){var a;f=f[o[r]]=r+1<o.length?f[o[r]]||(a=o[r+1],n.includes(a)?[]:{}):(()=>{let t=null;if(i){const{methodOrProperty:r,thisObject:n}=((t,e)=>{let r=t;for(let t=0;t<e.length-1;t+=1)r=r[e[t]];return{thisObject:r,methodOrProperty:e.length>0?r[e[e.length-1]]:void 0}})(e,o);"function"==typeof r&&(t=(...t)=>r.apply(n,...t))}return"push"==o[r]&&Array.isArray(f)&&f.map(function(t){(e._ptf=e._ptf||[]).push(o,[t])}),function(){let r;return t&&(r=t(arguments)),(e._ptf=e._ptf||[]).push(o,arguments),r}})()})}),"complete"==o.readyState?h():(e.addEventListener("DOMContentLoaded",h),e.addEventListener("load",h))}(window,document,navigator,top,window.crossOriginIsolated)}();
   </script>
   <!-- partytown:end -->
-  <script type="text/partytown" src="https://www.googletagmanager.com/gtag/js?id=G-MEYN9YX3MM"></script>
-  <script type="text/partytown">
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function(){dataLayer.push(arguments);};
-    gtag('js', new Date());
-    gtag('config', 'G-MEYN9YX3MM', document.documentElement.dataset.staffTraffic === 'internal' ? { traffic_type: 'internal' } : {});
-  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Joe Constanti | Designer &amp; technologist | madebyjoe</title>
   <meta name="description" content="Joe is a London designer and technologist who makes things: From the Root Studio (3D, motion &amp; AI), Synthetic Labs (AI research), Cerebral (private AI hosting), Automate (AI automation) and joe.graphics (personal design work).">
@@ -145,7 +121,7 @@ html.lenis, html.lenis body { height: auto; }
 
 @media (max-width: 999px) {
   .hdr__role, .hdr__clock { display: none; }
-  .hdr__logo { grid-column: 1 / 7; }
+  .hdr__logo { grid-column: 1 / 7; justify-self: start; }
   .hdr__nav { grid-column: 7 / 13; gap: 14px; }
   .ftr__grid p:nth-child(1) { grid-column: 1 / 7; }
   .ftr__grid p:nth-child(2) { grid-column: 7 / 13; }
@@ -153,8 +129,14 @@ html.lenis, html.lenis body { height: auto; }
   .ftr__top { grid-column: 7 / 13; }
 }
 
+@media (max-width: 430px) {
+  .hdr__nav { gap: 8px; font-size: 10px; }
+}
+
 @media (max-width: 360px) {
-  .hdr__nav { gap: 7px; font-size: 10px; }
+  .hdr { padding-inline: 10px; }
+  .hdr__logo { font-size: 16px; }
+  .hdr__nav { gap: 4px; font-size: 9px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -744,7 +726,7 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
         <p class="sec-head__note">Names the work has reached.</p>
       </div>
       <ul class="brands__list">
-        <li><span>Samsung</span></li><li><span>Audi</span></li><li><span>Netflix</span></li><li><span>Absolut</span></li><li><span>Range Rover</span></li><li><span>LG</span></li>
+        <li><span><a href="/projects/samsung-space-selfie/">Samsung</a></span></li><li><span><a href="/projects/audi-red-blue/">Audi</a></span></li><li><span>Netflix</span></li><li><span>Absolut</span></li><li><span>Range Rover</span></li><li><span>LG</span></li>
         <li><span>Virgin Media</span></li><li><span>Barclays</span></li><li><span>Tesco</span></li><li><span>Royal Mail</span></li><li><span>House of Fraser</span></li><li><span>Mattel</span></li>
       </ul>
     </section>

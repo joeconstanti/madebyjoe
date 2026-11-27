@@ -16,7 +16,7 @@ class GenerationTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         for name in ('index.html', 'archive.html', 'makersclub.html', '404.html'):
             shutil.copy2(ROOT / name, self.root / name)
-        for name in ('css', 'fonts', 'js', 'media', 'resources', 'scripts'):
+        for name in ('css', 'fonts', 'js', 'media', 'resources', 'projects', 'scripts'):
             shutil.copytree(ROOT / name, self.root / name)
         self.page = self.root / 'index.html'
 
