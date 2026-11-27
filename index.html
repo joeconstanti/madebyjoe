@@ -350,6 +350,9 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .ch--light .ch__quote { color: var(--fg); }
 .ch__tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .ch__tags li { padding: 6px 10px 5px; border: 1px solid var(--line); border-radius: 99px; font: 400 var(--fs-mono)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .03em; }
+.ch__projects { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; }
+.ch__projects a { text-decoration: underline; text-underline-offset: .2em; }
+.ch__projects a:hover, .ch__projects a:focus-visible { color: var(--ac); }
 .ch__stats { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 4px clamp(20px, 3vw, 48px); }
 .ch__stats dt { order: 2; font: 400 var(--fs-mono)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .04em; opacity: .6; }
 .ch__stats div { display: flex; flex-direction: column-reverse; gap: 6px; }
@@ -663,6 +666,10 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
             <p class="ch__quote">“We craft digital assets ready for the future.”</p>
             <ul class="ch__tags"><li>3D &amp; CG</li><li>Anamorphic billboards</li><li>AI tools</li></ul>
             <a class="btn" href="https://fromtheroot.studio" target="_blank" rel="noopener" data-cursor="Visit"><span>Visit fromtheroot.studio</span><i>↗</i></a>
+            <ul class="ch__projects" aria-label="Selected projects">
+              <li><a href="/projects/samsung-space-selfie/">Samsung Space Selfie</a></li>
+              <li><a href="/projects/audi-red-blue/">Audi A1 Red vs Blue</a></li>
+            </ul>
           </div>
           <figure class="ch__media" data-cursor="Visit">
             <a href="https://fromtheroot.studio" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
